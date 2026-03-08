@@ -1,0 +1,19 @@
+.city-page {
+    padding: 2rem;
+}
+
+.map-container {
+    height: 400px;
+    background-color: #e5e7eb;
+    border-radius: var(--border-radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 2rem;
+}
+
+.filter-bar {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
