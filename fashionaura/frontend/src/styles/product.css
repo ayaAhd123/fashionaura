@@ -1,0 +1,26 @@
+.product-page {
+    display: flex;
+    gap: 4rem;
+    padding: 2rem;
+}
+
+.product-images {
+    flex: 1;
+}
+
+.product-details {
+    flex: 1;
+}
+
+.product-price {
+    font-size: 2rem;
+    color: var(--primary-color);
+    font-weight: bold;
+}
+
+.color-selector,
+.size-selector {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
