@@ -1,0 +1,22 @@
+/* Placeholder pour styles CSS de la page et composants associés */
+.landing-hero {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 80vh;
+    text-align: center;
+    padding: 2rem;
+}
+
+.landing-hero h1 {
+    font-size: 3rem;
+    color: var(--primary-hover);
+    margin-bottom: 1rem;
+}
+
+.landing-hero p {
+    font-size: 1.25rem;
+    color: var(--text-dark);
+    max-width: 600px;
+}

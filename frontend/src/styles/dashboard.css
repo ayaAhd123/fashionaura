@@ -1,0 +1,23 @@
+.dashboard-layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+.sidebar {
+    width: 250px;
+    background-color: var(--white);
+    padding: 2rem;
+    border-right: 1px solid #e5e7eb;
+}
+
+.dashboard-content {
+    flex: 1;
+    padding: 2rem;
+    background-color: var(--background-light);
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
