@@ -487,30 +487,178 @@
     z-index: 2; /* Still above the motif */
 }
 
-/* CASABLANCA: Art Deco blueprint */
-.artdeco-blueprint {
+/* CASABLANCA: Hassan II Mosque (Casa Branca) */
+
+/* Hero gradient — White / Limestone */
+.theme-casablanca .city-hero {
+    background: linear-gradient(160deg, #FDFCF9 0%, #F5F3EC 40%, #EBE7DC 100%);
+}
+
+/* Typography Overrides for White Theme */
+.theme-casablanca .city-main-title {
+    color: #091A11 !important; /* Extremely dark green */
+}
+.theme-casablanca .city-nickname {
+    color: #C8A87A; /* Mosque Beige */
+}
+.theme-casablanca .city-editorial-stat,
+.theme-casablanca .city-nav-link {
+    color: #1E6B47; /* Emerald */
+}
+.theme-casablanca .scroll-progress-line {
+    background: rgba(30, 107, 71, 0.2);
+}
+.theme-casablanca .scroll-dot {
+    background: #1E6B47;
+}
+
+/* Ocean waves atmosphere (subtle emerald/blue wash) */
+.hassan-ocean-glow {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% 90%, rgba(30, 107, 71, 0.05) 0%, transparent 60%);
+    z-index: 2;
+    pointer-events: none;
+    animation: hassanGlow 8s ease-in-out infinite;
+}
+
+.hassan-ocean-waves {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 15vh;
+    z-index: 2;
+    pointer-events: none;
+}
+
+.hassan-wave {
+    position: absolute;
+    bottom: 0;
+    width: 200%;
+    height: 100%;
+    animation: waveX 15s linear infinite;
+}
+
+.hassan-wave-1 { fill: rgba(30, 107, 71, 0.04); animation-duration: 18s; }
+.hassan-wave-2 { fill: rgba(30, 107, 71, 0.06); animation-duration: 25s; }
+
+@keyframes hassanGlow {
+    0%, 100% { opacity: 0.7; }
+    50% { opacity: 1; }
+}
+
+/* Repeating Moorish Arches in Perspective - Beige/Green on White */
+.hassan-arches-layer {
     position: absolute;
     inset: 0;
     z-index: 3;
     pointer-events: none;
-    background-image: 
-        linear-gradient(rgba(200, 180, 140, 0.08) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(200, 180, 140, 0.08) 1px, transparent 1px);
-    background-size: 40px 40px;
-    animation: blueprintScale 12s ease-in-out infinite alternate;
+    overflow: hidden;
 }
 
-@keyframes blueprintScale {
-    from { transform: scale(1); }
-    to { transform: scale(1.05); }
+.hassan-arch-frame {
+    position: absolute;
+    bottom: 0;
+    width: 20%;
+    height: 85%;
+    border: 1px solid rgba(200, 168, 122, calc(var(--arch-opacity, 0.12) * 3)); /* Beige darker for white */
+    border-bottom: none;
+    border-radius: 50% 50% 0 0 / 30% 30% 0 0;
+    transform-origin: bottom center;
+    box-shadow: inset 0 0 40px rgba(30, 107, 71, 0.03); /* Subtle emerald inner shadow */
+    animation: archPulse 4s ease-in-out infinite alternate;
+    animation-delay: var(--arch-delay);
 }
 
+@keyframes archPulse {
+    from { box-shadow: inset 0 0 20px rgba(30, 107, 71, 0.01); }
+    to { box-shadow: inset 0 0 35px rgba(30, 107, 71, 0.04); }
+}
+
+/* 8-pointed star mosaic pattern (emerald) */
+.hassan-mosaic-stars {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    pointer-events: none;
+}
+
+.hassan-star {
+    position: absolute;
+    width: var(--star-size);
+    fill: #1E6B47; 
+    opacity: 0.12;
+    animation: starRotate 20s linear infinite;
+}
+
+/* Emerald Zellige band at bottom of hero */
+.hassan-zellige-band {
+    position: absolute;
+    bottom: 60px;
+    left: 0;
+    width: 100%;
+    height: 50px;
+    z-index: 6;
+    pointer-events: none;
+    background-image:
+        repeating-linear-gradient(45deg,
+            rgba(30, 107, 71, 0.25) 0px,
+            rgba(30, 107, 71, 0.25) 4px,
+            transparent 4px,
+            transparent 16px
+        ),
+        repeating-linear-gradient(-45deg,
+            rgba(200, 168, 122, 0.3) 0px,
+            rgba(200, 168, 122, 0.3) 4px,
+            transparent 4px,
+            transparent 16px
+        );
+    mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
+}
+
+/* Star-pattern Marble Floor at bottom (Beige/Green lines) */
+.hassan-marble-floor {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 60px;
+    z-index: 7;
+    pointer-events: none;
+    background-image:
+        linear-gradient(45deg, rgba(200, 168, 122, 0.15) 25%, transparent 25%),
+        linear-gradient(-45deg, rgba(200, 168, 122, 0.15) 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, rgba(30, 107, 71, 0.1) 75%),
+        linear-gradient(-45deg, transparent 75%, rgba(30, 107, 71, 0.1) 75%);
+    background-size: 24px 24px;
+    background-position: 0 0, 0 12px, 12px -12px, -12px 0;
+    mask-image: linear-gradient(to top, rgba(0,0,0,0.6), transparent);
+    -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,0.6), transparent);
+}
+
+/* Minaret silhouette on the right (emerald tint outline) */
+.hassan-minaret-silhouette {
+    position: absolute;
+    right: 8%;
+    bottom: 0;
+    width: 60px;
+    height: 75%;
+    z-index: 4;
+    pointer-events: none;
+    background:
+        linear-gradient(to top, rgba(30, 107, 71, 0.12) 0%, rgba(30, 107, 71, 0.04) 80%, transparent 100%);
+    clip-path: polygon(30% 100%, 70% 100%, 65% 20%, 55% 10%, 50% 0%, 45% 10%, 35% 20%);
+}
+
+/* Ticker */
 .casa-ticker {
     position: absolute;
     bottom: 0;
     width: 100%;
     background: transparent;
-    border-top: 1px solid rgba(200, 180, 140, 0.15);
+    border-top: 1px solid rgba(30, 107, 71, 0.15);
     padding: 1.2rem 0;
     overflow: hidden;
     white-space: nowrap;
@@ -520,10 +668,11 @@
 .ticker-gold {
     display: inline-block;
     animation: goldTicker 25s linear infinite;
-    color: var(--city-main);
+    color: #1E6B47;
     font-size: 0.72rem;
     letter-spacing: 0.4em;
     text-transform: uppercase;
+    font-weight: 500;
 }
 
 @keyframes goldTicker {
@@ -531,25 +680,129 @@
     to { transform: translateX(-50%); }
 }
 
-/* RABAT: Royal Garden Sway */
-.botanical-layer {
+/* Light white/cream boutiques section for Casablanca */
+.theme-casablanca .boutiques-view {
+    background: linear-gradient(180deg, #FDFCF9 0%, #FFFFFF 100%) !important;
+}
+
+.theme-casablanca .boutique-card {
+    background: #FFFFFF;
+    border: 1px solid rgba(200, 168, 122, 0.3); /* Beige border */
+    box-shadow: 0 20px 50px rgba(9, 26, 17, 0.04);
+}
+
+.theme-casablanca .boutique-card-title {
+    color: #091A11; /* Dark green */
+}
+
+.theme-casablanca .boutique-card:hover {
+    box-shadow: 0 25px 60px rgba(30, 107, 71, 0.08);
+    transform: translateY(-4px);
+    border-color: #1E6B47; /* Hover emerald border */
+}
+
+.theme-casablanca .boutique-card-top {
+    background: linear-gradient(135deg, #1E6B47, #C8A87A); /* Emerald to Beige */
+    opacity: 0.9;
+}
+
+.theme-casablanca .explore-others-section {
+    background: #FDFCF9 !important;
+    border-top: 1px solid rgba(200, 168, 122, 0.2);
+}
+
+.theme-casablanca .explore-large-title {
+    color: #091A11 !important;
+}
+
+.theme-casablanca .other-card-name {
+    color: #091A11 !important;
+}
+
+.theme-casablanca .other-card-tagline {
+    color: #1E6B47 !important;
+}
+
+
+
+/* RABAT: Modern Royal Style */
+.rabat-zaha-curves {
     position: absolute;
     inset: 0;
     z-index: 3;
     pointer-events: none;
+    overflow: hidden;
 }
 
-.leaf-path {
+.zaha-rib {
     position: absolute;
-    fill: #1A7A44;
-    opacity: 0.12;
-    transform-origin: bottom center;
+    width: 250%;
+    height: 100%;
+    fill: none;
+    stroke: rgba(138, 155, 176, 0.08); /* Silver fluid curves */
+    stroke-width: 0.5;
+    animation: ribFlow 20s ease-in-out infinite alternate;
 }
 
-@keyframes sway-1 { from { transform: rotate(-8deg); } to { transform: rotate(8deg); } }
-@keyframes sway-2 { from { transform: rotate(5deg); } to { transform: rotate(-5deg); } }
+.zaha-rib:nth-child(1) { animation-duration: 25s; stroke-width: 0.7; }
+.zaha-rib:nth-child(2) { animation-duration: 18s; top: -5%; left: -20%; stroke: rgba(220, 161, 80, 0.04); }
+.zaha-rib:nth-child(3) { animation-duration: 30s; top: 10%; stroke: rgba(44, 158, 106, 0.04); }
 
-/* Golden Dust */
+@keyframes ribFlow {
+    from { transform: translateX(0) scaleY(1); }
+    to { transform: translateX(-20%) scaleY(1.1); }
+}
+
+.rabat-m6-beam {
+    position: absolute;
+    right: 15%;
+    bottom: 0;
+    width: 150px;
+    height: 100vh;
+    background: linear-gradient(to top, rgba(138, 155, 176, 0.15) 0%, rgba(138, 155, 176, 0.02) 50%, transparent 100%);
+    clip-path: polygon(45% 0%, 55% 0%, 100% 100%, 0% 100%);
+    z-index: 2;
+    pointer-events: none;
+}
+
+.rabat-hassan-lattice {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background-image: 
+        linear-gradient(30deg, rgba(220, 161, 80, 0.02) 12%, transparent 12.5%, transparent 87%, rgba(220, 161, 80, 0.02) 87.5%, rgba(220, 161, 80, 0.02)),
+        linear-gradient(150deg, rgba(220, 161, 80, 0.02) 12%, transparent 12.5%, transparent 87%, rgba(220, 161, 80, 0.02) 87.5%, rgba(220, 161, 80, 0.02)),
+        linear-gradient(30deg, rgba(220, 161, 80, 0.02) 12%, transparent 12.5%, transparent 87%, rgba(220, 161, 80, 0.02) 87.5%, rgba(220, 161, 80, 0.02)),
+        linear-gradient(150deg, rgba(220, 161, 80, 0.02) 12%, transparent 12.5%, transparent 87%, rgba(220, 161, 80, 0.02) 87.5%, rgba(220, 161, 80, 0.02)),
+        linear-gradient(60deg, rgba(220, 161, 80, 0.03) 25%, transparent 25.5%, transparent 75%, rgba(220, 161, 80, 0.03) 75%, rgba(220, 161, 80, 0.03)),
+        linear-gradient(60deg, rgba(220, 161, 80, 0.03) 25%, transparent 25.5%, transparent 75%, rgba(220, 161, 80, 0.03) 75%, rgba(220, 161, 80, 0.03));
+    background-size: 80px 140px;
+    background-position: 0 0, 0 0, 40px 70px, 40px 70px, 0 0, 40px 70px;
+}
+
+.rabat-ticker {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    background: transparent;
+    border-top: 1px solid rgba(138, 155, 176, 0.2);
+    padding: 1.2rem 0;
+    overflow: hidden;
+    white-space: nowrap;
+    z-index: 20;
+}
+
+.ticker-silver {
+    display: inline-block;
+    animation: goldTicker 28s linear infinite;
+    color: #8A9BB0;
+    font-size: 0.72rem;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+}
+
+/* Luxury City Lights / Golden Dust */
 .particle-emitter {
     position: absolute;
     inset: 0;
@@ -558,7 +811,7 @@
 
 .dust {
     position: absolute;
-    background: #D4AF6A;
+    background: #DCA150;
     border-radius: 50%;
     width: 2px;
     height: 2px;
@@ -566,11 +819,36 @@
     animation: dustFly 8s ease-in infinite;
 }
 
+.city-light {
+    animation-name: cityLightGlow;
+    animation-duration: 4s;
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+}
+
+@keyframes cityLightGlow {
+    0% { opacity: 0; transform: scale(0.5); box-shadow: 0 0 5px currentColor; }
+    100% { opacity: 0.6; transform: scale(1.5); box-shadow: 0 0 15px currentColor; }
+}
+
 @keyframes dustFly {
     0% { transform: translateY(100vh) scale(0); opacity: 0; }
     50% { opacity: 0.4; }
     100% { transform: translateY(-100px) scale(1.5); opacity: 0; }
 }
+
+/* Rabat Boutique Cards (Navy / Steel / Gold) */
+.theme-rabat .boutique-card {
+    background: #0A0F1A; /* Deep navy */
+    border: 1px solid rgba(138, 155, 176, 0.1);
+    box-shadow: 0 20px 50px rgba(5, 10, 20, 0.4);
+}
+
+.theme-rabat .boutique-card:hover { border-color: #DCA150; }
+.theme-rabat .boutique-card-top { background: linear-gradient(135deg, #2C9E6A, #DCA150); }
+.theme-rabat .boutiques-view { background: linear-gradient(180deg, #050A14 0%, #03060C 100%) !important; }
+.theme-rabat .explore-others-section { background: linear-gradient(180deg, #03060C 0%, #000000 100%) !important; }
 
 /* FÈS: Gold Dust Rain */
 .gold-rain-layer {
@@ -641,26 +919,175 @@
     100% { transform: translateY(110vh) rotate(360deg) scale(1.2); opacity: 0; }
 }
 
-/* MARRAKECH: Heat Shimmer */
-.heat-shimmer {
+/* MARRAKECH: Riad Courtyard Experience */
+.theme-marrakech .city-hero {
+    background: linear-gradient(160deg, #C87A5A 0%, #A85A3A 30%, #6B2E1A 70%, #2A0E06 100%);
+}
+
+.riad-warm-glow {
     position: absolute;
     inset: 0;
-    background: linear-gradient(rgba(15, 2, 0, 0), rgba(26, 5, 0, 0.1));
-    animation: shimmerPulse 4s ease-in-out infinite;
-    z-index: 15;
+    background: radial-gradient(ellipse at 50% 30%, rgba(232, 168, 138, 0.25) 0%, rgba(200, 122, 90, 0.1) 40%, transparent 70%);
+    z-index: 2;
     pointer-events: none;
+    animation: riadGlowPulse 6s ease-in-out infinite;
 }
 
-@keyframes shimmerPulse {
-    0%, 100% { backdrop-filter: blur(0px); }
-    50% { backdrop-filter: blur(1.2px); }
+@keyframes riadGlowPulse {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 1; }
 }
 
-.zellige-star {
+/* Moorish Arch Silhouettes */
+.riad-arches-layer {
     position: absolute;
-    fill: #C04820;
-    opacity: 0.08;
+    inset: 0;
     z-index: 3;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.riad-arch {
+    position: absolute;
+    bottom: 0;
+    color: rgba(255, 255, 255, 0.08);
+    filter: drop-shadow(0 0 15px rgba(200, 122, 90, 0.1));
+}
+
+.riad-arch-1 {
+    left: 5%;
+    width: 220px;
+    height: 350px;
+    color: rgba(255, 255, 255, 0.07);
+    animation: archSway1 10s ease-in-out infinite alternate;
+}
+
+.riad-arch-2 {
+    left: 35%;
+    width: 280px;
+    height: 420px;
+    color: rgba(255, 255, 255, 0.05);
+    animation: archSway2 12s ease-in-out infinite alternate;
+}
+
+.riad-arch-3 {
+    right: 8%;
+    width: 200px;
+    height: 320px;
+    color: rgba(255, 255, 255, 0.06);
+    animation: archSway1 14s ease-in-out infinite alternate-reverse;
+}
+
+@keyframes archSway1 {
+    from { transform: translateX(-5px); }
+    to { transform: translateX(5px); }
+}
+
+@keyframes archSway2 {
+    from { transform: translateX(3px) scale(1); }
+    to { transform: translateX(-3px) scale(1.02); }
+}
+
+/* Lantern Glow */
+.riad-lantern-glow {
+    position: absolute;
+    top: 15%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(232, 168, 100, 0.3) 0%, rgba(200, 122, 90, 0.1) 40%, transparent 70%);
+    z-index: 4;
+    pointer-events: none;
+    animation: lanternFlicker 4s ease-in-out infinite;
+}
+
+@keyframes lanternFlicker {
+    0%, 100% { opacity: 0.7; transform: translateX(-50%) scale(1); }
+    33% { opacity: 1; transform: translateX(-50%) scale(1.05); }
+    66% { opacity: 0.8; transform: translateX(-50%) scale(0.98); }
+}
+
+/* Floating Orange Blossom Petals */
+.riad-petals-layer {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.riad-petal {
+    position: absolute;
+    top: -20px;
+    width: var(--petal-size, 8px);
+    height: var(--petal-size, 8px);
+    background: var(--petal-hue, #E8943A);
+    border-radius: 50% 0 50% 0;
+    opacity: 0;
+    animation: petalFall var(--petal-duration, 10s) ease-in infinite;
+}
+
+@keyframes petalFall {
+    0% {
+        transform: translateY(-20px) rotate(0deg) translateX(0);
+        opacity: 0;
+    }
+    10% { opacity: 0.7; }
+    50% {
+        transform: translateY(50vh) rotate(180deg) translateX(40px);
+        opacity: 0.5;
+    }
+    80% { opacity: 0.3; }
+    100% {
+        transform: translateY(100vh) rotate(360deg) translateX(-20px);
+        opacity: 0;
+    }
+}
+
+/* Mosaic Floor (bottom of hero) */
+.riad-mosaic-floor {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 80px;
+    z-index: 6;
+    pointer-events: none;
+    background-image:
+        linear-gradient(45deg, rgba(255,255,255,0.04) 25%, transparent 25%),
+        linear-gradient(-45deg, rgba(255,255,255,0.04) 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, rgba(255,255,255,0.04) 75%),
+        linear-gradient(-45deg, transparent 75%, rgba(255,255,255,0.04) 75%);
+    background-size: 20px 20px;
+    background-position: 0 0, 0 10px, 10px -10px, -10px 0;
+    mask-image: linear-gradient(to top, rgba(0,0,0,0.5), transparent);
+    -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,0.5), transparent);
+}
+
+/* Warm Boutiques Section for Marrakech */
+.theme-marrakech .boutiques-view {
+    background: linear-gradient(180deg, #FDF0E8 0%, #F9E4D6 50%, #F5D5C0 100%) !important;
+}
+
+.theme-marrakech .boutique-card {
+    background: #FFFBF7;
+    border: 1px solid rgba(200, 122, 90, 0.12);
+    box-shadow: 0 20px 50px rgba(168, 90, 58, 0.06);
+}
+
+.theme-marrakech .boutique-card:hover {
+    box-shadow: 0 25px 60px rgba(168, 90, 58, 0.12);
+    transform: translateY(-4px);
+}
+
+.theme-marrakech .boutique-card-top {
+    background: linear-gradient(135deg, #C87A5A, #E8A88A);
+}
+
+.theme-marrakech .explore-others-section {
+    background: linear-gradient(180deg, #2A0E06 0%, #1A0800 100%) !important;
 }
 
 @keyframes starRotate { to { transform: rotate(360deg); } }
@@ -735,8 +1162,8 @@
 }
 
 @keyframes breatheBg {
-    0%, 100% { background-color: var(--city-bg); }
-    50% { background-color: rgba(var(--city-bg-rgb, 15, 2, 0), 1.2); }
+    0%, 100% { background-color: #2A0E06; }
+    50% { background-color: #351208; }
 }
 
 /* ─── SKELETONS ──────────────────────────── */
@@ -849,19 +1276,21 @@
         text-align: center;
     }
     .others-grid { 
-        justify-content: flex-start;
-        padding: 0 2rem 2rem;
-        overflow-x: auto; 
-        flex-wrap: nowrap;
-        -webkit-overflow-scrolling: touch;
-        scroll-snap-type: x mandatory;
-        gap: 1.5rem;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        padding: 0 1.5rem;
+        gap: 1rem;
+        overflow-x: visible;
     }
     .other-card { 
-        width: 280px; 
-        height: 280px; 
-        padding: 2.5rem; 
-        scroll-snap-align: start;
+        width: 100%;
+        height: 180px; 
+        padding: 1.8rem;
+        flex-shrink: unset;
+    }
+    .other-card-name {
+        font-size: 1.5rem;
+        word-break: break-word;
     }
 }
 

@@ -1,0 +1,42 @@
+{
+  "landing": {
+    "nav_home": "Accueil",
+    "nav_explore": "Explorer",
+    "nav_about": "À propos",
+    "hero_tag": "Mode · Maroc · Authenticité",
+    "hero_head_1": "La mode marocaine",
+    "hero_head_2": "à portée de main",
+    "hero_sub": "Explorez les boutiques tendance de vos villes préférées — Tanger, Casablanca, Marrakech et bien plus encore.",
+    "explore_btn": "Explorer les villes",
+    "ai_btn": "Styliste AI",
+    "scroll": "Défiler",
+    "stats_cities": "Villes",
+    "stats_boutiques": "Boutiques",
+    "stats_products": "Produits",
+    "stats_moroccan": "Marocain",
+    "map_tag": "Carte interactive",
+    "map_title": "Explorez le Maroc",
+    "map_subtitle": "Cliquez sur une ville de la carte",
+    "ai_badge": "Propulsé par l'IA",
+    "ai_title_1": "Votre Styliste",
+    "ai_title_2": "Personnel",
+    "ai_desc": "Décrivez le look que vous recherchez et notre IA vous proposera des tenues, des boutiques et des conseils mode adaptés à vos goûts.",
+    "ai_try_btn": "Essayer maintenant",
+    "chat_ai_1": "Bonjour ! Je suis votre styliste IA. Que cherchez-vous aujourd'hui ?",
+    "chat_user": "Je cherche une tenue pour un mariage marocain traditionnel",
+    "chat_ai_2": "Excellent choix ! Je vous recommande un caftan de chez Maison Amira à Marrakech...",
+    "footer_copy": "© 2025 FashionAura — Tous droits réservés"
+  },
+  "city": {
+    "filter_all": "Tout",
+    "filter_women": "Femme",
+    "filter_men": "Homme",
+    "filter_accessories": "Accessoires",
+    "filter_luxury": "Luxe",
+    "discover": "Découvrir",
+    "coming_soon": "Bientôt disponible",
+    "explore_title": "Laisse-toi emporter",
+    "explore_sub": "Chaque ville, une expérience d'exception",
+    "back_map": "Carte"
+  }
+}

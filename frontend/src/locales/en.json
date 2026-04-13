@@ -1,0 +1,42 @@
+{
+  "landing": {
+    "nav_home": "Home",
+    "nav_explore": "Explore",
+    "nav_about": "About",
+    "hero_tag": "Fashion · Morocco · Authenticity",
+    "hero_head_1": "Moroccan fashion",
+    "hero_head_2": "at your fingertips",
+    "hero_sub": "Explore trendy boutiques in your favorite cities — Tangier, Casablanca, Marrakech and more.",
+    "explore_btn": "Explore cities",
+    "ai_btn": "AI Stylist",
+    "scroll": "Scroll",
+    "stats_cities": "Cities",
+    "stats_boutiques": "Boutiques",
+    "stats_products": "Products",
+    "stats_moroccan": "Moroccan",
+    "map_tag": "Interactive map",
+    "map_title": "Explore Morocco",
+    "map_subtitle": "Click on a city on the map",
+    "ai_badge": "Powered by AI",
+    "ai_title_1": "Your Personal",
+    "ai_title_2": "Stylist",
+    "ai_desc": "Describe the look you want and our AI will suggest outfits, boutiques, and fashion tips tailored to your taste.",
+    "ai_try_btn": "Try it now",
+    "chat_ai_1": "Hello! I'm your AI stylist. What are you looking for today?",
+    "chat_user": "I need an outfit for a traditional Moroccan wedding",
+    "chat_ai_2": "Excellent choice! I recommend a caftan from Maison Amira in Marrakech...",
+    "footer_copy": "© 2025 FashionAura — All rights reserved"
+  },
+  "city": {
+    "filter_all": "All",
+    "filter_women": "Women",
+    "filter_men": "Men",
+    "filter_accessories": "Accessories",
+    "filter_luxury": "Luxury",
+    "discover": "Discover",
+    "coming_soon": "Coming soon",
+    "explore_title": "Let yourself be carried away",
+    "explore_sub": "Every city, an exceptional experience",
+    "back_map": "Map"
+  }
+}

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ChatbotController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\CityController;
 use App\Http\Controllers\API\BoutiqueController;
@@ -18,3 +19,4 @@ Route::get('/cities/{cityId}/boutiques', [BoutiqueController::class, 'byCity']);
 Route::get('/products', [ProductController::class, 'index']);
 Route::get('/products/{id}', [ProductController::class, 'show']);
 Route::get('/boutiques/{boutiqueId}/products', [ProductController::class, 'byBoutique']);
+Route::post('/chatbot', [ChatbotController::class, 'chat']);

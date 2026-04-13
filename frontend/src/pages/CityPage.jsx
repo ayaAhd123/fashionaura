@@ -5,41 +5,53 @@ import { getBoutiquesByCity } from '../api/boutiqueService';
 import '../styles/city.css';
 import CustomCursor from '../components/CustomCursor';
 import zelligeImage from '../images/zellige-marocain.jpg';
+import { useTranslation } from 'react-i18next';
 
 const CITY_THEMES = {
     'Tanger': {
-        bg: '#273462', bgRgb: '39, 52, 98', main: '#045490', mid: '#84B7CE', light: '#FFFFFF', accent: '#FFF08C',
+        bg: '#35457A', bgRgb: '53, 69, 122', main: '#045490', mid: '#84B7CE', light: '#FFFFFF', accent: '#FFF08C',
         nickname: 'La Perle Azuré & Limoncello',
         poetic: 'Un zeste de soleil sur le bleu de la Méditerranée',
         effect: 'waves'
     },
     'Casablanca': {
-        bg: '#0D0D0B', bgRgb: '13, 13, 11', main: '#C4A882', mid: '#D4D0C8', light: '#F0EEE8', accent: '#FFFFFF',
+        bg: '#FDFCF9', bgRgb: '253, 252, 249', main: '#1E6B47', mid: '#C8A87A', light: '#091A11', accent: '#D4A843',
         nickname: 'Casa Branca',
-        poetic: "L'élégance à l'état pur",
-        effect: 'artdeco'
+        poetic: 'Majestueuse sous le ciel atlantique',
+        effect: 'hassan'
     },
     'Rabat': {
-        bg: '#061A0E', bgRgb: '6, 26, 14', main: '#1A7A44', mid: '#7AC49A', light: '#E8F5EC', accent: '#D4AF6A',
-        nickname: 'La Capitale Émeraude',
-        poetic: 'Le luxe discret du palais',
-        effect: 'garden'
+        bg: '#0A1428', bgRgb: '10, 20, 40', main: '#DCA150', mid: '#8A9BB0', light: '#2C9E6A', accent: '#F0EFEA',
+        nickname: 'La Ville Lumière',
+        poetic: "Où l'histoire sculpte le futur",
+        effect: 'modern-royal'
     },
     'Fès': {
-        bg: '#1A0E00', bgRgb: '26, 14, 0', main: '#C4821B', mid: '#D4AF6A', light: '#FBF0CC', accent: '#3A2800',
+        bg: '#301A00', bgRgb: '48, 26, 0', main: '#C4821B', mid: '#D4AF6A', light: '#FBF0CC', accent: '#3A2800',
         nickname: 'La Ville Impériale',
         poetic: "L'art du zellige t'immerge",
         effect: 'zellige'
     },
     'Marrakech': {
-        bg: '#0F0200', bgRgb: '15, 2, 0', main: '#C04820', mid: '#E07840', light: '#F5D5C0', accent: '#F0C898',
-        nickname: 'Al Hamra',
-        poetic: 'Laisse-toi enflammer',
-        effect: 'heat'
+        bg: '#4A1C10', bgRgb: '74, 28, 16', main: '#C87A5A', mid: '#E8A88A', light: '#F5D5C0', accent: '#8B6914',
+        nickname: 'La Ville Ocre',
+        poetic: 'Le charme intemporel du riad',
+        effect: 'riad'
     }
 };
 
+// Returns true if the hex color is perceptually light (luminance > 0.4)
+const isLightBg = (hex) => {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    // Perceived luminance formula (ITU-R BT.709)
+    const luminance = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
+    return luminance > 0.4;
+};
+
 const CityPage = () => {
+    const { t, i18n } = useTranslation();
     const { id } = useParams();
     const navigate = useNavigate();
     const [city, setCity] = useState(null);
@@ -145,10 +157,9 @@ const CityPage = () => {
         if (city?.name !== 'Fès') return;
         const x = (e.clientX - window.innerWidth / 2) / 50;
         const y = (e.clientY - window.innerHeight / 2) / 50;
+        
         const motif = document.querySelector('.zellige-motif-img');
-        if (motif) {
-            motif.style.transform = `translate(${x}px, ${y}px) scale(1.1)`;
-        }
+        if (motif) motif.style.transform = `translate(${x}px, ${y}px) scale(1.1)`;
     };
 
     const handleFilterChange = (cat) => {
@@ -228,11 +239,53 @@ const CityPage = () => {
 
                     {city.name === 'Casablanca' && (
                         <>
-                            <div className="artdeco-blueprint" />
-                            <div className="noise-overlay" />
+                            {/* Ocean atmosphere */}
+                            <div className="hassan-ocean-glow" />
+                            <div className="hassan-ocean-waves">
+                                <svg className="hassan-wave hassan-wave-1" viewBox="0 24 150 28" preserveAspectRatio="none">
+                                    <path d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z" />
+                                </svg>
+                                <svg className="hassan-wave hassan-wave-2" viewBox="0 24 150 28" preserveAspectRatio="none">
+                                    <path d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z" />
+                                </svg>
+                            </div>
+
+                            {/* Moorish arches in perspective */}
+                            <div className="hassan-arches-layer">
+                                {[...Array(7)].map((_, i) => (
+                                    <div key={i} className="hassan-arch-frame" style={{
+                                        left: `${i * 14.28}%`,
+                                        '--arch-delay': `${i * 0.3}s`,
+                                        '--arch-opacity': 0.12 - i * 0.012
+                                    }} />
+                                ))}
+                            </div>
+
+                            {/* 8-pointed star mosaic pattern */}
+                            <div className="hassan-mosaic-stars">
+                                {[...Array(12)].map((_, i) => (
+                                    <svg key={i} className="hassan-star" style={{
+                                        top: `${10 + Math.random() * 70}%`,
+                                        left: `${Math.random() * 90}%`,
+                                        animationDelay: `${Math.random() * 6}s`,
+                                        '--star-size': `${20 + Math.random() * 25}px`
+                                    }} viewBox="0 0 40 40">
+                                        <path d="M20 0l5.5 14.5L40 20l-14.5 5.5L20 40l-5.5-14.5L0 20l14.5-5.5z" />
+                                    </svg>
+                                ))}
+                            </div>
+
+                            {/* Zellige emerald band */}
+                            <div className="hassan-zellige-band" />
+                            {/* Marble floor pattern */}
+                            <div className="hassan-marble-floor" />
+                            {/* Minaret silhouette */}
+                            <div className="hassan-minaret-silhouette" />
+
+                            {/* Ticker */}
                             <div className="casa-ticker">
                                 <div className="ticker-gold">
-                                    HASSAN II · CORNICHE · ART DÉCO · MODERNITÉ · HASSAN II · CORNICHE · ART DÉCO · MODERNITÉ · HASSAN II · CORNICHE · ART DÉCO · MODERNITÉ
+                                    MOSQUÉE HASSAN II · CORNICHE · ATLANTIQUE · ZELLIGE · MODERNITÉ · MOSQUÉE HASSAN II · CORNICHE · ATLANTIQUE · ZELLIGE · MODERNITÉ · MOSQUÉE HASSAN II
                                 </div>
                             </div>
                         </>
@@ -240,18 +293,44 @@ const CityPage = () => {
 
                     {city.name === 'Rabat' && (
                         <>
-                            <div className="botanical-layer">
-                                <svg className="leaf-path" style={{ width: '400px', top: '-50px', left: '-100px' }} viewBox="0 0 100 100">
-                                    <path d="M10,100 Q40,40 100,10" style={{ animation: 'sway-1 5s ease-in-out infinite alternate' }} fill="none" strokeWidth="0.5" stroke="currentColor" />
+                            {/* Grand Theatre Sweeping Ribs & River */}
+                            <div className="rabat-zaha-curves">
+                                <svg className="zaha-rib" viewBox="0 0 100 100" preserveAspectRatio="none">
+                                    <path d="M-10,80 Q30,100 60,60 T120,40" />
                                 </svg>
-                                <svg className="leaf-path" style={{ width: '300px', bottom: '-50px', right: '-80px' }} viewBox="0 0 100 100">
-                                    <path d="M90,100 Q60,40 0,10" style={{ animation: 'sway-2 7s ease-in-out infinite alternate' }} fill="none" strokeWidth="0.5" stroke="currentColor" />
+                                <svg className="zaha-rib" viewBox="0 0 100 100" preserveAspectRatio="none">
+                                    <path d="M-10,95 Q40,110 70,70 T120,50" />
+                                </svg>
+                                <svg className="zaha-rib" viewBox="0 0 100 100" preserveAspectRatio="none">
+                                    <path d="M-10,110 Q50,120 80,80 T120,60" />
                                 </svg>
                             </div>
+
+                            {/* Mohammed VI Tower Glowing Beam */}
+                            <div className="rabat-m6-beam" />
+
+                            {/* Hassan Tower Moroccan Lattice overlay */}
+                            <div className="rabat-hassan-lattice" />
+
+                            {/* Luxury City Lights / Stars */}
                             <div className="particle-emitter">
-                                {[...Array(15)].map((_, i) => (
-                                    <div key={i} className="dust" style={{ left: `${Math.random() * 100}%`, animationDelay: `${Math.random() * 7}s` }} />
+                                {[...Array(20)].map((_, i) => (
+                                    <div key={i} className="dust city-light" style={{ 
+                                        left: `${Math.random() * 100}%`, 
+                                        top: `${Math.random() * 100}%`,
+                                        animationDelay: `${Math.random() * 5}s`,
+                                        width: `${2 + Math.random() * 3}px`,
+                                        height: `${2 + Math.random() * 3}px`,
+                                        backgroundColor: i % 2 === 0 ? '#DCA150' : '#8A9BB0'
+                                    }} />
                                 ))}
+                            </div>
+
+                            {/* Ticker */}
+                            <div className="rabat-ticker">
+                                <div className="ticker-silver">
+                                    GRAND THÉÂTRE · TOUR MOHAMMED VI · TOUR HASSAN · MAUSOLÉE · VALLÉE DU BOUREGREG · LUMIÈRE · MODERNITÉ · HÉRITAGE · GRAND THÉÂTRE
+                                </div>
                             </div>
                         </>
                     )}
@@ -279,12 +358,33 @@ const CityPage = () => {
 
                     {city.name === 'Marrakech' && (
                         <>
-                            <div className="heat-shimmer" />
-                            {[...Array(8)].map((_, i) => (
-                                <svg key={i} className="zellige-star" style={{ width: '40px', top: `${Math.random() * 80}%`, left: `${Math.random() * 90}%`, animation: `starRotate ${20 + Math.random() * 25}s linear infinite` }} viewBox="0 0 40 40">
-                                    <path d="M20 0l5.5 14.5L40 20l-14.5 5.5L20 40l-5.5-14.5L0 20l14.5-5.5z" />
+                            <div className="riad-warm-glow" />
+                            <div className="riad-arches-layer">
+                                <svg className="riad-arch riad-arch-1" viewBox="0 0 200 300" preserveAspectRatio="none">
+                                    <path d="M0,300 L0,120 Q0,0 100,0 Q200,0 200,120 L200,300" fill="none" stroke="currentColor" strokeWidth="1.5" />
+                                    <path d="M30,300 L30,140 Q30,30 100,30 Q170,30 170,140 L170,300" fill="none" stroke="currentColor" strokeWidth="0.8" />
                                 </svg>
-                            ))}
+                                <svg className="riad-arch riad-arch-2" viewBox="0 0 200 300" preserveAspectRatio="none">
+                                    <path d="M0,300 L0,120 Q0,0 100,0 Q200,0 200,120 L200,300" fill="none" stroke="currentColor" strokeWidth="1.5" />
+                                    <path d="M30,300 L30,140 Q30,30 100,30 Q170,30 170,140 L170,300" fill="none" stroke="currentColor" strokeWidth="0.8" />
+                                </svg>
+                                <svg className="riad-arch riad-arch-3" viewBox="0 0 200 300" preserveAspectRatio="none">
+                                    <path d="M0,300 L0,120 Q0,0 100,0 Q200,0 200,120 L200,300" fill="none" stroke="currentColor" strokeWidth="1.5" />
+                                </svg>
+                            </div>
+                            <div className="riad-lantern-glow" />
+                            <div className="riad-petals-layer">
+                                {[...Array(18)].map((_, i) => (
+                                    <div key={i} className="riad-petal" style={{
+                                        left: `${Math.random() * 100}%`,
+                                        animationDelay: `${Math.random() * 10}s`,
+                                        animationDuration: `${8 + Math.random() * 6}s`,
+                                        '--petal-size': `${6 + Math.random() * 8}px`,
+                                        '--petal-hue': i % 3 === 0 ? '#E8943A' : i % 3 === 1 ? '#F0C060' : '#C87A5A'
+                                    }} />
+                                ))}
+                            </div>
+                            <div className="riad-mosaic-floor" />
                         </>
                     )}
                 </div>
@@ -297,13 +397,19 @@ const CityPage = () => {
             {/* ─── SECTION 2: STICKY FILTER BAR ─── */}
             <div className={`sticky-nav-wrapper ${navHidden ? 'hidden' : ''}`}>
                 <nav className="filter-bar">
-                    {['Tout', 'Femme', 'Homme', 'Accessoires', 'Luxe'].map(cat => (
+                    {[
+                        { key: 'Tout', label: t('city.filter_all') },
+                        { key: 'Femme', label: t('city.filter_women') },
+                        { key: 'Homme', label: t('city.filter_men') },
+                        { key: 'Accessoires', label: t('city.filter_accessories') },
+                        { key: 'Luxe', label: t('city.filter_luxury') }
+                    ].map(({ key, label }) => (
                         <button
-                            key={cat}
-                            className={`filter-pill ${filter === cat ? 'active' : ''}`}
-                            onClick={() => handleFilterChange(cat)}
+                            key={key}
+                            className={`filter-pill ${filter === key ? 'active' : ''}`}
+                            onClick={() => handleFilterChange(key)}
                         >
-                            {cat}
+                            {label}
                         </button>
                     ))}
                 </nav>
@@ -330,14 +436,14 @@ const CityPage = () => {
                                     <span className="boutique-card-category">{boutique.category || 'Collection'}</span>
                                     <h3 className="boutique-card-title">{boutique.name}</h3>
                                     <p className="boutique-card-desc">{boutique.description}</p>
-                                    <Link to={`/boutiques/${boutique.id}`} className="boutique-card-link">Découvrir</Link>
+                                    <Link to={`/boutiques/${boutique.id}`} className="boutique-card-link">{t('city.discover')}</Link>
                                 </div>
                             </article>
                         ))
                     ) : (
                         <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '10rem 0' }}>
                             <div style={{ width: '30px', height: '1px', background: 'var(--city-main)', margin: '0 auto 2rem' }} />
-                            <p style={{ fontFamily: 'Playfair Display', fontSize: '1.4rem', color: '#1A1A18', letterSpacing: '0.05em' }}>Bientôt disponible</p>
+                            <p style={{ fontFamily: 'Playfair Display', fontSize: '1.4rem', color: '#1A1A18', letterSpacing: '0.05em' }}>{t('city.coming_soon')}</p>
                         </div>
                     )}
                 </div>
@@ -346,9 +452,9 @@ const CityPage = () => {
             {/* ─── SECTION 4: EXPLORE OTHER CITIES ─── */}
             <section className="explore-others-section" style={{ background: theme.bg }}>
                 <div className="explore-heading">
-                    <h2 className="explore-large-title" style={{ color: '#FFFFFF' }}>Laisse-toi emporter</h2>
+                    <h2 className="explore-large-title" style={{ color: '#FFFFFF' }}>{t('city.explore_title')}</h2>
                     <div className="gold-hr" style={{ margin: '0 auto 2rem', background: theme.main }} />
-                    <span className="explore-small-tag" style={{ color: theme.mid }}>Chaque ville, une expérience d'exception</span>
+                    <span className="explore-small-tag" style={{ color: theme.mid }}>{t('city.explore_sub')}</span>
                 </div>
 
                 <div className="others-grid-container">

@@ -6,6 +6,7 @@ import BoutiquePage from '../pages/BoutiquePage';
 import ProductPage from '../pages/ProductPage';
 import OwnerDashboard from '../pages/Dashboard/OwnerDashboard';
 import AdminDashboard from '../pages/Admin/AdminDashboard';
+import ChatbotWindow from '../components/AI/ChatbotWindow';
 
 const AppRouter = () => {
     return (
@@ -25,6 +26,9 @@ const AppRouter = () => {
                 {/* Catch All */}
                 <Route path="*" element={<div>Page Not Found</div>} />
             </Routes>
+
+            {/* Chatbot global — visible sur toutes les pages */}
+            <ChatbotWindow />
         </BrowserRouter>
     );
 };

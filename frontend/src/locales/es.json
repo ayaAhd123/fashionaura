@@ -1,0 +1,42 @@
+{
+  "landing": {
+    "nav_home": "Inicio",
+    "nav_explore": "Explorar",
+    "nav_about": "Acerca de",
+    "hero_tag": "Moda · Marruecos · Autenticidad",
+    "hero_head_1": "La moda marroquí",
+    "hero_head_2": "al alcance de tu mano",
+    "hero_sub": "Explora boutiques de moda en tus ciudades favoritas — Tánger, Casablanca, Marrakech y más.",
+    "explore_btn": "Explorar ciudades",
+    "ai_btn": "Estilista IA",
+    "scroll": "Desplazar",
+    "stats_cities": "Ciudades",
+    "stats_boutiques": "Boutiques",
+    "stats_products": "Productos",
+    "stats_moroccan": "Marroquí",
+    "map_tag": "Mapa interactivo",
+    "map_title": "Explora Marruecos",
+    "map_subtitle": "Haz clic en una ciudad del mapa",
+    "ai_badge": "Impulsado por IA",
+    "ai_title_1": "Tu Estilista",
+    "ai_title_2": "Personal",
+    "ai_desc": "Describe el look que buscas y nuestra IA te sugerirá conjuntos, boutiques y consejos de moda adaptados a tu gusto.",
+    "ai_try_btn": "Probar ahora",
+    "chat_ai_1": "¡Hola! Soy tu estilista IA. ¿Qué buscas hoy?",
+    "chat_user": "Busco un atuendo para una boda marroquí tradicional",
+    "chat_ai_2": "¡Excelente elección! Te recomiendo un caftán de Maison Amira en Marrakech...",
+    "footer_copy": "© 2025 FashionAura — Todos los derechos reservados"
+  },
+  "city": {
+    "filter_all": "Todo",
+    "filter_women": "Mujer",
+    "filter_men": "Hombre",
+    "filter_accessories": "Accesorios",
+    "filter_luxury": "Lujo",
+    "discover": "Descubrir",
+    "coming_soon": "Próximamente",
+    "explore_title": "Déjate llevar",
+    "explore_sub": "Cada ciudad, una experiencia excepcional",
+    "back_map": "Mapa"
+  }
+}
