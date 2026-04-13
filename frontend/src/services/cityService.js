@@ -1,11 +1,13 @@
-import api from './api';
+import API from '../api/axios';
 
-export const getCities = async () => {
-    const response = await api.get('/cities');
+export const cityService = {
+  getCities: async () => {
+    const response = await API.get('/cities');
     return response.data;
-};
+  },
 
-export const getCity = async (id) => {
-    const response = await api.get(`/cities/${id}`);
+  getCityBySlug: async (slug) => {
+    const response = await API.get(`/cities/${slug}`);
     return response.data;
+  },
 };

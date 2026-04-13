@@ -10,14 +10,23 @@ class CityController extends Controller
     // Retourne toutes les villes
     public function index()
     {
-        $cities = City::all();
+        $cities = City::where('is_active', true)
+            ->with('boutiques')
+            ->select(['id', 'name', 'slug', 'description', 'region', 'image'])
+            ->get();
+
         return response()->json($cities);
     }
 
     // Retourne une seule ville avec ses boutiques
-    public function show($id)
+    public function show($slug)
     {
-        $city = City::with('boutiques')->findOrFail($id);
+        $city = City::where('slug', $slug)
+            ->with(['boutiques' => function ($query) {
+                $query->where('is_active', true)->select(['id', 'name', 'slug', 'logo', 'rating', 'city_id']);
+            }])
+            ->firstOrFail();
+
         return response()->json($city);
     }
 }
