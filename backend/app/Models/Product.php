@@ -24,10 +24,23 @@ class Product extends Model
     protected $casts = [
         'sizes' => 'array',
         'colors' => 'array',
+        'price' => 'decimal:2',
+        'promo_price' => 'decimal:2',
+        'is_active' => 'boolean',
     ];
 
     public function boutique()
     {
         return $this->belongsTo(Boutique::class);
+    }
+
+    public function orderItems()
+    {
+        return $this->hasMany(OrderItem::class);
+    }
+
+    public function analytics()
+    {
+        return $this->hasMany(ProductAnalytics::class);
     }
 }

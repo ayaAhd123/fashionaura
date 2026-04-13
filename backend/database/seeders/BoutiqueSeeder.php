@@ -10,23 +10,80 @@ class BoutiqueSeeder extends Seeder
 {
     public function run(): void
     {
-        $tanger = City::where('name', 'Tanger')->first();
-        $casablanca = City::where('name', 'Casablanca')->first();
-        $marrakech = City::where('name', 'Marrakech')->first();
-
+        $cities = City::all();
+        
         $boutiques = [
-            // Tanger
-            ['name' => 'Tanger Élégance', 'city_id' => $tanger->id, 'description' => 'La boutique tendance du boulevard Pasteur.', 'address' => 'Boulevard Pasteur, Tanger', 'logo' => null, 'banner' => null],
-            ['name' => 'Médina Chic', 'city_id' => $tanger->id, 'description' => 'Mode moderne inspirée de la médina de Tanger.', 'address' => 'Rue de la Médina, Tanger', 'logo' => null, 'banner' => null],
-            ['name' => 'Détroit Fashion', 'city_id' => $tanger->id, 'description' => 'Style contemporain face au détroit.', 'address' => 'Avenue Mohammed VI, Tanger', 'logo' => null, 'banner' => null],
-            // Casablanca
-            ['name' => 'Élégance Casa', 'city_id' => $casablanca->id, 'description' => 'Boutique tendance au cœur de Casablanca.', 'address' => 'Boulevard Anfa, Casablanca', 'logo' => null, 'banner' => null],
-            // Marrakech
-            ['name' => 'Marrakech Chic', 'city_id' => $marrakech->id, 'description' => 'Mode et artisanat fusionnés.', 'address' => 'Rue de la Médina, Marrakech', 'logo' => null, 'banner' => null],
+            [
+                'name' => 'Luxury Fashion House',
+                'logo' => 'https://ui-avatars.com/api/?name=Luxury&background=000000&color=fff',
+                'banner' => 'https://images.unsplash.com/photo-1441986300917-64674bd600d8',
+                'description' => 'Premium luxury clothing and accessories from top international brands.',
+                'category' => 'luxury',
+                'address' => 'Anfa Place Shopping Center, Casablanca',
+                'phone' => '+212522123456',
+                'email' => 'contact@luxuryfashion.ma',
+                'is_verified' => true,
+                'is_active' => true,
+            ],
+            [
+                'name' => 'Street Style Morocco',
+                'logo' => 'https://ui-avatars.com/api/?name=Street&background=14b8a6&color=fff',
+                'banner' => 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2',
+                'description' => 'Urban streetwear and casual fashion for the modern Moroccan.',
+                'category' => 'streetwear',
+                'address' => 'Marjane Mall, Casablanca',
+                'phone' => '+212522234567',
+                'email' => 'info@streetstyle.ma',
+                'is_verified' => true,
+                'is_active' => true,
+            ],
+            [
+                'name' => 'Casablanca Chic',
+                'logo' => 'https://ui-avatars.com/api/?name=Chic&background=ec489a&color=fff',
+                'banner' => 'https://images.unsplash.com/photo-1539109136881-3be0616acf4b',
+                'description' => 'Elegant and chic fashion for women who love style.',
+                'category' => 'casual',
+                'address' => 'Morocco Mall, Casablanca',
+                'phone' => '+212522345678',
+                'email' => 'hello@casablancachic.ma',
+                'is_verified' => true,
+                'is_active' => true,
+            ],
+            [
+                'name' => 'Modern Wear',
+                'logo' => 'https://ui-avatars.com/api/?name=Modern&background=3b82f6&color=fff',
+                'banner' => 'https://images.unsplash.com/photo-1483985988355-763728e1935b',
+                'description' => 'Contemporary fashion for men and women.',
+                'category' => 'casual',
+                'address' => 'Guéliz, Marrakech',
+                'phone' => '+212524456789',
+                'email' => 'contact@modernwear.ma',
+                'is_verified' => true,
+                'is_active' => true,
+            ],
+            [
+                'name' => 'Elite Collection',
+                'logo' => 'https://ui-avatars.com/api/?name=Elite&background=8b5cf6&color=fff',
+                'banner' => 'https://images.unsplash.com/photo-1441984904996-e0b6ba687e04',
+                'description' => 'Exclusive designer pieces and limited editions.',
+                'category' => 'luxury',
+                'address' => 'Agdal, Rabat',
+                'phone' => '+212537567890',
+                'email' => 'info@elitecollection.ma',
+                'is_verified' => false,
+                'is_active' => true,
+            ],
         ];
-
-        foreach ($boutiques as $boutique) {
-            Boutique::create($boutique);
+        
+        foreach ($boutiques as $index => $boutiqueData) {
+            $city = $cities[$index % $cities->count()];
+            $boutiqueData['city_id'] = $city->id;
+            $boutique = Boutique::create($boutiqueData);
+            
+            // Update city boutique count
+            $city->increment('boutiques_count');
         }
+        
+        $this->command->info('✅ Boutiques seeded!');
     }
 }

@@ -11,6 +11,7 @@ class City extends Model
         'image',
         'description',
         'region',
+        'boutiques_count',
     ];
 
     public function boutiques()
