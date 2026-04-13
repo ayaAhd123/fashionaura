@@ -12,11 +12,12 @@ return new class extends Migration {
     {
         Schema::create('cities', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->string('name')->unique();
+            $table->string('slug')->unique();
             $table->string('image')->nullable();
             $table->text('description')->nullable();
             $table->string('region')->nullable();
-            $table->integer('boutiques_count')->default(0);
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
     }

@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#D9DDDF;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#B7C6C9;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <rect width="400" height="400" fill="url(#bg)"/>
+  
+  <!-- Image frame -->
+  <rect x="60" y="60" width="280" height="280" fill="none" stroke="#8A908C" stroke-width="3" stroke-dasharray="10,5"/>
+  
+  <!-- Mountain/Picture icon -->
+  <g opacity="0.4">
+    <circle cx="120" cy="100" r="25" fill="#6E7F78"/>
+    <path d="M60 180 L140 100 L220 160 L340 80" fill="none" stroke="#6E7F78" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/>
+    <polygon points="60,320 200,180 340,320" fill="#6E7F78"/>
+  </g>
+  
+  <!-- Text -->
+  <text x="200" y="370" font-family="Inter, sans-serif" font-size="14" fill="#8A908C" text-anchor="middle" opacity="0.6">
+    Aucune image
+  </text>
+</svg>

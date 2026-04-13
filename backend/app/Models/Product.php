@@ -8,26 +8,50 @@ class Product extends Model
 {
     protected $fillable = [
         'boutique_id',
+        'category_id',
         'name',
+        'slug',
         'description',
         'price',
-        'promo_price',
-        'image',
-        'category',
+        'discount_price',
+        'rating',
+        'reviews_count',
+        'stock_quantity',
         'style',
-        'sizes',
-        'colors',
-        'stock',
         'is_active',
     ];
 
     protected $casts = [
-        'sizes' => 'array',
-        'colors' => 'array',
+        'is_active' => 'boolean',
     ];
 
     public function boutique()
     {
         return $this->belongsTo(Boutique::class);
+    }
+
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
+
+    public function images()
+    {
+        return $this->hasMany(ProductImage::class);
+    }
+
+    public function variants()
+    {
+        return $this->hasMany(ProductVariant::class);
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
+
+    public function favorites()
+    {
+        return $this->hasMany(Favorite::class);
     }
 }
