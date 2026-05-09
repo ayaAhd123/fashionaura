@@ -1,8 +1,8 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
-
 import Login from './pages/Login';
+import Register from './pages/Register'; 
 import AdminLayout from './layouts/AdminLayout';
 import BoutiqueLayout from './layouts/BoutiqueLayout';
 import AdminDashboard from './pages/Admin/AdminDashboard';
@@ -17,8 +17,9 @@ function App() {
       <AuthProvider>
         <Routes>
           <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
           
-          {/* Routes Admin avec layout */}
+
           <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
             <Route element={<AdminLayout />}>
               <Route path="/admin/dashboard" element={<AdminDashboard />} />

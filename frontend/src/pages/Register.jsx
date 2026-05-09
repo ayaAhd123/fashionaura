@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { registerUser } from '../services/api';
 
 function Register() {
   const navigate = useNavigate();
@@ -41,44 +42,33 @@ function Register() {
     return errors;
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
-    
-    const errors = validate();
-    if (Object.keys(errors).length > 0) {
-      setFieldErrors(errors);
-      return;
-    }
-    
-    setIsLoading(true);
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setError('');
 
-    try {
-      const response = await fetch('http://127.0.0.1:8000/api/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
-      });
-      
-      const data = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(data.message || 'Erreur lors de l\'inscription');
-      }
-      
-      // Connexion automatique après inscription
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify(data.user));
-      
-      // Redirection vers le dashboard
-      navigate('/');
-      
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const errors = validate();
+  if (Object.keys(errors).length > 0) {
+    setFieldErrors(errors);
+    return;
+  }
+
+  setIsLoading(true);
+
+  try {
+    const response = await registerUser(formData);  // ✅ utilise api.js
+    const data = response.data;
+
+    localStorage.setItem('token', data.token);
+    localStorage.setItem('user', JSON.stringify(data.user));
+
+    navigate('/');
+
+  } catch (err) {
+    setError(err.response?.data?.message || 'Erreur lors de l\'inscription');
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   return (
     <div style={{

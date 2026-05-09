@@ -1,7 +1,8 @@
 import axios from 'axios';
+// ❌ Supprimez cette ligne : import { registerUser } from '../services/api';
 
 const api = axios.create({
-  baseURL: 'http://localhost:8000/api',
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8001/api',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -20,11 +21,6 @@ api.interceptors.request.use(
 );
 
 // ─── Intercepteur Response ────────────────────────────────────────────────────
-// RÈGLE : on ne redirige vers /login sur 401 QUE si le token lui-même est invalide.
-// On ne redirige PAS si c'est un endpoint API qui n'existe pas encore côté backend
-// ou qui retourne 401 pour une autre raison (ex: notifications, stats...).
-// Pour cela on vérifie que la requête portait bien un token ET on laisse les
-// composants gérer leurs propres erreurs via leur propre catch/error state.
 api.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -32,7 +28,6 @@ api.interceptors.response.use(
     const requestUrl = error.config?.url || '';
     const hasToken   = !!localStorage.getItem('token');
 
-    // Routes à ne JAMAIS auto-rediriger (erreur gérée localement)
     const silentRoutes = [
       '/login',
       '/boutique/notifications',
@@ -47,8 +42,6 @@ api.interceptors.response.use(
 
     const isSilent = silentRoutes.some(r => requestUrl.includes(r));
 
-    // On redirige uniquement si : 401 + token présent + pas une route silencieuse
-    // Cela correspond à un vrai token expiré/invalide sur une action critique
     if (status === 401 && hasToken && !isSilent) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
@@ -59,7 +52,8 @@ api.interceptors.response.use(
   }
 );
 
-export const loginUser  = (email, password) => api.post('/login', { email, password });
-export const logoutUser = () => api.post('/logout');
+export const loginUser    = (email, password) => api.post('/login', { email, password });
+export const logoutUser   = () => api.post('/logout');
+export const registerUser = (data) => api.post('/register', data);  // ✅ Ajouté
 
 export default api;
