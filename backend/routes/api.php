@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\ChatbotController;
+use App\Http\Controllers\API\ChatbotController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\CityController;
 use App\Http\Controllers\API\BoutiqueController;

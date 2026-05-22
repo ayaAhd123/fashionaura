@@ -4,21 +4,16 @@ const MessageBubble = ({ message }) => {
     const isAi = message.sender === 'ai';
 
     return (
-        <div style={{
-            display: 'flex',
-            justifyContent: isAi ? 'flex-start' : 'flex-end',
-            marginBottom: '10px'
-        }}>
-            <div style={{
-                background: isAi ? '#f3f4f6' : 'var(--primary-color)',
-                color: isAi ? '#374151' : 'white',
-                padding: '10px',
-                borderRadius: '16px',
-                borderBottomLeftRadius: isAi ? '4px' : '16px',
-                borderBottomRightRadius: !isAi ? '4px' : '16px',
-                maxWidth: '80%'
-            }}>
-                {message.text}
+        <div className={`message-container ${isAi ? 'ai' : 'user'}`}>
+            <div className={`message-bubble ${isAi ? 'ai-bubble' : 'user-bubble'}`}>
+                {message.image && (
+                    <div className="message-image-container">
+                        <img src={message.image} alt="User upload" className="message-image" />
+                    </div>
+                )}
+                <div className="message-text">
+                    {message.text}
+                </div>
             </div>
         </div>
     );

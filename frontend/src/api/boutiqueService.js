@@ -1,4 +1,4 @@
-import api from './axios';
+///////////////////////////////////////////6import api from './axios';
 
 // Récupérer toutes les boutiques
 export const getBoutiques = async () => {
