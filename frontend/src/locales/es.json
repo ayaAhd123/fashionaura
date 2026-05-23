@@ -1,0 +1,153 @@
+{
+  "nav": {
+    "main": "Navegación principal",
+    "home": "Inicio",
+    "top_cities": "Top 3 por ciudad",
+    "boutiques": "Boutiques",
+    "products": "Creaciones",
+    "favorites": "Favoritos",
+    "cart": "Carrito",
+    "open_menu": "Abrir menú",
+    "close_menu": "Cerrar menú"
+  },
+  "footer": {
+    "tagline": "La esencia del lujo marroquí. Descubre la marketplace dedicada a la moda y la creación artesanal.",
+    "synthesis": "Proyecto de síntesis — datos y boutiques ficticios con fines pedagógicos.",
+    "rights": "Todos los derechos reservados."
+  },
+  "boutiques_page": {
+    "title": "Nuestras boutiques asociadas",
+    "subtitle": "Descubre una selección de creadores y artesanos de moda marroquí.",
+    "search_placeholder": "Buscar una boutique...",
+    "all_ratings": "Todas las valoraciones",
+    "rating_5": "Excelente (5 estrellas)",
+    "rating_4": "Muy bien (4+ estrellas)",
+    "rating_3": "Bien (3+ estrellas)",
+    "all_cities": "Todas las ciudades",
+    "loading": "Cargando boutiques...",
+    "empty": "Ninguna boutique encontrada para estos criterios.",
+    "prev": "← Anterior",
+    "next": "Siguiente →"
+  },
+  "top_boutiques": {
+    "badge": "Top 3 por ciudad",
+    "title": "Las mejores boutiques de Marruecos",
+    "subtitle": "Compra en las boutiques mejor valoradas de todo Marruecos cuando ofrecen entrega.",
+    "delivery_hint": "Badge entrega = compra posible desde otra ciudad",
+    "delivery_short": "Entrega disponible",
+    "unified_subtitle": "Todas las perlas de la moda marroquí en una sola página — top 3 de cada ciudad.",
+    "back_home": "Volver al inicio",
+    "total_count": "{{count}} boutiques · {{cities}} ciudades",
+    "creations": "creaciones",
+    "view_city": "Ver la ciudad",
+    "loading": "Cargando clasificación...",
+    "empty": "Ninguna boutique clasificada por el momento.",
+    "error": "No se pudo cargar la clasificación."
+  },
+  "landing": {
+    "nav_home": "Inicio",
+    "nav_explore": "Explorar",
+    "nav_about": "Acerca de",
+    "hero_tag": "Moda · Marruecos · Autenticidad",
+    "hero_head_1": "La moda marroquí",
+    "hero_head_2": "al alcance de tu mano",
+    "hero_sub": "Explora boutiques de moda en tus ciudades favoritas — Tánger, Casablanca, Marrakech y más.",
+    "explore_btn": "Explorar ciudades",
+    "ai_btn": "Estilista IA",
+    "scroll": "Desplazar",
+    "stats_cities": "Ciudades",
+    "stats_boutiques": "Boutiques",
+    "stats_products": "Productos",
+    "stats_moroccan": "Marroquí",
+    "map_tag": "Mapa interactivo",
+    "map_title": "Explora Marruecos",
+    "map_subtitle": "Haz clic en una ciudad del mapa",
+    "top_partners_tag": "Excelencia",
+    "top_partners_title": "Descubre nuestros mejores socios de cada ciudad",
+    "top_partners_sub": "Las 3 mejores boutiques por ciudad — entrega posible en todo Marruecos.",
+    "top_partners_cta": "Ver clasificación completa",
+    "top_partners_placeholder": "Boutique asociada",
+    "ai_badge": "Impulsado por IA",
+    "ai_title_1": "Tu Estilista",
+    "ai_title_2": "Personal",
+    "ai_desc": "Describe el look que buscas y nuestra IA te sugerirá conjuntos, boutiques y consejos de moda adaptados a tu gusto.",
+    "ai_try_btn": "Probar ahora",
+    "chat_ai_1": "¡Hola! Soy tu estilista IA. ¿Qué buscas hoy?",
+    "chat_user": "Busco un atuendo para una boda marroquí tradicional",
+    "chat_ai_2": "¡Excelente elección! Te recomiendo un caftán de Maison Amira en Marrakech...",
+    "footer_copy": "© 2025 FashionAura — Todos los derechos reservados"
+  },
+  "city": {
+    "filter_all": "Todo",
+    "filter_women": "Mujer",
+    "filter_men": "Hombre",
+    "filter_accessories": "Accesorios",
+    "filter_luxury": "Lujo",
+    "discover": "Descubrir",
+    "coming_soon": "Próximamente",
+    "explore_title": "Déjate llevar",
+    "explore_sub": "Cada ciudad, una experiencia excepcional",
+    "back_map": "Mapa",
+    "explore_city": "Explorar la ciudad",
+    "boutiques_count": "{{count}} boutique",
+    "boutiques_count_plural": "{{count}} boutiques"
+  },
+  "cities": {
+    "casablanca": {
+      "name": "Casablanca",
+      "region": "Casablanca-Settat",
+      "nickname": "Casa Branca",
+      "poetic": "Elegancia en estado puro",
+      "hero_title": "Casablanca"
+    },
+    "marrakech": {
+      "name": "Marrakech",
+      "region": "Marrakech-Safi",
+      "nickname": "Al Hamra",
+      "poetic": "Déjate encender",
+      "hero_title": "Marrakech"
+    },
+    "rabat": {
+      "name": "Rabat",
+      "region": "Rabat-Salé-Kénitra",
+      "nickname": "La capital esmeralda",
+      "poetic": "El lujo discreto del palacio",
+      "hero_title": "Rabat"
+    },
+    "tanger": {
+      "name": "Tánger",
+      "region": "Tánger-Tetuán-Al Hoceima",
+      "nickname": "La perla azul",
+      "poetic": "Un toque de sol sobre el azul mediterráneo",
+      "hero_title": "Tánger"
+    },
+    "fes": {
+      "name": "Fe",
+      "region": "Fe-Meknes",
+      "nickname": "La ciudad imperial",
+      "poetic": "El arte del zellige te envuelve",
+      "hero_title": "FE-MÉKNES"
+    },
+    "agadir": {
+      "name": "Agadir",
+      "region": "Souss-Massa",
+      "nickname": "Perla del sur",
+      "poetic": "Horizonte atlántico",
+      "hero_title": "Agadir"
+    },
+    "meknes": {
+      "name": "Mequinez",
+      "region": "Fe-Meknes",
+      "nickname": "El Versalles de Marruecos",
+      "poetic": "Esplendor imperial",
+      "hero_title": "Mequinez"
+    },
+    "oujda": {
+      "name": "Uchda",
+      "region": "Oriental",
+      "nickname": "Puerta del este",
+      "poetic": "Donde despierta Marruecos",
+      "hero_title": "Uchda"
+    }
+  }
+}

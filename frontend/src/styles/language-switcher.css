@@ -1,0 +1,153 @@
+.language-switcher {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-shrink: 0;
+}
+
+.language-switcher__btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.6875rem;
+  letter-spacing: 0.1em;
+  font-family: 'Tajawal', 'Inter', sans-serif;
+  transition: color 0.2s, opacity 0.2s;
+  padding: 0.25rem 0.2rem;
+  font-weight: 500;
+}
+
+.language-switcher__sep {
+  font-size: 0.6875rem;
+  user-select: none;
+  opacity: 0.35;
+}
+
+/* Shop header — light */
+.language-switcher--header {
+  padding: 0.35rem 0.625rem;
+  border-radius: 999px;
+  background: rgba(217, 221, 223, 0.45);
+  border: 1px solid rgba(183, 198, 201, 0.4);
+}
+
+.language-switcher--header .language-switcher__btn {
+  color: var(--neutral);
+}
+
+.language-switcher--header .language-switcher__btn:hover {
+  color: var(--text);
+}
+
+.language-switcher--header .language-switcher__btn--active {
+  color: var(--text);
+  font-weight: 700;
+}
+
+.language-switcher--header .language-switcher__sep {
+  color: var(--neutral);
+}
+
+/* Landing navbar — on hero */
+.language-switcher--landing {
+  padding: 0.4rem 0.75rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.language-switcher--landing .language-switcher__btn {
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.language-switcher--landing .language-switcher__btn:hover {
+  color: #fff;
+}
+
+.language-switcher--landing .language-switcher__btn--active {
+  color: #fff;
+  font-weight: 700;
+}
+
+.language-switcher--landing .language-switcher__sep {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+/* City page — dark hero */
+.language-switcher--dark {
+  padding: 0.35rem 0.65rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.language-switcher--dark .language-switcher__btn {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.language-switcher--dark .language-switcher__btn--active {
+  color: #fff;
+  font-weight: 700;
+}
+
+.language-switcher--dark .language-switcher__sep {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+/* Top partners page — gold & white */
+.language-switcher--gold {
+  padding: 0.35rem 0.65rem;
+  border-radius: 999px;
+  background: rgba(212, 175, 106, 0.12);
+  border: 1px solid rgba(184, 148, 63, 0.35);
+}
+
+.language-switcher--gold .language-switcher__btn {
+  color: rgba(44, 24, 16, 0.5);
+}
+
+.language-switcher--gold .language-switcher__btn:hover {
+  color: var(--text);
+}
+
+.language-switcher--gold .language-switcher__btn--active {
+  color: #b8943f;
+  font-weight: 700;
+}
+
+.language-switcher--gold .language-switcher__sep {
+  color: rgba(184, 148, 63, 0.4);
+}
+
+@media (max-width: 767px) {
+  .site-header__actions .language-switcher--header {
+    display: none;
+  }
+}
+
+.site-header__mobile-lang .language-switcher--header {
+  display: flex;
+}
+
+.site-header__mobile-lang {
+  display: flex;
+  justify-content: center;
+  padding: 0.5rem 0 0.75rem;
+  border-top: 1px solid rgba(183, 198, 201, 0.25);
+  margin-top: 0.5rem;
+}
+
+@media (min-width: 768px) {
+  .site-header__mobile-lang {
+    display: none;
+  }
+}
+
+.top-gold-page__nav .language-switcher {
+  margin-left: 0;
+}
+
+html[dir='rtl'] .top-gold-page__nav .language-switcher {
+  margin-right: 0;
+}

@@ -1,0 +1,153 @@
+{
+  "nav": {
+    "main": "Navigation principale",
+    "home": "Accueil",
+    "top_cities": "Top 3 par ville",
+    "boutiques": "Boutiques",
+    "products": "Créations",
+    "favorites": "Favoris",
+    "cart": "Panier",
+    "open_menu": "Ouvrir le menu",
+    "close_menu": "Fermer le menu"
+  },
+  "footer": {
+    "tagline": "L'essence du luxe marocain. Découvrez la marketplace dédiée à la mode et à la création artisanale.",
+    "synthesis": "Projet de synthèse — données et boutiques fictives à des fins pédagogiques.",
+    "rights": "Tous droits réservés."
+  },
+  "boutiques_page": {
+    "title": "Nos boutiques partenaires",
+    "subtitle": "Découvrez une sélection de créateurs et artisans de mode marocaine.",
+    "search_placeholder": "Rechercher une boutique...",
+    "all_ratings": "Toutes les notes",
+    "rating_5": "Excellent (5 étoiles)",
+    "rating_4": "Très bien (4+ étoiles)",
+    "rating_3": "Bien (3+ étoiles)",
+    "all_cities": "Toutes les villes",
+    "loading": "Chargement des boutiques...",
+    "empty": "Aucune boutique trouvée pour ces critères.",
+    "prev": "← Précédent",
+    "next": "Suivant →"
+  },
+  "top_boutiques": {
+    "badge": "Top 3 par ville",
+    "title": "Les meilleures boutiques du Maroc",
+    "subtitle": "Commandez chez les boutiques les mieux notées, partout au Maroc, dès qu'elles proposent la livraison.",
+    "delivery_hint": "Badge livraison = achat possible depuis une autre ville",
+    "delivery_short": "Livraison disponible",
+    "unified_subtitle": "Toutes les perles de la mode marocaine réunies sur une seule page — le top 3 de chaque ville.",
+    "back_home": "Retour à l'accueil",
+    "total_count": "{{count}} boutiques · {{cities}} villes",
+    "creations": "créations",
+    "view_city": "Voir la ville",
+    "loading": "Chargement du classement...",
+    "empty": "Aucune boutique classée pour le moment.",
+    "error": "Impossible de charger le classement."
+  },
+  "landing": {
+    "nav_home": "Accueil",
+    "nav_explore": "Explorer",
+    "nav_about": "À propos",
+    "hero_tag": "Mode · Maroc · Authenticité",
+    "hero_head_1": "La mode marocaine",
+    "hero_head_2": "à portée de main",
+    "hero_sub": "Explorez les boutiques tendance de vos villes préférées — Tanger, Casablanca, Marrakech et bien plus encore.",
+    "explore_btn": "Explorer les villes",
+    "ai_btn": "Styliste AI",
+    "scroll": "Défiler",
+    "stats_cities": "Villes",
+    "stats_boutiques": "Boutiques",
+    "stats_products": "Produits",
+    "stats_moroccan": "Marocain",
+    "map_tag": "Carte interactive",
+    "map_title": "Explorez le Maroc",
+    "map_subtitle": "Cliquez sur une ville de la carte",
+    "top_partners_tag": "Excellence",
+    "top_partners_title": "Découvrez nos top partenaires de chaque ville",
+    "top_partners_sub": "Les 3 meilleures boutiques par ville — livraison possible partout au Maroc.",
+    "top_partners_cta": "Voir le classement complet",
+    "top_partners_placeholder": "Boutique partenaire",
+    "ai_badge": "Propulsé par l'IA",
+    "ai_title_1": "Votre Styliste",
+    "ai_title_2": "Personnel",
+    "ai_desc": "Décrivez le look que vous recherchez et notre IA vous proposera des tenues, des boutiques et des conseils mode adaptés à vos goûts.",
+    "ai_try_btn": "Essayer maintenant",
+    "chat_ai_1": "Bonjour ! Je suis votre styliste IA. Que cherchez-vous aujourd'hui ?",
+    "chat_user": "Je cherche une tenue pour un mariage marocain traditionnel",
+    "chat_ai_2": "Excellent choix ! Je vous recommande un caftan de chez Maison Amira à Marrakech...",
+    "footer_copy": "© 2025 FashionAura — Tous droits réservés"
+  },
+  "city": {
+    "filter_all": "Tout",
+    "filter_women": "Femme",
+    "filter_men": "Homme",
+    "filter_accessories": "Accessoires",
+    "filter_luxury": "Luxe",
+    "discover": "Découvrir",
+    "coming_soon": "Bientôt disponible",
+    "explore_title": "Laisse-toi emporter",
+    "explore_sub": "Chaque ville, une expérience d'exception",
+    "back_map": "Carte",
+    "explore_city": "Explorer la ville",
+    "boutiques_count": "{{count}} boutique",
+    "boutiques_count_plural": "{{count}} boutiques"
+  },
+  "cities": {
+    "casablanca": {
+      "name": "Casablanca",
+      "region": "Casablanca-Settat",
+      "nickname": "Casa Branca",
+      "poetic": "L'élégance à l'état pur",
+      "hero_title": "Casablanca"
+    },
+    "marrakech": {
+      "name": "Marrakech",
+      "region": "Marrakech-Safi",
+      "nickname": "Al Hamra",
+      "poetic": "Laisse-toi enflammer",
+      "hero_title": "Marrakech"
+    },
+    "rabat": {
+      "name": "Rabat",
+      "region": "Rabat-Salé-Kénitra",
+      "nickname": "La Capitale Émeraude",
+      "poetic": "Le luxe discret du palais",
+      "hero_title": "Rabat"
+    },
+    "tanger": {
+      "name": "Tanger",
+      "region": "Tanger-Tétouan-Al Hoceïma",
+      "nickname": "La Perle Azurée",
+      "poetic": "Un zeste de soleil sur la Méditerranée",
+      "hero_title": "Tanger"
+    },
+    "fes": {
+      "name": "Fès",
+      "region": "Fès-Meknès",
+      "nickname": "La Ville Impériale",
+      "poetic": "L'art du zellige t'immerge",
+      "hero_title": "FÈS-MEKNÈS"
+    },
+    "agadir": {
+      "name": "Agadir",
+      "region": "Souss-Massa",
+      "nickname": "Perle du Sud",
+      "poetic": "Horizon atlantique",
+      "hero_title": "Agadir"
+    },
+    "meknes": {
+      "name": "Meknès",
+      "region": "Fès-Meknès",
+      "nickname": "La Versailles du Maroc",
+      "poetic": "Splendeur impériale",
+      "hero_title": "Meknès"
+    },
+    "oujda": {
+      "name": "Oujda",
+      "region": "Oriental",
+      "nickname": "Porte de l'Est",
+      "poetic": "Là où le Maroc s'éveille",
+      "hero_title": "Oujda"
+    }
+  }
+}

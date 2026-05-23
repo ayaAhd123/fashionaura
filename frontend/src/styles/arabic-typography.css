@@ -1,0 +1,119 @@
+/* =========================================
+   FashionAura — Arabic typography (Google Fonts)
+   El Messiri: elegant display (headlines)
+   Tajawal: clean UI/body (excellent Arabic UX)
+   ========================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=El+Messiri:wght@400;500;600;700&family=Tajawal:wght@300;400;500;700&display=swap');
+
+:root {
+    --font-ar-body: 'Tajawal', 'Segoe UI', Tahoma, sans-serif;
+    --font-ar-display: 'El Messiri', 'Tajawal', serif;
+}
+
+html[lang='ar'],
+html[dir='rtl'] {
+    font-family: var(--font-ar-body);
+}
+
+html[lang='ar'] body,
+html[dir='rtl'] body {
+    font-family: var(--font-ar-body);
+}
+
+/* Headlines & editorial text */
+html[lang='ar'] .hero-headline,
+html[lang='ar'] .hero-word,
+html[lang='ar'] .hero-tag,
+html[lang='ar'] .section-title,
+html[lang='ar'] .section-tag,
+html[lang='ar'] .ai-title,
+html[lang='ar'] .stat-number,
+html[lang='ar'] .stat-label,
+html[lang='ar'] .marquee-text,
+html[lang='ar'] .city-title-hero,
+html[lang='ar'] .city-poetic-line,
+html[lang='ar'] .explore-large-title,
+html[lang='ar'] .other-city-name,
+html[lang='ar'] .font-serif,
+html[lang='ar'] h1,
+html[lang='ar'] h2,
+html[lang='ar'] h3 {
+    font-family: var(--font-ar-display) !important;
+}
+
+/* Body, nav, buttons */
+html[lang='ar'] .landing-page,
+html[lang='ar'] .city-page-container,
+html[lang='ar'] .hero-sub,
+html[lang='ar'] .ai-description,
+html[lang='ar'] .navbar-links,
+html[lang='ar'] .btn-primary,
+html[lang='ar'] .ai-button,
+html[lang='ar'] .filter-pill,
+html[lang='ar'] .bubble-text,
+html[lang='ar'] .footer-copy,
+html[lang='ar'] .map-subtitle,
+html[lang='ar'] .explore-small-tag,
+html[lang='ar'] p,
+html[lang='ar'] button,
+html[lang='ar'] a:not(.fa-logo),
+html[lang='ar'] input {
+    font-family: var(--font-ar-body);
+}
+
+/* Latin letter-spacing hurts Arabic readability */
+html[lang='ar'] .hero-word,
+html[lang='ar'] .hero-tag,
+html[lang='ar'] .btn-primary,
+html[lang='ar'] .ai-button,
+html[lang='ar'] .navbar-links a,
+html[lang='ar'] .stat-label,
+html[lang='ar'] .section-tag,
+html[lang='ar'] .filter-pill,
+html[lang='ar'] .marquee-text {
+    letter-spacing: 0 !important;
+}
+
+/* Slightly larger body text for Arabic legibility */
+html[lang='ar'] .hero-sub {
+    font-size: 1.05rem;
+    line-height: 1.85;
+}
+
+html[lang='ar'] .hero-word {
+    line-height: 1.25;
+}
+
+/* RTL layout helpers */
+html[dir='rtl'] .fab-btn {
+    right: auto;
+    left: 40px;
+}
+
+html[dir='rtl'] .chatbot-window {
+    right: auto;
+    left: 40px;
+}
+
+html[dir='rtl'] .chatbot-window.expanded {
+    right: auto;
+    left: 40px;
+}
+
+html[dir='rtl'] .fixed-map-link {
+    left: auto;
+    right: 2rem;
+}
+
+@media (max-width: 480px) {
+    html[dir='rtl'] .fab-btn {
+        left: 20px;
+        right: auto;
+    }
+
+    html[dir='rtl'] .chatbot-window {
+        left: 20px;
+        right: auto;
+    }
+}

@@ -1,0 +1,82 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Pinyon+Script&display=swap');
+
+/* Logo FashionAura — même style sur tout le site (toujours en latin, même en arabe) */
+.fa-logo {
+    display: inline-flex;
+    align-items: baseline;
+    text-decoration: none;
+    line-height: 1;
+    gap: 0.06em;
+    white-space: nowrap;
+    direction: ltr;
+    unicode-bidi: isolate;
+}
+
+.fa-logo__fashion {
+    font-family: 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: #2C2A22;
+}
+
+.fa-logo__aura {
+    font-family: 'Pinyon Script', cursive;
+    font-weight: 400;
+    color: #A8A59D;
+    line-height: 1;
+    position: relative;
+    top: 0.06em;
+}
+
+/* Tailles */
+.fa-logo--sm .fa-logo__fashion { font-size: 1.35rem; }
+.fa-logo--sm .fa-logo__aura { font-size: 1.65rem; }
+
+.fa-logo--md .fa-logo__fashion { font-size: 1.75rem; }
+.fa-logo--md .fa-logo__aura { font-size: 2.15rem; }
+
+.fa-logo--lg .fa-logo__fashion { font-size: 2rem; }
+.fa-logo--lg .fa-logo__aura { font-size: 2.5rem; }
+
+/* Fond clair (défaut) — header e-commerce, landing navbar */
+.fa-logo--default:hover .fa-logo__fashion {
+    color: #2C2A22;
+}
+
+.fa-logo--default:hover .fa-logo__aura {
+    color: #8A9F8A;
+}
+
+/* Footer sombre (landing) */
+.fa-logo--light .fa-logo__fashion {
+    color: #F0EEE8;
+}
+
+.fa-logo--light .fa-logo__aura {
+    color: #D4D0C8;
+}
+
+/* Pages ville (fond noir) */
+.fa-logo--onDark .fa-logo__fashion {
+    color: #F0EEE8;
+}
+
+.fa-logo--onDark .fa-logo__aura {
+    color: #A8A59D;
+}
+
+/* Garde Fashion + Aura identiques en arabe / RTL */
+html[lang='ar'] .fa-logo,
+html[dir='rtl'] .fa-logo,
+html[lang='ar'] .fa-logo__fashion,
+html[dir='rtl'] .fa-logo__fashion {
+    font-family: 'Cormorant Garamond', 'Playfair Display', Georgia, serif !important;
+    letter-spacing: 0.04em !important;
+}
+
+html[lang='ar'] .fa-logo__aura,
+html[dir='rtl'] .fa-logo__aura {
+    font-family: 'Pinyon Script', cursive !important;
+    font-weight: 400 !important;
+    top: 0.06em;
+}
