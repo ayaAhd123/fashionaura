@@ -26,10 +26,7 @@ if not exist "backend\.env" (
     cd backend
     call composer install --no-interaction 2>nul
     php artisan key:generate
-    if not exist "database\database.sqlite" (
-        echo. > database\database.sqlite
-    )
-    php artisan migrate --seed --force
+    php artisan fashionaura:ensure-data
     cd ..
 )
 

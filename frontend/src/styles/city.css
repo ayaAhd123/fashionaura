@@ -282,6 +282,12 @@ html[dir='rtl'] .city-hero-topbar {
     transform: translateY(0);
 }
 
+/* BoutiqueCard inside city grid — parent handles reveal animation */
+.city-boutique-item .boutique-card {
+    opacity: 1;
+    transform: none;
+}
+
 .city-boutiques-empty {
     grid-column: 1 / -1;
     text-align: center;

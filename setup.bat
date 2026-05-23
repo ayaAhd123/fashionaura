@@ -2,13 +2,23 @@
 title FashionAura - First-time setup
 cd /d "%~dp0"
 
+echo ========================================
+echo   FashionAura - Setup (MySQL)
+echo ========================================
+echo.
+echo Assurez-vous que MySQL tourne et que la base existe :
+echo   CREATE DATABASE fashionaura_db;
+echo.
+echo Verifiez backend\.env (DB_HOST, DB_DATABASE, DB_USERNAME, DB_PASSWORD)
+echo.
+pause
+
 echo Installing backend...
 cd backend
 if not exist ".env" copy .env.example .env
 call composer install
 php artisan key:generate
-if not exist "database\database.sqlite" echo. > database\database.sqlite
-php artisan migrate:fresh --seed --force
+php artisan fashionaura:ensure-data
 cd ..
 
 echo.

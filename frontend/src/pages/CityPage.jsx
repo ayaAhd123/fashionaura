@@ -203,13 +203,13 @@ const CityPage = () => {
 
 
 
-                const boutiquesData = boutiquesResponse.data || boutiquesResponse;
-
-
+                const boutiquesData = boutiquesResponse?.data ?? boutiquesResponse;
+                const boutiquesList = Array.isArray(boutiquesData)
+                    ? boutiquesData
+                    : (Array.isArray(boutiquesData?.data) ? boutiquesData.data : (cityData.boutiques ?? []));
 
                 setCity(cityData);
-
-                setBoutiques(Array.isArray(boutiquesData) ? boutiquesData : []);
+                setBoutiques(boutiquesList);
 
                 setOtherCities(allCities.filter(c => c.slug !== slug).slice(0, 4));
 
@@ -265,9 +265,16 @@ const CityPage = () => {
 
         targets.forEach(t => observerRef.current.observe(t));
 
+        const fallbackTimer = setTimeout(() => {
+            document.querySelectorAll('.city-boutique-item:not(.revealed)').forEach((el) => {
+                el.classList.add('revealed');
+            });
+        }, 600);
 
-
-        return () => observerRef.current?.disconnect();
+        return () => {
+            clearTimeout(fallbackTimer);
+            observerRef.current?.disconnect();
+        };
 
     }, [loading, boutiques, filter]);
 
