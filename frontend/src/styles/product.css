@@ -1,7 +1,13 @@
 .product-page {
     display: flex;
-    gap: 4rem;
+    flex-direction: column;
+    gap: 2rem;
     padding: 2rem;
+}
+
+.product-main {
+    display: flex;
+    gap: 4rem;
 }
 
 .product-images {
@@ -23,4 +29,39 @@
     display: flex;
     gap: 0.5rem;
     margin-top: 1rem;
+}
+
+.comment-section {
+    padding: 1rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    background-color: #fff;
+}
+
+.comment-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 0.75rem;
+}
+
+.comment-input {
+    width: 100%;
+    resize: vertical;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    padding: 0.75rem;
+    font: inherit;
+}
+
+.comment-list {
+    margin-top: 1rem;
+}
+
+.comment-item {
+    background-color: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
 }

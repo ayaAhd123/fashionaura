@@ -2,16 +2,22 @@ import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Users, Star, Package, MapPin, Phone, Mail, Globe, ArrowLeft, UserCheck, UserPlus } from 'lucide-react';
 import { boutiqueService } from '../services/boutiqueService';
+import { reviewService } from '../services/reviewService';
+import { useToast } from '../contexts/ToastContext';
 import { ProductCard } from '../components/ProductCard';
 
 export const BoutiqueDetailPage = () => {
   const { slug } = useParams();
+  const toast = useToast();
   const [boutique, setBoutique] = useState(null);
   const [loading, setLoading] = useState(true);
   const [following, setFollowing] = useState(false);
   const [followersCount, setFollowersCount] = useState(0);
   const [followLoading, setFollowLoading] = useState(false);
   const [reviews, setReviews] = useState([]);
+  const [newRating, setNewRating] = useState(5);
+  const [newComment, setNewComment] = useState('');
+  const [reviewSubmitting, setReviewSubmitting] = useState(false);
 
   useEffect(() => {
     fetchBoutiqueDetails();
@@ -60,6 +66,32 @@ export const BoutiqueDetailPage = () => {
       setFollowersCount(prev => following ? Math.max(0, prev - 1) : prev + 1);
     } finally {
       setFollowLoading(false);
+    }
+  };
+
+  const handleSubmitReview = async (event) => {
+    event.preventDefault();
+    const comment = newComment.trim();
+    if (!comment || !boutique?.id || reviewSubmitting) {
+      return;
+    }
+
+    try {
+      setReviewSubmitting(true);
+      await reviewService.createReview({
+        boutique_id: boutique.id,
+        rating: Number(newRating),
+        comment,
+      });
+      const reviewsData = await boutiqueService.getBoutiqueReviews(boutique.id);
+      setReviews(Array.isArray(reviewsData) ? reviewsData : reviewsData.data || []);
+      setNewComment('');
+      setNewRating(5);
+      toast.success('Commentaire ajouté avec succès.');
+    } catch (error) {
+      toast.error("Impossible d'ajouter le commentaire. Connectez-vous puis réessayez.");
+    } finally {
+      setReviewSubmitting(false);
     }
   };
 
@@ -235,6 +267,43 @@ export const BoutiqueDetailPage = () => {
         {/* Reviews Section */}
         <section className="bg-white rounded-[2rem] shadow-sm border border-accent/10 p-8 md:p-12 mb-16">
           <h2 className="text-3xl font-serif font-bold text-text mb-10 text-center">Ce que nos clients disent</h2>
+          <form onSubmit={handleSubmitReview} className="mb-10 border border-accent/20 rounded-2xl p-5 md:p-6 bg-background/20">
+            <h3 className="text-lg font-semibold text-text mb-4">Laisser votre avis</h3>
+            <div className="mb-4">
+              <label htmlFor="boutique-review-rating" className="block text-sm text-neutral mb-2">Note</label>
+              <select
+                id="boutique-review-rating"
+                value={newRating}
+                onChange={(event) => setNewRating(Number(event.target.value))}
+                className="w-full md:w-48 border border-accent/40 rounded-xl px-3 py-2 bg-white text-text"
+              >
+                <option value={5}>5 / 5</option>
+                <option value={4}>4 / 5</option>
+                <option value={3}>3 / 5</option>
+                <option value={2}>2 / 5</option>
+                <option value={1}>1 / 5</option>
+              </select>
+            </div>
+            <div className="mb-4">
+              <label htmlFor="boutique-review-comment" className="block text-sm text-neutral mb-2">Commentaire</label>
+              <textarea
+                id="boutique-review-comment"
+                value={newComment}
+                onChange={(event) => setNewComment(event.target.value)}
+                rows={4}
+                placeholder="Partagez votre experience..."
+                className="w-full border border-accent/40 rounded-xl px-3 py-2 bg-white text-text"
+                required
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={reviewSubmitting}
+              className="bg-primary text-white px-5 py-2.5 rounded-xl font-medium disabled:opacity-60"
+            >
+              {reviewSubmitting ? 'Publication...' : 'Publier'}
+            </button>
+          </form>
 
           {reviews.length === 0 ? (
             <div className="text-center py-12">
