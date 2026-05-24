@@ -57,6 +57,13 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
+  const setSession = useCallback((userData, userToken) => {
+    localStorage.setItem('token', userToken);
+    localStorage.setItem('user', JSON.stringify(userData));
+    setToken(userToken);
+    setUser(userData);
+  }, []);
+
   // ── Helpers de rôle ────────────────────────────────────────────────────────
   const isAdmin         = () => user?.role === 'admin';
   const isBoutiqueOwner = () => user?.role === 'boutique_owner';
@@ -68,6 +75,7 @@ export function AuthProvider({ children }) {
     isAuthenticated: !!token,
     login,
     logout,
+    setSession,
     isAdmin,
     isBoutiqueOwner,
   };

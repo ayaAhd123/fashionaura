@@ -117,9 +117,10 @@ body {
     left: 0;
     right: 0;
     z-index: 1000;
-    display: flex;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
     align-items: center;
-    justify-content: space-between;
+    gap: 1rem;
     padding: 0 4rem;
     height: 80px;
     background: transparent;
@@ -137,14 +138,144 @@ body {
 .navbar-logo {
     z-index: 1100;
     flex-shrink: 0;
+    justify-self: start;
+    grid-column: 1;
 }
 
 .navbar__actions {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    justify-content: flex-end;
+    gap: 0.65rem;
     z-index: 1100;
     flex-shrink: 0;
+    justify-self: end;
+    grid-column: 3;
+    min-width: 0;
+}
+
+.navbar-auth {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    flex-shrink: 0;
+}
+
+.navbar-auth--mobile {
+    display: none;
+    flex-direction: column;
+    width: 100%;
+    max-width: 280px;
+    gap: 0.75rem;
+}
+
+.navbar-auth--desktop {
+    display: flex;
+}
+
+.navbar-auth__btn {
+    font-family: 'Jost', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 0.5rem 0.85rem;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+    white-space: nowrap;
+    line-height: 1.2;
+}
+
+.navbar-auth__btn--ghost {
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--black-warm);
+}
+
+.navbar-auth__btn--ghost:hover {
+    color: var(--sage-dark);
+}
+
+.navbar-auth__btn--outline {
+    background: transparent;
+    border: 1px solid var(--black-warm);
+    color: var(--black-warm);
+}
+
+.navbar-auth__btn--outline:hover {
+    background: var(--black-warm);
+    color: var(--cream);
+}
+
+.navbar-auth__btn--primary {
+    background: var(--sage-dark);
+    border: 1px solid var(--sage-dark);
+    color: var(--white);
+}
+
+.navbar-auth__btn--primary:hover {
+    background: var(--black-warm);
+    border-color: var(--black-warm);
+    transform: translateY(-1px);
+}
+
+.navbar-auth__btn--link {
+    background: transparent;
+    border: none;
+    color: var(--gray-warm);
+    padding: 0.5rem 0.35rem;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+}
+
+.navbar-auth__btn--link:hover {
+    color: var(--black-warm);
+}
+
+.navbar-auth__sep {
+    width: 1px;
+    height: 18px;
+    background: var(--border);
+    flex-shrink: 0;
+    margin: 0 0.15rem;
+}
+
+.navbar--shrunk .navbar-auth__btn--ghost {
+    color: var(--black-warm);
+}
+
+.navbar-auth__sep--desktop {
+    display: inline-block;
+}
+
+@media (max-width: 1100px) {
+    .navbar-auth--desktop .navbar-auth__boutique,
+    .navbar-auth--desktop .navbar-auth__sep--desktop {
+        display: none;
+    }
+}
+
+@media (max-width: 900px) {
+    .navbar {
+        padding: 0 2rem;
+    }
+
+    .navbar-links {
+        gap: 1.75rem;
+    }
+
+    .navbar-auth__btn {
+        padding: 0.45rem 0.7rem;
+        font-size: 0.65rem;
+    }
+}
+
+.navbar-links__auth {
+    display: none;
+    list-style: none;
+    width: 100%;
+    max-width: 320px;
 }
 
 .navbar-links {
@@ -154,14 +285,9 @@ body {
     z-index: 1000;
     margin: 0;
     padding: 0;
-}
-
-@media (min-width: 769px) {
-    .navbar-links {
-        position: absolute;
-        left: 50%;
-        transform: translateX(-50%);
-    }
+    justify-self: center;
+    grid-column: 2;
+    flex-shrink: 0;
 }
 
 .navbar-links__lang {
@@ -1113,6 +1239,36 @@ body {
     }
 
     .navbar__actions .language-switcher {
+        display: none;
+    }
+
+    .navbar-auth--desktop {
+        display: none;
+    }
+
+    .navbar-links__auth {
+        display: block;
+        margin-top: 1rem;
+    }
+
+    .navbar-auth--mobile {
+        display: flex;
+    }
+
+    .navbar-auth--mobile .navbar-auth__btn {
+        width: 100%;
+    }
+
+    .navbar-auth--mobile .navbar-auth__boutique {
+        display: block;
+        width: 100%;
+        border: 1px solid var(--black-warm);
+        border-radius: 999px;
+        color: var(--black-warm);
+        padding: 0.55rem 0.9rem;
+    }
+
+    .navbar-auth--mobile .navbar-auth__sep--desktop {
         display: none;
     }
 

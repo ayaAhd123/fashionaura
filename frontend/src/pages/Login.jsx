@@ -113,7 +113,11 @@ function Login() {
 
   useEffect(() => {
     if (isAuthenticated && user) {
-      const destination = from || (user.role === 'admin' ? '/admin/dashboard' : '/boutique/dashboard');
+      const destination = from || (
+        user.role === 'admin' ? '/admin/dashboard'
+        : user.role === 'boutique_owner' ? '/boutique/dashboard'
+        : '/'
+      );
       navigate(destination, { replace: true });
     }
   }, [isAuthenticated, user, navigate, from]);
@@ -141,7 +145,11 @@ function Login() {
 
     try {
       const userData = await login(email, password);
-      const destination = userData.role === 'admin' ? '/admin/dashboard' : '/boutique/dashboard';
+      const destination = userData.role === 'admin'
+        ? '/admin/dashboard'
+        : userData.role === 'boutique_owner'
+          ? '/boutique/dashboard'
+          : (from || '/');
       navigate(destination, { replace: true });
 
     } catch (err) {

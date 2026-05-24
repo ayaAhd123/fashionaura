@@ -1,29 +1,46 @@
-import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+﻿import { useState, useEffect } from 'react';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { registerUser } from '../services/api';
+import { getCities } from '../api/cityService';
 
 function Register() {
   const navigate = useNavigate();
-  const { login } = useAuth();
-  
+  const [searchParams] = useSearchParams();
+  const isBoutique = searchParams.get('type') === 'boutique';
+  const { setSession } = useAuth();
+
+  const [cities, setCities] = useState([]);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     phone: '',
     password: '',
     password_confirmation: '',
+    boutique_name: '',
+    city_id: '',
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [fieldErrors, setFieldErrors] = useState({});
 
+  useEffect(() => {
+    if (!isBoutique) return;
+    getCities()
+      .then((data) => {
+        setCities(data);
+        if (data[0]?.id) {
+          setFormData((prev) => ({ ...prev, city_id: String(data[0].id) }));
+        }
+      })
+      .catch(() => setCities([]));
+  }, [isBoutique]);
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
-    // Effacer l'erreur du champ quand l'utilisateur tape
     if (fieldErrors[e.target.name]) {
       setFieldErrors({ ...fieldErrors, [e.target.name]: '' });
     }
@@ -39,36 +56,51 @@ function Register() {
     if (formData.password !== formData.password_confirmation) {
       errors.password_confirmation = 'Les mots de passe ne correspondent pas';
     }
+    if (isBoutique) {
+      if (!formData.boutique_name) errors.boutique_name = 'Nom de la boutique requis';
+      if (!formData.city_id) errors.city_id = 'Ville requise';
+    }
     return errors;
   };
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  setError('');
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
 
-  const errors = validate();
-  if (Object.keys(errors).length > 0) {
-    setFieldErrors(errors);
-    return;
-  }
+    const errors = validate();
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
+      return;
+    }
 
-  setIsLoading(true);
+    setIsLoading(true);
 
-  try {
-    const response = await registerUser(formData);  // ✅ utilise api.js
-    const data = response.data;
+    try {
+      const payload = {
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        password: formData.password,
+        password_confirmation: formData.password_confirmation,
+        role: isBoutique ? 'boutique_owner' : 'customer',
+      };
 
-    localStorage.setItem('token', data.token);
-    localStorage.setItem('user', JSON.stringify(data.user));
+      if (isBoutique) {
+        payload.boutique_name = formData.boutique_name;
+        payload.city_id = Number(formData.city_id);
+      }
 
-    navigate('/');
+      const response = await registerUser(payload);
+      const data = response.data;
 
-  } catch (err) {
-    setError(err.response?.data?.message || 'Erreur lors de l\'inscription');
-  } finally {
-    setIsLoading(false);
-  }
-};
+      setSession(data.user, data.token);
+      navigate(isBoutique ? '/boutique/dashboard' : '/', { replace: true });
+    } catch (err) {
+      setError(err.response?.data?.message || err.message || 'Erreur lors de l\'inscription');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div style={{
@@ -94,7 +126,7 @@ const handleSubmit = async (e) => {
           marginBottom: '8px',
           fontFamily: 'Cormorant Garamond, serif',
         }}>
-          Créer un compte
+          {isBoutique ? 'Ouvrir une boutique' : 'Créer un compte'}
         </h1>
         <p style={{
           textAlign: 'center',
@@ -121,11 +153,57 @@ const handleSubmit = async (e) => {
         )}
 
         <form onSubmit={handleSubmit}>
+          {isBoutique && (
+            <>
+              <div style={{ marginBottom: '16px' }}>
+                <input
+                  type="text"
+                  name="boutique_name"
+                  placeholder="Nom de la boutique"
+                  value={formData.boutique_name}
+                  onChange={handleChange}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: `1px solid ${fieldErrors.boutique_name ? '#c0392b' : '#D4E0E2'}`,
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                  }}
+                />
+                {fieldErrors.boutique_name && <p style={{ color: '#c0392b', fontSize: '11px', marginTop: '4px' }}>{fieldErrors.boutique_name}</p>}
+              </div>
+
+              <div style={{ marginBottom: '16px' }}>
+                <select
+                  name="city_id"
+                  value={formData.city_id}
+                  onChange={handleChange}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: `1px solid ${fieldErrors.city_id ? '#c0392b' : '#D4E0E2'}`,
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    background: '#fff',
+                  }}
+                >
+                  <option value="">Choisir une ville</option>
+                  {cities.map((city) => (
+                    <option key={city.id} value={city.id}>{city.name}</option>
+                  ))}
+                </select>
+                {fieldErrors.city_id && <p style={{ color: '#c0392b', fontSize: '11px', marginTop: '4px' }}>{fieldErrors.city_id}</p>}
+              </div>
+            </>
+          )}
+
           <div style={{ marginBottom: '16px' }}>
             <input
               type="text"
               name="name"
-              placeholder="Nom complet"
+              placeholder={isBoutique ? 'Nom du responsable' : 'Nom complet'}
               value={formData.name}
               onChange={handleChange}
               style={{
@@ -230,10 +308,10 @@ const handleSubmit = async (e) => {
               cursor: 'pointer',
               transition: 'background-color 0.3s',
             }}
-            onMouseEnter={(e) => e.target.style.backgroundColor = '#556968'}
-            onMouseLeave={(e) => e.target.style.backgroundColor = '#69807E'}
+            onMouseEnter={(e) => { e.target.style.backgroundColor = '#556968'; }}
+            onMouseLeave={(e) => { e.target.style.backgroundColor = '#69807E'; }}
           >
-            {isLoading ? 'Création...' : 'CRÉER UN COMPTE'}
+            {isLoading ? 'Création...' : (isBoutique ? 'CRÉER MON ESPACE BOUTIQUE' : 'CRÉER UN COMPTE')}
           </button>
         </form>
 

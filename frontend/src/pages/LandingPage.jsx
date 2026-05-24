@@ -11,6 +11,7 @@ import FashionAuraLogo from '../components/common/FashionAuraLogo';
 import LanguageSwitcher from '../components/LanguageSwitcher';
 import { getCitySlug, cityName, cityRegion, marqueeCityText } from '../utils/cityI18n';
 import { openFashionBot } from '../utils/openFashionBot';
+import LandingAuthNav from '../components/Landing/LandingAuthNav';
 
 // ── Image Map Coordinates (by city slug) ─────────────────────────────────────
 const CITY_COORDS = {
@@ -311,9 +312,13 @@ const LandingPage = () => {
                     <li className="navbar-links__lang">
                         <LanguageSwitcher variant="header" />
                     </li>
+                    <li className="navbar-links__auth">
+                        <LandingAuthNav onNavigate={() => setMobileMenuOpen(false)} className="navbar-auth--mobile" />
+                    </li>
                 </ul>
 
                 <div className="navbar__actions hero-reveal">
+                    <LandingAuthNav className="navbar-auth--desktop" />
                     <LanguageSwitcher variant={navShrunk ? 'header' : 'landing'} />
                     <button
                         type="button"
