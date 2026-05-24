@@ -8,6 +8,8 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
+        $this->command?->info('Starting database seeding...');
+
         $this->call([
             CitySeeder::class,
             CategorySeeder::class,
@@ -18,6 +20,11 @@ class DatabaseSeeder extends Seeder
             ProductVariantSeeder::class,
             TangerFashionSeeder::class,
             ReviewSeeder::class,
+            AdminUserSeeder::class,
+            BoutiqueOwnerSeeder::class,
+            DashboardDummyDataSeeder::class,
         ]);
+
+        $this->command?->info('Database seeding completed.');
     }
 }

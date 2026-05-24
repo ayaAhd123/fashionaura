@@ -54,4 +54,14 @@ class Product extends Model
     {
         return $this->hasMany(Favorite::class);
     }
+
+    public function orderItems()
+    {
+        return $this->hasMany(OrderItem::class);
+    }
+
+    public function analytics()
+    {
+        return $this->hasMany(ProductAnalytics::class);
+    }
 }

@@ -34,6 +34,7 @@ class Boutique extends Model
         'is_verified' => 'boolean',
         'is_active' => 'boolean',
         'offers_delivery' => 'boolean',
+        'rating' => 'decimal:1',
     ];
 
     public function city()
@@ -54,5 +55,25 @@ class Boutique extends Model
     public function followers()
     {
         return $this->hasMany(BoutiqueFollower::class);
+    }
+
+    public function owner()
+    {
+        return $this->hasOne(User::class, 'boutique_id');
+    }
+
+    public function analytics()
+    {
+        return $this->hasMany(BoutiqueAnalytics::class);
+    }
+
+    public function validationRequest()
+    {
+        return $this->hasOne(BoutiqueValidationRequest::class);
+    }
+
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class);
     }
 }
