@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
             AdminUserSeeder::class,
             BoutiqueOwnerSeeder::class,
             DashboardDummyDataSeeder::class,
+            StockAlertTestSeeder::class,
         ]);
 
         $this->command?->info('Database seeding completed.');

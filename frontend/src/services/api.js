@@ -31,6 +31,7 @@ api.interceptors.response.use(
     const silentRoutes = [
       '/login',
       '/boutique/notifications',
+      '/boutique/notifications/check-stock',
       '/boutique/dashboard/stats',
       '/boutique/dashboard/charts',
       '/boutique/ai-advisor/recommendations',

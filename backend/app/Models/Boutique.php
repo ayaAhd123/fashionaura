@@ -24,6 +24,7 @@ class Boutique extends Model
         'opening_hours',
         'is_verified',
         'is_active',
+        'stock_alert_threshold',
         'offers_delivery',
         'delivery_scope',
         'delivery_note',

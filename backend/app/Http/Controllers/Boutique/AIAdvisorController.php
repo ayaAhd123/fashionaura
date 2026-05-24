@@ -4,12 +4,15 @@ namespace App\Http\Controllers\Boutique;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product;
+use App\Services\StockAlertService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class AIAdvisorController extends Controller
 {
+    public function __construct(private StockAlertService $stockAlerts) {}
+
     private function getBoutiqueId()
     {
         return Auth::user()->boutique_id;
@@ -18,6 +21,9 @@ class AIAdvisorController extends Controller
     public function recommendations()
     {
         $boutiqueId = $this->getBoutiqueId();
+        $boutique = Auth::user()->boutique;
+        $threshold = $this->stockAlerts->thresholdForBoutique($boutique);
+        $critical = $this->stockAlerts->criticalForThreshold($threshold);
         
         $topProducts = Product::where('boutique_id', $boutiqueId)
             ->with(['analytics' => function($q) {
@@ -62,23 +68,41 @@ class AIAdvisorController extends Controller
         }
 
         $lowStock = Product::where('boutique_id', $boutiqueId)
-            ->where('stock', '<', 10)
-            ->where('stock', '>', 0)
+            ->where('is_active', true)
+            ->where('stock_quantity', '<=', $threshold)
+            ->where('stock_quantity', '>', 0)
             ->get();
 
         foreach ($lowStock as $product) {
             $recommendations[] = [
                 'type' => 'low_stock',
                 'title' => 'Stock faible',
-                'message' => "Le produit '{$product->name}' n'a plus que {$product->stock} unités en stock.",
+                'message' => "Le produit '{$product->name}' n'a plus que {$product->stock_quantity} unités en stock.",
                 'product_id' => $product->id,
                 'priority' => 'medium',
+            ];
+        }
+
+        $outOfStock = Product::where('boutique_id', $boutiqueId)
+            ->where('is_active', true)
+            ->where('stock_quantity', '<=', 0)
+            ->limit(5)
+            ->get();
+
+        foreach ($outOfStock as $product) {
+            $recommendations[] = [
+                'type' => 'out_of_stock',
+                'title' => 'Rupture de stock',
+                'message' => "Le produit '{$product->name}' est en rupture de stock.",
+                'product_id' => $product->id,
+                'priority' => 'high',
             ];
         }
 
         return response()->json([
             'top_products' => $topProducts,
             'recommendations' => $recommendations,
+            'stock_alert_threshold' => $threshold,
         ]);
     }
 }

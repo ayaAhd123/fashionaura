@@ -14,6 +14,7 @@ use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\CityController as AdminCityController;
 use App\Http\Controllers\Admin\BoutiqueValidationController;
+use App\Http\Controllers\Boutique\BoutiqueProductController;
 use App\Http\Controllers\Boutique\BoutiqueDashboardController;
 use App\Http\Controllers\Boutique\AIAdvisorController;
 use App\Http\Controllers\Boutique\NotificationController;
@@ -82,10 +83,19 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/dashboard/stats', [BoutiqueDashboardController::class, 'stats']);
         Route::get('/dashboard/charts', [BoutiqueDashboardController::class, 'charts']);
 
+        Route::get('/products/categories', [BoutiqueProductController::class, 'categories']);
+        Route::get('/products', [BoutiqueProductController::class, 'index']);
+        Route::post('/products', [BoutiqueProductController::class, 'store']);
+        Route::put('/products/{id}', [BoutiqueProductController::class, 'update']);
+        Route::delete('/products/{id}', [BoutiqueProductController::class, 'destroy']);
+
         Route::get('/ai-advisor/recommendations', [AIAdvisorController::class, 'recommendations']);
 
         Route::get('/notifications', [NotificationController::class, 'index']);
         Route::get('/notifications/unread-count', [NotificationController::class, 'unreadCount']);
+        Route::get('/notifications/stock-settings', [NotificationController::class, 'stockSettings']);
+        Route::put('/notifications/stock-settings', [NotificationController::class, 'updateStockSettings']);
+        Route::post('/notifications/check-stock', [NotificationController::class, 'checkStock']);
         Route::put('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
         Route::put('/notifications/read-all', [NotificationController::class, 'markAllAsRead']);
     });

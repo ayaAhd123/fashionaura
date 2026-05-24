@@ -40,5 +40,5 @@ export const useAdminAnalytics     = (period='30days') => useDashboardData('/adm
 export const usePendingBoutiques   = ()          => useDashboardData('/admin/boutiques/pending', {}, []);
 export const useBoutiqueStats      = ()          => useDashboardData('/boutique/dashboard/stats');
 export const useBoutiqueCharts     = (period='30days') => useDashboardData('/boutique/dashboard/charts', { period });
-export const useBoutiqueNotifications = ()       => useDashboardData('/boutique/notifications', {}, []);
+export const useBoutiqueNotifications = ()       => useDashboardData('/boutique/notifications', {}, { data: [] });
 export const useAIRecommendations  = ()          => useDashboardData('/boutique/ai-advisor/recommendations');
