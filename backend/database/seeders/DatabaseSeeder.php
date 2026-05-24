@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
             ProductSeeder::class,
             ProductImageSeeder::class,
             ProductVariantSeeder::class,
+            TangerFashionSeeder::class,
             ReviewSeeder::class,
         ]);
     }

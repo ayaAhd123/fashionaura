@@ -13,6 +13,7 @@ use App\Http\Controllers\API\ChatbotController;
 // Public Routes
 
 // Cities
+Route::get('/stats', [CityController::class, 'stats']);
 Route::get('/cities', [CityController::class, 'index']);
 Route::get('/cities/top-boutiques', [CityController::class, 'topBoutiques']);
 Route::get('/cities/{slug}', [CityController::class, 'show']);

@@ -38,6 +38,22 @@ class DemoMediaUrls
         'logo' => 'https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=400&h=400&fit=crop&q=80',
         'banner' => 'https://images.unsplash.com/photo-1617137968427-85924c800a41?w=1200&h=450&fit=crop&q=80',
       ],
+      'cap-spartel-mariee' => [
+        'logo' => 'https://images.unsplash.com/photo-1519741497674-611481863552?w=400&h=400&fit=crop&q=80',
+        'banner' => 'https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=1200&h=450&fit=crop&q=80',
+      ],
+      'bab-kasbah-homme' => [
+        'logo' => 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&q=80',
+        'banner' => 'https://images.unsplash.com/photo-1617127365659-c47fa864d8bc?w=1200&h=450&fit=crop&q=80',
+      ],
+      'azulejos-co' => [
+        'logo' => 'https://images.unsplash.com/photo-1611591437281-460bf0a0b2c4?w=400&h=400&fit=crop&q=80',
+        'banner' => 'https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=1200&h=450&fit=crop&q=80',
+      ],
+      'malabata-summer' => [
+        'logo' => 'https://images.unsplash.com/photo-1509631179647-0177331693ae?w=400&h=400&fit=crop&q=80',
+        'banner' => 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&h=450&fit=crop&q=80',
+      ],
     ];
 
     return $map[$slug] ?? [
@@ -82,6 +98,27 @@ class DemoMediaUrls
       'sac-cuir-artisanal' => [
         'https://images.unsplash.com/photo-1590874103328-e188e96e6419?w=600&h=800&fit=crop&q=80',
         'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=600&h=800&fit=crop&q=80',
+      ],
+      'takchita-royale-brodee' => [
+        'https://images.unsplash.com/photo-1617137968427-85924c800a41?w=600&h=800&fit=crop&q=80',
+      ],
+      'takchita-cristal-blanc' => [
+        'https://images.unsplash.com/photo-1519741497674-611481863552?w=600&h=800&fit=crop&q=80',
+      ],
+      'caftan-mariage-perle' => [
+        'https://images.unsplash.com/photo-1583497019940-1c28c814b91f?w=600&h=800&fit=crop&q=80',
+      ],
+      'costume-lin-beige-homme' => [
+        'https://images.unsplash.com/photo-1594938298602-c814c564c4e8?w=600&h=800&fit=crop&q=80',
+      ],
+      'foulard-soie-azulejos' => [
+        'https://images.unsplash.com/photo-1601925260368-ae2f83cf8b7f?w=600&h=800&fit=crop&q=80',
+      ],
+      'coffret-cadeau-parfum-foulard' => [
+        'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=600&h=800&fit=crop&q=80',
+      ],
+      'robe-lin-plage' => [
+        'https://images.unsplash.com/photo-1595777457583-95e059588314?w=600&h=800&fit=crop&q=80',
       ],
     ];
 

@@ -842,6 +842,192 @@ body {
 }
 
 
+/* ─── CITIES GRID (landing) ──────────────── */
+.cities-grid-section {
+    padding: 5rem 4rem;
+    background: var(--white);
+}
+
+.cities-grid-section__inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.cities-grid-section__sub {
+    color: var(--gray-warm);
+    font-size: 1rem;
+    margin: 0 0 2.5rem;
+    font-weight: 300;
+}
+
+.cities-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.25rem;
+    text-align: left;
+}
+
+.city-card {
+    background: var(--cream);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 0.5s ease, transform 0.5s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.city-card--visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.city-card:hover {
+    box-shadow: 0 16px 40px rgba(44, 42, 34, 0.08);
+    border-color: var(--sage-light);
+    transform: translateY(-4px);
+}
+
+.city-card-img {
+    height: 100px;
+    background: linear-gradient(135deg, var(--sage-light) 0%, var(--map-fill) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.city-card-emoji {
+    font-size: 2.5rem;
+}
+
+.city-card-body {
+    padding: 1.125rem 1rem 1.25rem;
+}
+
+.city-card-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.35rem;
+    font-weight: 600;
+    color: var(--black-warm);
+    margin: 0 0 0.25rem;
+}
+
+.city-card-region {
+    font-size: 0.6875rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gray-warm);
+    margin: 0 0 0.75rem;
+}
+
+.city-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    color: var(--sage-dark);
+    font-weight: 500;
+}
+
+.city-card-arrow {
+    opacity: 0.5;
+    transition: transform 0.2s, opacity 0.2s;
+}
+
+.city-card:hover .city-card-arrow {
+    transform: translateX(4px);
+    opacity: 1;
+}
+
+/* ─── ABOUT / SYNTHÈSE ───────────────────── */
+.about-strip {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: 520px;
+    background: var(--cream-dark);
+}
+
+.about-left {
+    padding: 5rem 4rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.about-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2rem, 4vw, 2.75rem);
+    font-weight: 500;
+    color: var(--black-warm);
+    line-height: 1.15;
+    margin: 0 0 1.25rem;
+}
+
+.about-lead {
+    font-size: 1.05rem;
+    line-height: 1.65;
+    color: var(--gray-warm);
+    margin: 0 0 2rem;
+    font-weight: 300;
+}
+
+.about-modules {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.about-modules li {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    padding-left: 1rem;
+    border-left: 2px solid var(--sage-dark);
+}
+
+.about-modules strong {
+    font-size: 0.8125rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--black-warm);
+}
+
+.about-modules span {
+    font-size: 0.875rem;
+    line-height: 1.55;
+    color: var(--gray-warm);
+    font-weight: 300;
+}
+
+.about-synthesis {
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+    color: var(--gray-light);
+    font-style: italic;
+    margin: 0;
+}
+
+.about-right {
+    background: var(--black-warm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+}
+
+.about-visual {
+    max-width: 280px;
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.3));
+}
+
 /* ─── FOOTER ─────────────────────────────── */
 .landing-footer {
     background: var(--black-warm);
@@ -864,6 +1050,10 @@ body {
 
 /* ─── RESPONSIVE ─────────────────────────── */
 @media (max-width: 1100px) {
+    .cities-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
     .hero-content {
         padding: 0 4rem 0 3rem;
     }
@@ -957,6 +1147,14 @@ body {
 
     .explore-center {
         padding: 2rem 1rem;
+    }
+
+    .cities-grid-section {
+        padding: 3rem 1.25rem;
+    }
+
+    .cities-grid {
+        grid-template-columns: 1fr;
     }
 
     .explore-center-map {

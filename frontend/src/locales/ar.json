@@ -75,7 +75,20 @@
     "chat_ai_1": "مرحباً! أنا منسقة أزيائك الذكية. ماذا تبحثين عنه اليوم؟",
     "chat_user": "أبحث عن إطلالة لحفل زفاف مغربي تقليدي",
     "chat_ai_2": "اختيار رائع! أنصحك بقفطان من Maison Amira في مراكش...",
-    "footer_copy": "© 2025 FashionAura — جميع الحقوق محفوظة"
+    "footer_copy": "© 2025 FashionAura — جميع الحقوق محفوظة",
+    "cities_grid_tag": "استكشف",
+    "cities_grid_title": "جميع مدننا",
+    "cities_grid_sub": "اختر وجهة واكتشف المتاجر المحلية",
+    "about_tag": "مشروع التركيب",
+    "about_title": "FashionAura، الأزياء المغربية حسب المدينة",
+    "about_lead": "FashionAura منصة تربط مبدعي الأزياء المغربية بالمشترين، مدينة بمدينة.",
+    "about_module_discovery": "وحدة الاستكشاف",
+    "about_module_discovery_desc": "صفحة رئيسية غامرة، خريطة المغرب التفاعلية وصفحات مدن مميزة — متعدد اللغات.",
+    "about_module_shop": "وحدة التجارة",
+    "about_module_shop_desc": "سجل المتاجر والمنتجات والسلة والمفضلة.",
+    "about_module_ai": "مساعد الذكاء الاصطناعي",
+    "about_module_ai_desc": "منسقة أزياء ذكية متصلة بالمنتجات والمتاجر الحقيقية.",
+    "about_synthesis": "مشروع تركيب أكاديمي — بيانات وهمية لأغراض تعليمية."
   },
   "city": {
     "filter_all": "الكل",
@@ -90,7 +103,9 @@
     "back_map": "الخريطة",
     "explore_city": "استكشفي المدينة",
     "boutiques_count": "{{count}} بوتيك",
-    "boutiques_count_plural": "{{count}} بوتيكات"
+    "boutiques_count_plural": "{{count}} بوتيكات",
+    "boutiques_in_city": "{{count}} متاجر مميزة",
+    "poetic_label": "المدينة باختصار"
   },
   "cities": {
     "casablanca": {
@@ -149,5 +164,39 @@
       "poetic": "حيث يستيقظ المغرب",
       "hero_title": "وجدة"
     }
+  },
+  "chatbot": {
+    "name": "FashionBot",
+    "status": "مصمم أزياء ذكي · FashionAura",
+    "status_city": "دليل · {{city}}",
+    "welcome": "سلام! أنا FashionBot، مصمم أزياء ذكي.\nأخبرني عن المناسبة أو الأسلوب أو الألوان — أنصحك أولاً ثم أعرض المتاجر إذا طلبت ذلك.",
+    "welcome_city": "سلام! أنت تستكشف {{city}}.\nأخبرني عن المناسبة أو الأسلوب المطلوب — أقدم نصائح أولاً ثم أعرض المتاجر عند رغبتك.",
+    "placeholder": "اكتب سؤالك عن الموضة...",
+    "photo_sent": "📷 تم إرسال الصورة",
+    "error": "عذراً، حدث خطأ.",
+    "chip_wedding": "زي لحفل زفاف",
+    "chip_gift": "فكرة هدية",
+    "chip_boutiques_tanger": "متاجر طنجة",
+    "chip_boutiques_city": "متاجر {{city}}",
+    "chip_top_boutiques": "أفضل المتاجر حسب المدينة",
+    "chip_advice_wedding": "نصائح زي الزفاف",
+    "chip_advice_evening": "إطلالة سهرة أنيقة",
+    "chip_advice_colors": "ما الألوان المناسبة؟",
+    "chip_show_boutiques": "أرني المتاجر",
+    "chip_show_boutiques_city": "أرني متاجر {{city}}",
+    "prefill_city": "ما المتاجر التي تنصح بها في {{city}}؟",
+    "prefill_top": "ما أفضل المتاجر في كل مدينة؟",
+    "ask_button": "اسأل FashionBot",
+    "ask_top": "اطلب أفضل 3 من FashionBot",
+    "expand": "توسيع النافذة",
+    "shrink": "تصغير النافذة",
+    "fullscreen": "ملء الشاشة",
+    "exit_fullscreen": "الخروج من ملء الشاشة",
+    "close": "إغلاق المحادثة",
+    "upload_title": "إرسال صورة",
+    "type_product": "منتج",
+    "type_boutique": "متجر",
+    "country_fallback": "المغرب",
+    "cta_view": "عرض →"
   }
 }

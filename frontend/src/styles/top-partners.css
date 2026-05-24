@@ -537,6 +537,24 @@ html[dir='rtl'] .top-gold-page__back {
   box-shadow: 0 12px 32px rgba(157, 176, 157, 0.5);
 }
 
+.landing-top-partners__ai-link {
+  display: block;
+  margin: 1.25rem auto 0;
+  background: none;
+  border: none;
+  color: #9DB09D;
+  font-size: 0.8125rem;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  transition: color 0.2s ease;
+}
+
+.landing-top-partners__ai-link:hover {
+  color: #7a917a;
+}
+
 .landing-top-partners__skeleton {
   height: 6rem;
   border-radius: 1rem;

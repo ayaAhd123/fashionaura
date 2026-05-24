@@ -1,16 +1,16 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { getCities, getTopBoutiquesByCity } from '../api/cityService';
+import { getCities, getTopBoutiquesByCity, getSiteStats } from '../api/cityService';
 import mapImage from '../images/map-of-morocco-morocco-map-on-white-background-free-vector.jpg';
 import heroImage from '../images/7cc005b2eb503737952150e1655566bb.jpg';
-import aboutImage from '../images/Gemini_Generated_Image_cccb5vcccb5vcccb-removebg-preview.png';
 import '../styles/landing.css';
 import '../styles/top-partners.css';
 import CustomCursor from '../components/CustomCursor';
 import FashionAuraLogo from '../components/common/FashionAuraLogo';
 import LanguageSwitcher from '../components/LanguageSwitcher';
 import { getCitySlug, cityName, cityRegion, marqueeCityText } from '../utils/cityI18n';
+import { openFashionBot } from '../utils/openFashionBot';
 
 // ── Image Map Coordinates (by city slug) ─────────────────────────────────────
 const CITY_COORDS = {
@@ -22,12 +22,6 @@ const CITY_COORDS = {
     oujda: { top: 17, left: 83 },
     marrakech: { top: 42, left: 55 },
     agadir: { top: 63, left: 44 },
-};
-
-const CITY_EMOJIS = {
-    casablanca: '🌆', marrakech: '🏯', tanger: '⚓',
-    rabat: '🏛️', fes: '🕌', agadir: '🏖️',
-    meknes: '🌿', oujda: '🌄',
 };
 
 const DEFAULT_CITIES = [
@@ -111,48 +105,6 @@ function StatItem({ number, label, suffix = '' }) {
         <div className="stat-item" ref={ref}>
             <span className="stat-number">{val}{suffix}</span>
             <span className="stat-label">{label}</span>
-        </div>
-    );
-}
-
-// ── City card (scroll-reveal) ─────────────────────────────────────────────────
-function CityCard({ city, index, onClick }) {
-    const { t } = useTranslation();
-    const ref = useRef(null);
-    const [vis, setVis] = useState(false);
-
-    useEffect(() => {
-        const observer = new IntersectionObserver(
-            ([entry]) => { if (entry.isIntersecting) { setVis(true); observer.disconnect(); } },
-            { threshold: 0.1 }
-        );
-        if (ref.current) observer.observe(ref.current);
-        return () => observer.disconnect();
-    }, []);
-
-    const slug = getCitySlug(city);
-
-    return (
-        <div
-            ref={ref}
-            className={`city-card ${vis ? 'city-card--visible' : ''}`}
-            style={{ transitionDelay: `${(index % 4) * 0.08}s` }}
-            onClick={onClick}
-            data-cursor-grow
-        >
-            <div className="city-card-img">
-                <span className="city-card-emoji">{CITY_EMOJIS[slug] || '🏙️'}</span>
-            </div>
-            <div className="city-card-body">
-                <h3 className="city-card-name">{cityName(t, city)}</h3>
-                <p className="city-card-region">{cityRegion(t, city)}</p>
-                <div className="city-card-footer">
-                    <span className="city-card-boutiques">
-                        {t('city.boutiques_count_plural', { count: city.boutiques_count ?? 0 })}
-                    </span>
-                    <span className="city-card-arrow">→</span>
-                </div>
-            </div>
         </div>
     );
 }
@@ -264,6 +216,14 @@ function TopPartnersTeaser({ navigate }) {
                 >
                     {t('landing.top_partners_cta')} →
                 </MagneticButton>
+
+                <button
+                    type="button"
+                    className="landing-top-partners__ai-link"
+                    onClick={() => openFashionBot({ prefill: t('chatbot.prefill_top') })}
+                >
+                    ✦ {t('chatbot.ask_top')}
+                </button>
             </div>
         </section>
     );
@@ -273,27 +233,30 @@ function TopPartnersTeaser({ navigate }) {
 const LandingPage = () => {
     const { t, i18n } = useTranslation();
     const [cities, setCities] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [stats, setStats] = useState({ cities: 0, boutiques: 0, products: 0 });
     const [navShrunk, setNavShrunk] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const navigate = useNavigate();
 
-    // Fetch cities
+    // Fetch cities + stats
     useEffect(() => {
-        getCities()
-            .then(data => {
-                if (data && data.length > 0) {
-                    setCities(data);
-                } else {
-                    setCities(DEFAULT_CITIES);
-                }
-                setLoading(false);
-            })
-            .catch(err => {
-                console.error('Erreur SQL (Fallback activé):', err);
+        Promise.all([
+            getCities().catch(() => null),
+            getSiteStats().catch(() => null),
+        ]).then(([citiesData, statsData]) => {
+            if (citiesData && citiesData.length > 0) {
+                setCities(citiesData);
+            } else {
                 setCities(DEFAULT_CITIES);
-                setLoading(false);
-            });
+            }
+            if (statsData) {
+                setStats({
+                    cities: statsData.cities ?? 0,
+                    boutiques: statsData.boutiques ?? 0,
+                    products: statsData.products ?? 0,
+                });
+            }
+        });
     }, []);
 
     // Navbar shrink on scroll
@@ -318,14 +281,14 @@ const LandingPage = () => {
 
     const scrollToSection = useCallback((id) => {
         if (id === 'stylist') {
-            window.dispatchEvent(new Event('openFashionBot'));
+            openFashionBot();
             return;
         }
         document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
     }, []);
 
     const openChatbot = useCallback(() => {
-        window.dispatchEvent(new Event('openFashionBot'));
+        openFashionBot();
     }, []);
 
     useEffect(() => {
@@ -345,7 +308,6 @@ const LandingPage = () => {
                 <ul className={`navbar-links hero-reveal ${mobileMenuOpen ? 'active' : ''}`}>
                     <li><a href="/" onClick={() => setMobileMenuOpen(false)}>{t('landing.nav_home')}</a></li>
                     <li><a href="#explore" onClick={() => setMobileMenuOpen(false)}>{t('landing.nav_explore')}</a></li>
-                    <li><a href="#about" onClick={() => setMobileMenuOpen(false)}>{t('landing.nav_about')}</a></li>
                     <li className="navbar-links__lang">
                         <LanguageSwitcher variant="header" />
                     </li>
@@ -413,15 +375,15 @@ const LandingPage = () => {
 
                 {/* ── STATS BANNER ── */}
                 <div className="stats-banner">
-                    <StatItem number={cities.length || 8} label={t('landing.stats_cities')} suffix="+" />
-                    <StatItem number={120} label={t('landing.stats_boutiques')} suffix="+" />
-                    <StatItem number={500} label={t('landing.stats_products')} suffix="+" />
+                    <StatItem number={stats.cities || cities.length || 5} label={t('landing.stats_cities')} suffix="+" />
+                    <StatItem number={stats.boutiques || 0} label={t('landing.stats_boutiques')} suffix="+" />
+                    <StatItem number={stats.products || 0} label={t('landing.stats_products')} suffix="+" />
                     <StatItem number={100} label={t('landing.stats_moroccan')} suffix="%" />
                 </div>
 
                 <Divider />
 
-                {/* ── ALONE EXPLORE SECTION ── */}
+                {/* ── MAP ── */}
                 <section className="explore-center" id="explore">
                     <div className="explore-center-map">
                         <div className="map-heading-local">

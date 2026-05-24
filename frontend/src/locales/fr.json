@@ -75,7 +75,20 @@
     "chat_ai_1": "Bonjour ! Je suis votre styliste IA. Que cherchez-vous aujourd'hui ?",
     "chat_user": "Je cherche une tenue pour un mariage marocain traditionnel",
     "chat_ai_2": "Excellent choix ! Je vous recommande un caftan de chez Maison Amira à Marrakech...",
-    "footer_copy": "© 2025 FashionAura — Tous droits réservés"
+    "footer_copy": "© 2025 FashionAura — Tous droits réservés",
+    "cities_grid_tag": "Parcourir",
+    "cities_grid_title": "Toutes nos villes",
+    "cities_grid_sub": "Choisissez une destination et découvrez les boutiques locales",
+    "about_tag": "Projet de synthèse",
+    "about_title": "FashionAura, la mode marocaine par ville",
+    "about_lead": "FashionAura est une marketplace qui connecte les créateurs de mode marocaine aux acheteurs, ville par ville.",
+    "about_module_discovery": "Module découverte",
+    "about_module_discovery_desc": "Landing immersive, carte interactive du Maroc et pages ville thématiques — parcours géographique multilingue (FR · EN · ES · AR).",
+    "about_module_shop": "Module e-commerce",
+    "about_module_shop_desc": "Catalogue boutiques, créations, panier et favoris — parcours d'achat complet.",
+    "about_module_ai": "Assistant IA",
+    "about_module_ai_desc": "Styliste intelligent connecté au catalogue réel pour recommander boutiques et tenues.",
+    "about_synthesis": "Projet réalisé dans le cadre d'un projet de synthèse — données et boutiques fictives à des fins pédagogiques."
   },
   "city": {
     "filter_all": "Tout",
@@ -90,7 +103,9 @@
     "back_map": "Carte",
     "explore_city": "Explorer la ville",
     "boutiques_count": "{{count}} boutique",
-    "boutiques_count_plural": "{{count}} boutiques"
+    "boutiques_count_plural": "{{count}} boutiques",
+    "boutiques_in_city": "{{count}} boutiques d'exception",
+    "poetic_label": "La ville en bref"
   },
   "cities": {
     "casablanca": {
@@ -149,5 +164,39 @@
       "poetic": "Là où le Maroc s'éveille",
       "hero_title": "Oujda"
     }
+  },
+  "chatbot": {
+    "name": "FashionBot",
+    "status": "Styliste IA · FashionAura",
+    "status_city": "Guide · {{city}}",
+    "welcome": "Salam ! Je suis FashionBot, ton styliste IA.\nParle-moi de l'occasion, du style ou des couleurs que tu cherches — je te conseille avant de te proposer des boutiques.",
+    "welcome_city": "Salam ! Tu explores {{city}}.\nDis-moi l'occasion ou le style recherché : je te guide avec des conseils mode, puis je peux te montrer des boutiques si tu le souhaites.",
+    "placeholder": "Écris ta question mode...",
+    "photo_sent": "📷 Photo envoyée",
+    "error": "Désolé, une erreur est survenue.",
+    "chip_wedding": "Tenue pour un mariage",
+    "chip_gift": "Idée cadeau",
+    "chip_boutiques_tanger": "Boutiques à Tanger",
+    "chip_boutiques_city": "Boutiques à {{city}}",
+    "chip_top_boutiques": "Meilleures boutiques par ville",
+    "chip_advice_wedding": "Conseils tenue mariage",
+    "chip_advice_evening": "Look soirée élégante",
+    "chip_advice_colors": "Quelles couleurs porter ?",
+    "chip_show_boutiques": "Montrez-moi des boutiques",
+    "chip_show_boutiques_city": "Montrez des boutiques à {{city}}",
+    "prefill_city": "Quelles boutiques recommandes-tu à {{city}} ?",
+    "prefill_top": "Quelles sont les meilleures boutiques par ville ?",
+    "ask_button": "Demander à FashionBot",
+    "ask_top": "Demander le top 3 à FashionBot",
+    "expand": "Agrandir la fenêtre",
+    "shrink": "Réduire la fenêtre",
+    "fullscreen": "Plein écran",
+    "exit_fullscreen": "Quitter le plein écran",
+    "close": "Fermer le chat",
+    "upload_title": "Envoyer une photo",
+    "type_product": "Produit",
+    "type_boutique": "Boutique",
+    "country_fallback": "Maroc",
+    "cta_view": "Voir →"
   }
 }

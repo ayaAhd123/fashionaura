@@ -3,6 +3,7 @@
 use App\Models\City;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Schema;
 
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
@@ -19,6 +20,18 @@ Artisan::command('fashionaura:ensure-data', function () {
         }
     } else {
         $this->comment('Database driver: '.$driver.' · '.config('database.connections.'.$driver.'.database'));
+    }
+
+    $schemaOk = Schema::hasTable('cities')
+        && Schema::hasColumn('cities', 'slug')
+        && Schema::hasColumn('cities', 'is_active');
+
+    if (Schema::hasTable('cities') && ! $schemaOk) {
+        $this->warn('Ancien schéma détecté (table cities sans slug/is_active). Réinitialisation…');
+        $this->call('migrate:fresh', ['--force' => true, '--seed' => true]);
+        $this->info('Base réinitialisée avec le schéma FashionAura actuel.');
+
+        return 0;
     }
 
     $this->call('migrate', ['--force' => true]);

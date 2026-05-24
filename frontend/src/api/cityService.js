@@ -16,3 +16,8 @@ export const getTopBoutiquesByCity = async () => {
     const response = await api.get('/cities/top-boutiques');
     return response.data;
 };
+
+export const getSiteStats = async () => {
+    const response = await api.get('/stats');
+    return response.data;
+};

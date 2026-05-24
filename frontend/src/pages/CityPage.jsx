@@ -16,7 +16,9 @@ import FashionAuraLogo from '../components/common/FashionAuraLogo';
 import LanguageSwitcher from '../components/LanguageSwitcher';
 
 import zelligeImage from '../images/zellige-marocain.jpg';
-import { getCitySlug, cityName, cityRegion, cityHeroTitle, cityNickname, getCityTheme } from '../utils/cityI18n';
+import { Sparkles } from 'lucide-react';
+import { getCitySlug, cityName, cityRegion, cityHeroTitle, cityNickname, cityPoetic, getCityTheme } from '../utils/cityI18n';
+import { openFashionBot } from '../utils/openFashionBot';
 
 const FILTER_OPTIONS = [
     { id: 'Tout', labelKey: 'city.filter_all' },
@@ -48,6 +50,18 @@ const CITY_THEMES = {
     marrakech: {
         bg: '#0F0200', bgRgb: '15, 2, 0', main: '#C04820', mid: '#E07840', light: '#F5D5C0', accent: '#F0C898',
         effect: 'heat',
+    },
+    agadir: {
+        bg: '#0A1628', bgRgb: '10, 22, 40', main: '#3B82C4', mid: '#7CB9E8', light: '#E8F4FC', accent: '#F5D0A0',
+        effect: 'coast',
+    },
+    meknes: {
+        bg: '#1A1208', bgRgb: '26, 18, 8', main: '#8B6914', mid: '#C4A035', light: '#F5E6C8', accent: '#D4AF6A',
+        effect: 'imperial',
+    },
+    oujda: {
+        bg: '#120818', bgRgb: '18, 8, 24', main: '#7B3FA0', mid: '#B87FD4', light: '#F0E0F8', accent: '#E8C872',
+        effect: 'dawn',
     },
 };
 
@@ -462,11 +476,26 @@ const CityPage = () => {
 
                     <span className="city-nickname">{cityNickname(t, city)}</span>
 
+                    <p className="city-poetic">
+                        <span className="city-poetic__label">{t('city.poetic_label')}</span>
+                        {cityPoetic(t, city)}
+                    </p>
+
                     <div className="city-editorial-stat">
-
-                        {boutiques.length} boutiques d'exception
-
+                        {t('city.boutiques_in_city', { count: boutiques.length })}
                     </div>
+
+                    <button
+                        type="button"
+                        className="city-fashionbot-btn"
+                        onClick={() => openFashionBot({
+                            city: citySlug,
+                            cityName: cityName(t, city),
+                        })}
+                    >
+                        <Sparkles size={16} />
+                        {t('chatbot.ask_button')}
+                    </button>
 
                 </div>
 
@@ -709,7 +738,7 @@ const CityPage = () => {
                                     onFollow={handleFollow}
 
                                     isFollowing={following[boutique.id] || false}
-
+                                    showDelivery
                                 />
 
                             </div>

@@ -1,7 +1,7 @@
 import axios from './axios';
 
-export const sendMessage = async (message, history = [], imageBase64 = null) => {
-    const payload = { message, history };
+export const sendMessage = async (message, history = [], imageBase64 = null, context = {}) => {
+    const payload = { message, history, context };
 
     if (imageBase64) {
         payload.image = imageBase64;

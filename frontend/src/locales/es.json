@@ -75,7 +75,20 @@
     "chat_ai_1": "¡Hola! Soy tu estilista IA. ¿Qué buscas hoy?",
     "chat_user": "Busco un atuendo para una boda marroquí tradicional",
     "chat_ai_2": "¡Excelente elección! Te recomiendo un caftán de Maison Amira en Marrakech...",
-    "footer_copy": "© 2025 FashionAura — Todos los derechos reservados"
+    "footer_copy": "© 2025 FashionAura — Todos los derechos reservados",
+    "cities_grid_tag": "Explorar",
+    "cities_grid_title": "Todas nuestras ciudades",
+    "cities_grid_sub": "Elige un destino y descubre las boutiques locales",
+    "about_tag": "Proyecto de síntesis",
+    "about_title": "FashionAura, moda marroquí por ciudad",
+    "about_lead": "FashionAura es un marketplace que conecta creadores de moda marroquí con compradores, ciudad por ciudad.",
+    "about_module_discovery": "Módulo descubrimiento",
+    "about_module_discovery_desc": "Landing inmersiva, mapa interactivo de Marruecos y páginas ciudad temáticas — recorrido multilingüe (FR · EN · ES · AR).",
+    "about_module_shop": "Módulo e-commerce",
+    "about_module_shop_desc": "Catálogo de boutiques, creaciones, carrito y favoritos.",
+    "about_module_ai": "Asistente IA",
+    "about_module_ai_desc": "Estilista inteligente conectado al catálogo real.",
+    "about_synthesis": "Proyecto de síntesis — datos ficticios con fines pedagógicos."
   },
   "city": {
     "filter_all": "Todo",
@@ -90,7 +103,9 @@
     "back_map": "Mapa",
     "explore_city": "Explorar la ciudad",
     "boutiques_count": "{{count}} boutique",
-    "boutiques_count_plural": "{{count}} boutiques"
+    "boutiques_count_plural": "{{count}} boutiques",
+    "boutiques_in_city": "{{count}} boutiques excepcionales",
+    "poetic_label": "La ciudad en breve"
   },
   "cities": {
     "casablanca": {
@@ -149,5 +164,39 @@
       "poetic": "Donde despierta Marruecos",
       "hero_title": "Uchda"
     }
+  },
+  "chatbot": {
+    "name": "FashionBot",
+    "status": "Estilista IA · FashionAura",
+    "status_city": "Guía · {{city}}",
+    "welcome": "¡Salam! Soy FashionBot, tu estilista IA.\nCuéntame la ocasión, el estilo o los colores que buscas — te aconsejo primero y te muestro boutiques si lo pides.",
+    "welcome_city": "¡Salam! Estás explorando {{city}}.\nDime la ocasión o el estilo que buscas: te guío con consejos, luego te muestro boutiques si quieres.",
+    "placeholder": "Escribe tu pregunta de moda...",
+    "photo_sent": "📷 Foto enviada",
+    "error": "Lo sentimos, ha ocurrido un error.",
+    "chip_wedding": "Outfit para una boda",
+    "chip_gift": "Idea de regalo",
+    "chip_boutiques_tanger": "Boutiques en Tánger",
+    "chip_boutiques_city": "Boutiques en {{city}}",
+    "chip_top_boutiques": "Mejores boutiques por ciudad",
+    "chip_advice_wedding": "Consejos tenue boda",
+    "chip_advice_evening": "Look noche elegante",
+    "chip_advice_colors": "¿Qué colores llevar?",
+    "chip_show_boutiques": "Muéstrame boutiques",
+    "chip_show_boutiques_city": "Muéstrame boutiques en {{city}}",
+    "prefill_city": "¿Qué boutiques recomiendas en {{city}}?",
+    "prefill_top": "¿Cuáles son las mejores boutiques por ciudad?",
+    "ask_button": "Preguntar a FashionBot",
+    "ask_top": "Pedir el top 3 a FashionBot",
+    "expand": "Ampliar ventana",
+    "shrink": "Reducir ventana",
+    "fullscreen": "Pantalla completa",
+    "exit_fullscreen": "Salir de pantalla completa",
+    "close": "Cerrar chat",
+    "upload_title": "Enviar una foto",
+    "type_product": "Producto",
+    "type_boutique": "Boutique",
+    "country_fallback": "Marruecos",
+    "cta_view": "Ver →"
   }
 }
