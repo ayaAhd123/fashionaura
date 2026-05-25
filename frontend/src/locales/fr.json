@@ -205,5 +205,21 @@
     "type_boutique": "Boutique",
     "country_fallback": "Maroc",
     "cta_view": "Voir →"
+  },
+  "merchant_copilot": {
+    "name": "Copilote Magasinier",
+    "status": "Assistant boutique · FashionAura",
+    "welcome": "Bonjour ! Je suis votre copilote magasinier.\nJ'analyse les ventes, stocks et performances de votre boutique pour vous proposer des actions concrètes (réappro, prix, promos).\nQue souhaitez-vous optimiser ce mois-ci ?",
+    "placeholder": "Ex : stocks en rupture, ventes du mois, promo à lancer…",
+    "error": "Analyse temporairement indisponible. Réessayez ou consultez Conseiller IA.",
+    "chip_sales": "Booster les ventes",
+    "chip_stock": "Produits en rupture",
+    "chip_top": "Mes meilleures ventes",
+    "chip_month": "Priorités du mois",
+    "expand": "Agrandir",
+    "shrink": "Réduire",
+    "fullscreen": "Plein écran",
+    "exit_fullscreen": "Quitter le plein écran",
+    "close": "Fermer le copilote"
   }
 }

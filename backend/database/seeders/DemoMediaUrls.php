@@ -127,6 +127,34 @@ class DemoMediaUrls
     ];
   }
 
+  /** Images par type de vêtement (seeders alertes stock, etc.) */
+  public static function byType(string $type): array
+  {
+    return match ($type) {
+      'robe' => [
+        'https://images.unsplash.com/photo-1595777457583-95e059588314?w=600&h=800&fit=crop&q=80',
+      ],
+      'pantalon' => [
+        'https://images.unsplash.com/photo-1594633313593-bab3825d0f8d?w=600&h=800&fit=crop&q=80',
+      ],
+      'chemise' => [
+        'https://images.unsplash.com/photo-1596755094514-f87e3aae836b?w=600&h=800&fit=crop&q=80',
+      ],
+      'veste' => [
+        'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=600&h=800&fit=crop&q=80',
+      ],
+      'sac' => [
+        'https://images.unsplash.com/photo-1590874103328-e188e96e6419?w=600&h=800&fit=crop&q=80',
+      ],
+      'chaussure' => [
+        'https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=600&h=800&fit=crop&q=80',
+      ],
+      default => [
+        'https://images.unsplash.com/photo-1483985988353-763728e1935b?w=600&h=800&fit=crop&q=80',
+      ],
+    };
+  }
+
   public static function city(string $slug): string
   {
     $map = [

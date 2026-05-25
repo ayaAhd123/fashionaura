@@ -6,19 +6,17 @@ use App\Models\Boutique;
 use App\Models\Category;
 use App\Models\Notification;
 use App\Models\Product;
+use App\Models\ProductImage;
 use App\Models\User;
 use App\Services\StockAlertService;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 
 /**
- * Données de démo pour tester alertes stock + notifications.
+ * Produits réalistes (robe, pantalon, chemise…) avec photos pour tester les alertes stock.
  *
  * Usage :
  *   php artisan db:seed --class=StockAlertTestSeeder
- *
- * Puis connectez-vous en magasinier (ex. sarah@luxuryfashion.com / password123)
- * et ouvrez /boutique/notifications
  */
 class StockAlertTestSeeder extends Seeder
 {
@@ -37,7 +35,9 @@ class StockAlertTestSeeder extends Seeder
             return;
         }
 
-        $this->command?->info('Configuration des seuils et stocks de test…');
+        $this->ensureCategories();
+
+        $this->command?->info('Configuration des seuils et catalogue démo (robes, pantalons, chemises…)…');
 
         $thresholdPresets = [10, 5, 20, 10, 10];
 
@@ -50,12 +50,12 @@ class StockAlertTestSeeder extends Seeder
             $threshold = $thresholdPresets[$index] ?? 10;
             $boutique->update(['stock_alert_threshold' => $threshold]);
 
+            $this->cleanupLegacyTestProducts($boutique);
             $this->seedProductsForBoutique($boutique, $threshold);
 
             $this->command?->line("  • {$boutique->name} — seuil {$threshold} — {$owner->email}");
         }
 
-        // Nettoyer les anciennes alertes stock pour une démo propre
         Notification::where('type', 'stock')->delete();
 
         $this->command?->info('Génération des notifications via StockAlertService…');
@@ -72,61 +72,126 @@ class StockAlertTestSeeder extends Seeder
             $t = $owner->boutique?->stock_alert_threshold ?? 10;
             $this->command?->line("  → {$owner->email} / password123 (seuil {$t})");
         }
-        $this->command?->newLine();
-        $this->command?->comment('Relancer la vérif : php artisan fashionaura:check-stock-alerts');
+    }
+
+    private function ensureCategories(): void
+    {
+        $defs = [
+            ['name' => 'Pantalons', 'slug' => 'pantalons', 'description' => 'Pantalons et jeans'],
+        ];
+
+        foreach ($defs as $def) {
+            Category::firstOrCreate(
+                ['slug' => $def['slug']],
+                array_merge($def, ['is_active' => true])
+            );
+        }
+    }
+
+    private function cleanupLegacyTestProducts(Boutique $boutique): void
+    {
+        $legacy = Product::where('boutique_id', $boutique->id)
+            ->where(function ($q) {
+                $q->where('name', 'like', '[TEST ALERTE]%')
+                    ->orWhere('slug', 'like', 'test-alerte-%');
+            })
+            ->get();
+
+        foreach ($legacy as $product) {
+            $product->images()->delete();
+            $product->delete();
+        }
     }
 
     private function seedProductsForBoutique(Boutique $boutique, int $threshold): void
     {
-        $category = Category::query()->first();
-        $categoryId = $boutique->products()->value('category_id') ?? $category?->id;
+        $categories = Category::whereIn('slug', ['robes', 'pantalons', 'chemises', 'sacs', 'chaussures'])
+            ->pluck('id', 'slug');
 
-        if (! $categoryId) {
-            $this->command?->warn("  Pas de catégorie pour {$boutique->name}, produits test ignorés.");
+        if ($categories->isEmpty()) {
+            $this->command?->warn("  Pas de catégories pour {$boutique->name}.");
 
             return;
         }
 
-        // Scénarios : rupture, critique, faible, OK, confortable
-        $scenarios = [
-            ['suffix' => 'rupture', 'stock' => 0, 'label' => 'Rupture'],
-            ['suffix' => 'critique', 'stock' => max(1, (int) floor($threshold / 2)), 'label' => 'Stock critique'],
-            ['suffix' => 'faible', 'stock' => $threshold, 'label' => 'Stock faible'],
-            ['suffix' => 'limite', 'stock' => $threshold + 1, 'label' => 'Juste au-dessus du seuil'],
-            ['suffix' => 'ok', 'stock' => $threshold + 15, 'label' => 'Stock confortable'],
+        $critical = max(1, (int) floor($threshold / 2));
+
+        $catalog = [
+            [
+                'name' => 'Robe Soirée Satin',
+                'category' => 'robes',
+                'type' => 'robe',
+                'price' => 890,
+                'stock' => 0,
+                'style' => 'luxury',
+            ],
+            [
+                'name' => 'Pantalon Taille Haute Beige',
+                'category' => 'pantalons',
+                'type' => 'pantalon',
+                'price' => 450,
+                'stock' => $critical,
+                'style' => 'casual',
+            ],
+            [
+                'name' => 'Chemise Classique Blanche',
+                'category' => 'chemises',
+                'type' => 'chemise',
+                'price' => 320,
+                'stock' => $threshold,
+                'style' => 'formal',
+            ],
+            [
+                'name' => 'Veste Lin Premium',
+                'category' => 'chemises',
+                'type' => 'veste',
+                'price' => 620,
+                'stock' => $threshold + 1,
+                'style' => 'casual',
+            ],
+            [
+                'name' => 'Sac Cuir Artisanal',
+                'category' => 'sacs',
+                'type' => 'sac',
+                'price' => 780,
+                'stock' => $threshold + 15,
+                'style' => 'luxury',
+            ],
         ];
 
-        foreach ($scenarios as $scenario) {
-            $slug = Str::slug("[test-alerte-{$scenario['suffix']}] {$boutique->slug}");
+        foreach ($catalog as $item) {
+            $categoryId = $categories[$item['category']] ?? $categories->first();
+            $slug = Str::slug("{$item['name']}-{$boutique->slug}");
 
-            Product::updateOrCreate(
+            $product = Product::updateOrCreate(
                 ['slug' => $slug],
                 [
                     'boutique_id' => $boutique->id,
                     'category_id' => $categoryId,
-                    'name' => "[TEST ALERTE] {$scenario['label']} — {$boutique->name}",
-                    'description' => "Produit de test alerte stock ({$scenario['label']}, {$scenario['stock']} unités).",
-                    'price' => 299,
-                    'stock_quantity' => $scenario['stock'],
-                    'style' => 'casual',
-                    'rating' => 4.0,
+                    'name' => $item['name'],
+                    'description' => "{$item['name']} — collection {$boutique->name}.",
+                    'price' => $item['price'],
+                    'stock_quantity' => $item['stock'],
+                    'style' => $item['style'],
+                    'rating' => 4.2,
                     'is_active' => true,
                 ]
             );
+
+            $this->attachProductImage($product, $item['type']);
         }
+    }
 
-        // Ajuster aussi 2 produits existants (hors test) pour variété
-        $existing = $boutique->products()
-            ->where('name', 'not like', '[TEST ALERTE]%')
-            ->limit(2)
-            ->get();
+    private function attachProductImage(Product $product, string $type): void
+    {
+        $url = DemoMediaUrls::byType($type)[0];
 
-        $adjustStocks = [0, min(3, $threshold)];
-
-        foreach ($existing as $i => $product) {
-            if (isset($adjustStocks[$i])) {
-                $product->update(['stock_quantity' => $adjustStocks[$i]]);
-            }
-        }
+        $product->images()->updateOrCreate(
+            ['product_id' => $product->id, 'is_primary' => true],
+            [
+                'image_url' => $url,
+                'sort_order' => 0,
+            ]
+        );
     }
 }

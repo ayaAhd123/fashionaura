@@ -1,0 +1,249 @@
+/* Copilote magasinier — thème analytique (pas FashionBot client) */
+.merchant-copilot-window {
+    position: fixed;
+    bottom: 165px;
+    right: 40px;
+    width: 380px;
+    height: 540px;
+    max-height: calc(100vh - 180px);
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 12px 48px rgba(44, 58, 57, 0.18);
+    border: 1px solid rgba(105, 128, 126, 0.2);
+    display: flex;
+    flex-direction: column;
+    z-index: 20000;
+    overflow: hidden;
+    animation: mc-slideUp 0.3s ease;
+}
+
+.merchant-copilot-window.expanded {
+    width: 540px;
+    height: 720px;
+    max-height: calc(100vh - 100px);
+}
+
+.merchant-copilot-window.fullpage {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    max-height: 100%;
+    border-radius: 0;
+    z-index: 30000;
+}
+
+.merchant-copilot-fab {
+    position: fixed;
+    bottom: 90px;
+    right: 40px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #3D5452 0%, #69807E 100%);
+    color: white;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 6px 24px rgba(44, 58, 57, 0.25);
+    z-index: 20001;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.merchant-copilot-fab:hover {
+    transform: scale(1.08);
+    box-shadow: 0 8px 28px rgba(105, 128, 126, 0.4);
+}
+
+.mc-header {
+    background: linear-gradient(135deg, #2C3A39 0%, #3D5452 50%, #69807E 100%);
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: grab;
+    flex-shrink: 0;
+}
+
+.mc-header-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.mc-name {
+    display: block;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    font-weight: 500;
+    color: #fff;
+    line-height: 1.2;
+}
+
+.mc-status {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Raleway', sans-serif;
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.65);
+    letter-spacing: 0.04em;
+}
+
+.mc-status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #A8D5BA;
+}
+
+.mc-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.mc-suggestions {
+    display: flex;
+    gap: 8px;
+    padding: 10px 12px;
+    overflow-x: auto;
+    flex-shrink: 0;
+    background: #FAFCFD;
+    border-bottom: 1px solid #E8E5E0;
+}
+
+.mc-suggestions::-webkit-scrollbar {
+    height: 4px;
+}
+
+.mc-chip {
+    flex-shrink: 0;
+    padding: 8px 14px;
+    border-radius: 20px;
+    border: 1px solid #D4E0E2;
+    background: #fff;
+    color: #3D5452;
+    font-family: 'Raleway', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+    white-space: nowrap;
+}
+
+.mc-chip:hover {
+    background: #EEF6FF;
+    border-color: #69807E;
+    color: #2C3A39;
+}
+
+.mc-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    background: #F8FAFB;
+}
+
+.mc-body .user-bubble {
+    background: #69807E !important;
+    color: #fff !important;
+}
+
+.mc-body .ai-bubble {
+    background: #fff !important;
+    border: 1px solid #E8E5E0;
+    color: #2C2C2C !important;
+}
+
+.mc-body .message-text {
+    white-space: pre-wrap;
+}
+
+.mc-footer {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    border-top: 1px solid #E8E5E0;
+    background: #fff;
+    flex-shrink: 0;
+}
+
+.mc-input {
+    flex: 1;
+    padding: 12px 16px;
+    border-radius: 12px;
+    border: 1.5px solid #D4E0E2;
+    font-family: 'Raleway', sans-serif;
+    font-size: 13px;
+    outline: none;
+}
+
+.mc-input:focus {
+    border-color: #69807E;
+}
+
+.mc-send {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    border: none;
+    background: #69807E;
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mc-send:hover {
+    background: #3D5452;
+}
+
+.mc-action-btn {
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.85);
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 8px;
+}
+
+.mc-action-btn:hover {
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.mc-header-actions {
+    display: flex;
+    gap: 4px;
+}
+
+@keyframes mc-slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(16px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 480px) {
+    .merchant-copilot-window {
+        right: 12px;
+        left: 12px;
+        width: auto;
+        bottom: 100px;
+    }
+    .merchant-copilot-fab {
+        right: 20px;
+    }
+}

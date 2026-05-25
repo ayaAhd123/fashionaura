@@ -14,6 +14,7 @@ use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\CityController as AdminCityController;
 use App\Http\Controllers\Admin\BoutiqueValidationController;
+use App\Http\Controllers\Boutique\BoutiqueCopilotController;
 use App\Http\Controllers\Boutique\BoutiqueProductController;
 use App\Http\Controllers\Boutique\BoutiqueDashboardController;
 use App\Http\Controllers\Boutique\AIAdvisorController;
@@ -90,6 +91,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/products/{id}', [BoutiqueProductController::class, 'destroy']);
 
         Route::get('/ai-advisor/recommendations', [AIAdvisorController::class, 'recommendations']);
+        Route::get('/ai-advisor/analysis', [AIAdvisorController::class, 'analysis']);
+
+        Route::post('/copilot/chat', [BoutiqueCopilotController::class, 'chat']);
 
         Route::get('/notifications', [NotificationController::class, 'index']);
         Route::get('/notifications/unread-count', [NotificationController::class, 'unreadCount']);

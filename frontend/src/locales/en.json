@@ -205,5 +205,21 @@
     "type_boutique": "Boutique",
     "country_fallback": "Morocco",
     "cta_view": "View →"
+  },
+  "merchant_copilot": {
+    "name": "Store Copilot",
+    "status": "Boutique assistant · FashionAura",
+    "welcome": "Hello! I'm your store copilot.\nI analyze sales, stock and performance to suggest concrete actions.\nWhat would you like to optimize this month?",
+    "placeholder": "e.g. out of stock, monthly sales, promotion…",
+    "error": "Analysis temporarily unavailable.",
+    "chip_sales": "Boost sales",
+    "chip_stock": "Out of stock items",
+    "chip_top": "Best sellers",
+    "chip_month": "Monthly priorities",
+    "expand": "Expand",
+    "shrink": "Shrink",
+    "fullscreen": "Fullscreen",
+    "exit_fullscreen": "Exit fullscreen",
+    "close": "Close"
   }
 }

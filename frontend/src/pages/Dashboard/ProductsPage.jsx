@@ -50,10 +50,21 @@ const labelStyle = {
   marginBottom: 8,
 };
 
+const API_ORIGIN = (import.meta.env.VITE_API_URL || 'http://localhost:8000/api').replace(/\/api\/?$/, '');
+
+function resolveImageSrc(url) {
+  if (!url) return null;
+  if (url.startsWith('blob:') || url.startsWith('http')) return url;
+  if (url.startsWith('/')) return `${API_ORIGIN}${url}`;
+  return url;
+}
+
 function ProductModal({ product, categories, onClose, onSave }) {
   const toast = useToast();
   const [form, setForm] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
 
   useEffect(() => {
     if (product) {
@@ -66,15 +77,26 @@ function ProductModal({ product, categories, onClose, onSave }) {
         style: product.style || 'casual',
         is_active: product.is_active ?? true,
       });
+      setImagePreview(product.image_url || null);
+      setImageFile(null);
     } else {
       setForm({
         ...emptyForm,
         category_id: categories[0] ? String(categories[0].id) : '',
       });
+      setImagePreview(null);
+      setImageFile(null);
     }
   }, [product, categories]);
 
   const setField = (key, value) => setForm((prev) => ({ ...prev, [key]: value }));
+
+  const handleImageChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setImageFile(file);
+    setImagePreview(URL.createObjectURL(file));
+  };
 
   const handleSave = async () => {
     if (!form.name.trim() || !form.price || !form.category_id) {
@@ -82,23 +104,35 @@ function ProductModal({ product, categories, onClose, onSave }) {
       return;
     }
 
+    if (!product?.id && !imageFile) {
+      toast.error('Ajoutez une photo du produit.');
+      return;
+    }
+
     setSaving(true);
-    const payload = {
-      name: form.name.trim(),
-      description: form.description.trim() || null,
-      price: parseFloat(form.price),
-      stock_quantity: parseInt(form.stock_quantity, 10) || 0,
-      category_id: parseInt(form.category_id, 10),
-      style: form.style,
-      is_active: form.is_active,
-    };
+
+    const formData = new FormData();
+    formData.append('name', form.name.trim());
+    formData.append('description', form.description.trim());
+    formData.append('price', String(parseFloat(form.price)));
+    formData.append('stock_quantity', String(parseInt(form.stock_quantity, 10) || 0));
+    formData.append('category_id', String(parseInt(form.category_id, 10)));
+    formData.append('style', form.style);
+    formData.append('is_active', form.is_active ? '1' : '0');
+    if (imageFile) {
+      formData.append('image', imageFile);
+    }
 
     try {
       if (product?.id) {
-        await api.put(`/boutique/products/${product.id}`, payload);
+        await api.put(`/boutique/products/${product.id}`, formData, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        });
         toast.success('Produit mis à jour.');
       } else {
-        await api.post('/boutique/products', payload);
+        await api.post('/boutique/products', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        });
         toast.success('Produit ajouté.');
       }
       onSave();
@@ -118,6 +152,30 @@ function ProductModal({ product, categories, onClose, onSave }) {
         <h3 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 24, fontWeight: 500, color: '#2C2C2C', marginBottom: 24 }}>
           {product ? 'Modifier le produit' : 'Ajouter un produit'}
         </h3>
+
+        <div style={{ marginBottom: 18 }}>
+          <label style={labelStyle}>Photo du produit {!product?.id && '*'}</label>
+          <div style={{ display: 'flex', gap: 16, alignItems: 'center', flexWrap: 'wrap' }}>
+            {imagePreview && (
+              <img
+                src={resolveImageSrc(imagePreview)}
+                alt="Aperçu"
+                style={{ width: 80, height: 100, objectFit: 'cover', borderRadius: 10, border: '1px solid #D4E0E2' }}
+              />
+            )}
+            <input
+              type="file"
+              accept="image/jpeg,image/png,image/webp,image/jpg"
+              onChange={handleImageChange}
+              style={{ fontFamily: 'Raleway, sans-serif', fontSize: 13 }}
+            />
+          </div>
+          {product?.id && !imageFile && (
+            <p style={{ fontFamily: 'Raleway, sans-serif', fontSize: 11, color: '#939790', marginTop: 6 }}>
+              Laissez vide pour conserver la photo actuelle.
+            </p>
+          )}
+        </div>
 
         <div style={{ marginBottom: 18 }}>
           <label style={labelStyle}>Nom</label>
@@ -331,7 +389,7 @@ export default function ProductsPage() {
           <table style={{ width: '100%', borderCollapse: 'collapse', fontFamily: 'Raleway, sans-serif', fontSize: 14 }}>
             <thead>
               <tr style={{ background: '#FAFCFD', borderBottom: '1px solid #E8E5E0' }}>
-                {['Produit', 'Catégorie', 'Prix', 'Stock', 'Statut', 'Actif', 'Actions'].map((h) => (
+                {['Photo', 'Produit', 'Catégorie', 'Prix', 'Stock', 'Statut', 'Actif', 'Actions'].map((h) => (
                   <th key={h} style={{ padding: '14px 16px', textAlign: 'left', fontWeight: 600, color: '#69807E', fontSize: 12, letterSpacing: '0.05em' }}>
                     {h}
                   </th>
@@ -343,13 +401,19 @@ export default function ProductsPage() {
                 const st = alertStyles[p.stock_alert] || alertStyles.ok;
                 return (
                   <tr key={p.id} style={{ borderBottom: '1px solid #F3F2F5' }}>
-                    <td style={{ padding: '14px 16px', color: '#2C2C2C', fontWeight: p.is_test ? 600 : 400 }}>
-                      {p.name}
-                      {p.is_test && (
-                        <span style={{ marginLeft: 8, fontSize: 10, color: '#69807E', background: '#EEF6FF', padding: '2px 8px', borderRadius: 10 }}>
-                          TEST
-                        </span>
+                    <td style={{ padding: '14px 16px' }}>
+                      {p.image_url ? (
+                        <img
+                          src={resolveImageSrc(p.image_url)}
+                          alt={p.name}
+                          style={{ width: 48, height: 60, objectFit: 'cover', borderRadius: 8, border: '1px solid #E8E5E0' }}
+                        />
+                      ) : (
+                        <span style={{ fontSize: 11, color: '#C0C0BC' }}>—</span>
                       )}
+                    </td>
+                    <td style={{ padding: '14px 16px', color: '#2C2C2C' }}>
+                      {p.name}
                     </td>
                     <td style={{ padding: '14px 16px', color: '#939790' }}>{p.category || '—'}</td>
                     <td style={{ padding: '14px 16px', color: '#2C2C2C' }}>{p.price} MAD</td>

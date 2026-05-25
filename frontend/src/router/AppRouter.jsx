@@ -32,6 +32,7 @@ import DashboardProductsPage from '../pages/Dashboard/ProductsPage';
 import DashboardOrdersPage from '../pages/Dashboard/OrdersPage';
 
 import ChatbotWindow from '../components/AI/ChatbotWindow';
+import MerchantCopilotWindow from '../components/AI/MerchantCopilotWindow';
 
 const NotFound = () => (
     <div className="flex-1 flex items-center justify-center min-h-[60vh]">
@@ -80,8 +81,20 @@ function UnauthorizedPage() {
 
 function ChatbotGate() {
     const { pathname } = useLocation();
+    const { user, isAuthenticated } = useAuth();
     const hideOn = ['/login', '/register', '/forgot-password'];
+
     if (hideOn.includes(pathname)) return null;
+
+    const isBoutiqueDashboard = pathname.startsWith('/boutique');
+    const isMerchant = isAuthenticated && user?.role === 'boutique_owner';
+
+    if (isBoutiqueDashboard && isMerchant) {
+        return <MerchantCopilotWindow />;
+    }
+
+    if (pathname.startsWith('/admin')) return null;
+
     return <ChatbotWindow />;
 }
 

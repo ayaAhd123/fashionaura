@@ -35,6 +35,8 @@ api.interceptors.response.use(
       '/boutique/dashboard/stats',
       '/boutique/dashboard/charts',
       '/boutique/ai-advisor/recommendations',
+      '/boutique/ai-advisor/analysis',
+      '/boutique/copilot/chat',
       '/admin/dashboard/stats',
       '/admin/dashboard/analytics',
       '/admin/boutiques/pending',

@@ -5,9 +5,11 @@ namespace App\Http\Controllers\Boutique;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\ProductImage;
 use App\Services\StockAlertService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
@@ -32,7 +34,10 @@ class BoutiqueProductController extends Controller
         $threshold = $stockAlerts->thresholdForBoutique($boutique);
 
         $query = Product::where('boutique_id', $boutique->id)
-            ->with('category:id,name,slug');
+            ->with([
+                'category:id,name,slug',
+                'images' => fn ($q) => $q->orderByDesc('is_primary')->orderBy('sort_order'),
+            ]);
 
         if ($search = $request->get('search')) {
             $query->where('name', 'like', '%'.$search.'%');
@@ -62,7 +67,7 @@ class BoutiqueProductController extends Controller
     public function store(Request $request, StockAlertService $stockAlerts)
     {
         $boutique = $this->boutiqueOrFail();
-        $data = $this->validateProduct($request);
+        $data = $this->validateProduct($request, requiredImage: true);
 
         $product = Product::create([
             ...$data,
@@ -72,7 +77,9 @@ class BoutiqueProductController extends Controller
             'reviews_count' => 0,
         ]);
 
-        $product->load('category:id,name,slug');
+        $this->syncProductImage($product, $request);
+
+        $product->load(['category:id,name,slug', 'images']);
         $threshold = $stockAlerts->thresholdForBoutique($boutique);
         $stockAlerts->run($boutique->id);
 
@@ -93,14 +100,18 @@ class BoutiqueProductController extends Controller
         }
 
         $product->update($data);
-        $product->load('category:id,name,slug');
 
+        if ($request->hasFile('image')) {
+            $this->syncProductImage($product, $request);
+        }
+
+        $product->load(['category:id,name,slug', 'images']);
         $threshold = $stockAlerts->thresholdForBoutique($boutique);
         $stockAlerts->run($boutique->id);
 
         return response()->json([
             'message' => 'Produit mis à jour.',
-            'data' => $this->formatProduct($product->fresh(), $threshold),
+            'data' => $this->formatProduct($product->fresh(['category', 'images']), $threshold),
         ]);
     }
 
@@ -108,6 +119,10 @@ class BoutiqueProductController extends Controller
     {
         $boutique = $this->boutiqueOrFail();
         $product = $this->findOwnedProduct($boutique->id, $id);
+
+        foreach ($product->images as $image) {
+            $this->deleteStoredFile($image->image_url);
+        }
 
         $product->delete();
 
@@ -130,9 +145,11 @@ class BoutiqueProductController extends Controller
         return Product::where('boutique_id', $boutiqueId)->findOrFail($productId);
     }
 
-    private function validateProduct(Request $request, ?Product $product = null): array
+    private function validateProduct(Request $request, ?Product $product = null, bool $requiredImage = false): array
     {
-        $validated = $request->validate([
+        $needsImage = $requiredImage || ($product && ! $product->images()->exists());
+
+        $rules = [
             'name' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string', 'max:5000'],
             'price' => ['required', 'numeric', 'min:0'],
@@ -140,12 +157,58 @@ class BoutiqueProductController extends Controller
             'category_id' => ['required', 'integer', Rule::exists('categories', 'id')],
             'style' => ['nullable', 'string', Rule::in(self::STYLES)],
             'is_active' => ['sometimes', 'boolean'],
-        ]);
+            'image' => [
+                $needsImage ? 'required' : 'nullable',
+                'image',
+                'mimes:jpeg,jpg,png,webp',
+                'max:5120',
+            ],
+        ];
+
+        $validated = $request->validate($rules);
 
         $validated['style'] = $validated['style'] ?? 'casual';
         $validated['is_active'] = $request->boolean('is_active', true);
 
+        unset($validated['image']);
+
         return $validated;
+    }
+
+    private function syncProductImage(Product $product, Request $request): void
+    {
+        $file = $request->file('image');
+        if (! $file) {
+            return;
+        }
+
+        $path = $file->store('products', 'public');
+        $url = Storage::disk('public')->url($path);
+
+        $primary = $product->images()->where('is_primary', true)->first();
+        if ($primary) {
+            $this->deleteStoredFile($primary->image_url);
+            $primary->update(['image_url' => $url]);
+        } else {
+            ProductImage::create([
+                'product_id' => $product->id,
+                'image_url' => $url,
+                'is_primary' => true,
+                'sort_order' => 0,
+            ]);
+        }
+    }
+
+    private function deleteStoredFile(?string $url): void
+    {
+        if (! $url || ! str_contains($url, '/storage/')) {
+            return;
+        }
+
+        $path = Str::after($url, '/storage/');
+        if ($path && Storage::disk('public')->exists($path)) {
+            Storage::disk('public')->delete($path);
+        }
     }
 
     private function uniqueSlug(string $name, ?int $exceptId = null): string
@@ -174,6 +237,9 @@ class BoutiqueProductController extends Controller
             default => 'ok',
         };
 
+        $primary = $product->images->firstWhere('is_primary', true)
+            ?? $product->images->first();
+
         return [
             'id' => $product->id,
             'name' => $product->name,
@@ -185,9 +251,26 @@ class BoutiqueProductController extends Controller
             'category' => $product->category?->name,
             'style' => $product->style,
             'is_active' => (bool) $product->is_active,
-            'is_test' => str_starts_with($product->name, '[TEST ALERTE]'),
+            'image_url' => $this->resolveImageUrl($primary?->image_url),
             'stock_alert' => $alert,
             'threshold' => $threshold,
         ];
+    }
+
+    private function resolveImageUrl(?string $url): ?string
+    {
+        if (! $url) {
+            return null;
+        }
+
+        if (str_starts_with($url, 'http://') || str_starts_with($url, 'https://')) {
+            return $url;
+        }
+
+        if (str_starts_with($url, '/')) {
+            return rtrim(config('app.url'), '/').$url;
+        }
+
+        return $url;
     }
 }

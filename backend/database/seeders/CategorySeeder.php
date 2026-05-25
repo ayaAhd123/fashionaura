@@ -12,6 +12,7 @@ class CategorySeeder extends Seeder
         $categories = [
             ['name' => 'Robes', 'slug' => 'robes', 'description' => 'Robes élégantes pour toutes occasions'],
             ['name' => 'Chemises', 'slug' => 'chemises', 'description' => 'Chemises de qualité'],
+            ['name' => 'Pantalons', 'slug' => 'pantalons', 'description' => 'Pantalons et jeans'],
             ['name' => 'Chaussures', 'slug' => 'chaussures', 'description' => 'Chaussures premium'],
             ['name' => 'Accessoires', 'slug' => 'accessoires', 'description' => 'Accessoires mode'],
             ['name' => 'Sacs', 'slug' => 'sacs', 'description' => 'Sacs à main et de voyage'],
