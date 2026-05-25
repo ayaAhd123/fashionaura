@@ -71,8 +71,8 @@ const Image = ({
       onLoad={handleImageLoad}
       onError={handleImageError}
       style={{
-        width: width || 'auto',
-        height: height || 'auto',
+        ...(width && { width }),
+        ...(height && { height }),
         objectFit: objectFit,
       }}
       {...props}

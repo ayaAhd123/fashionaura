@@ -7,8 +7,10 @@ import {
 import { boutiqueService } from '../services/boutiqueService';
 import { reviewService } from '../services/reviewService';
 import { useToast } from '../contexts/ToastContext';
+import { useAuth } from '../contexts/AuthContext';
 import { ProductCard } from '../components/ProductCard';
 import { cityName } from '../utils/cityI18n';
+import AuthModal from '../components/AuthModal';
 import '../styles/boutique.css';
 
 const deliveryLabel = (boutique) => {
@@ -22,6 +24,7 @@ export const BoutiqueDetailPage = () => {
   const { t } = useTranslation();
   const { slug } = useParams();
   const toast = useToast();
+  const { isAuthenticated } = useAuth();
   const [boutique, setBoutique] = useState(null);
   const [loading, setLoading] = useState(true);
   const [following, setFollowing] = useState(false);
@@ -31,6 +34,10 @@ export const BoutiqueDetailPage = () => {
   const [newRating, setNewRating] = useState(5);
   const [newComment, setNewComment] = useState('');
   const [reviewSubmitting, setReviewSubmitting] = useState(false);
+
+  // Auth modal state
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [authModalMessage, setAuthModalMessage] = useState('');
 
   useEffect(() => {
     fetchBoutiqueDetails();
@@ -60,6 +67,12 @@ export const BoutiqueDetailPage = () => {
   };
 
   const handleFollow = async () => {
+    if (!isAuthenticated) {
+      setAuthModalMessage('Connectez-vous pour suivre cette boutique');
+      setAuthModalOpen(true);
+      return;
+    }
+
     if (followLoading) return;
     setFollowLoading(true);
     try {
@@ -81,6 +94,13 @@ export const BoutiqueDetailPage = () => {
 
   const handleSubmitReview = async (event) => {
     event.preventDefault();
+
+    if (!isAuthenticated) {
+      setAuthModalMessage('Connectez-vous pour laisser un avis');
+      setAuthModalOpen(true);
+      return;
+    }
+
     const comment = newComment.trim();
     if (!comment || !boutique?.id || reviewSubmitting) return;
 
@@ -344,6 +364,13 @@ export const BoutiqueDetailPage = () => {
           )}
         </section>
       </div>
+
+      {/* Auth Modal */}
+      <AuthModal
+        isOpen={authModalOpen}
+        onClose={() => setAuthModalOpen(false)}
+        message={authModalMessage}
+      />
     </article>
   );
 };

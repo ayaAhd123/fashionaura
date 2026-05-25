@@ -392,23 +392,7 @@
   color: var(--neutral);
 }
 
-.boutique-detail__products-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1.5rem;
-}
-
-@media (min-width: 640px) {
-  .boutique-detail__products-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (min-width: 1024px) {
-  .boutique-detail__products-grid {
-    grid-template-columns: repeat(4, 1fr);
-  }
-}
+/* Product grid layout: see product-cards.css (.boutique-detail__products-grid) */
 
 .boutique-detail__empty {
   text-align: center;

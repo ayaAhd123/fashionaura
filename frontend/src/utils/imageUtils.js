@@ -83,6 +83,24 @@ export const getAvatarUrl = (name, size = 64) => {
 };
 
 /**
+ * Résout une URL média (relative storage, API, ou absolue).
+ * @param {string} url
+ * @returns {string|null}
+ */
+export const resolveMediaUrl = (url) => {
+  if (!url || typeof url !== 'string') return null;
+  const trimmed = url.trim();
+  if (!trimmed) return null;
+  if (/^(https?:|data:|blob:)/i.test(trimmed)) return trimmed;
+
+  const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+  const origin = apiBase.replace(/\/api\/?$/, '');
+
+  if (trimmed.startsWith('/')) return `${origin}${trimmed}`;
+  return `${origin}/${trimmed}`;
+};
+
+/**
  * Optimise une image URL pour le web
  * @param {string} url - URL originale
  * @param {number} width - Largeur cible
@@ -91,16 +109,18 @@ export const getAvatarUrl = (name, size = 64) => {
  */
 export const optimizeImageUrl = (url, width = 400, quality = 80) => {
   if (!url) return DEFAULT_IMAGES.PRODUCT;
-  
+
+  const resolved = resolveMediaUrl(url) || url;
+
   // Si c'est une URL locale
-  if (url.startsWith('/')) return url;
+  if (resolved.startsWith('/')) return resolved;
   
   // Si c'est une URL d'API
-  if (url.includes('api')) {
-    return `${url}?w=${width}&q=${quality}`;
+  if (resolved.includes('api')) {
+    return `${resolved}?w=${width}&q=${quality}`;
   }
-  
-  return url;
+
+  return resolved;
 };
 
 /**

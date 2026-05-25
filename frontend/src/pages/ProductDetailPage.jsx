@@ -6,12 +6,16 @@ import { reviewService } from '../services/reviewService';
 import { CartContext } from '../contexts/CartContext';
 import { FavoritesContext } from '../contexts/FavoritesContext';
 import { useToast } from '../contexts/ToastContext';
+import { useAuth } from '../contexts/AuthContext';
 import { ProductCard } from '../components/ProductCard';
+import { ProductDetailGallery } from '../components/ProductDetailGallery';
+import AuthModal from '../components/AuthModal';
 
 export const ProductDetailPage = () => {
   const { slug } = useParams();
   const { addItem } = useContext(CartContext);
   const { addFavorite, removeFavorite, isFavorited } = useContext(FavoritesContext);
+  const { isAuthenticated, isAdmin, isBoutiqueOwner } = useAuth();
   const toast = useToast();
 
   const [product, setProduct] = useState(null);
@@ -27,6 +31,10 @@ export const ProductDetailPage = () => {
   const [newRating, setNewRating] = useState(5);
   const [newComment, setNewComment] = useState('');
   const [reviewSubmitting, setReviewSubmitting] = useState(false);
+
+  // Auth modal state
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [authModalMessage, setAuthModalMessage] = useState('');
 
   const liked = isFavorited(product?.id);
 
@@ -86,6 +94,17 @@ export const ProductDetailPage = () => {
   };
 
   const handleToggleFavorite = () => {
+    if (!isAuthenticated) {
+      setAuthModalMessage('Connectez-vous pour ajouter aux favoris');
+      setAuthModalOpen(true);
+      return;
+    }
+
+    if (isAdmin?.() || isBoutiqueOwner?.()) {
+      toast.error("Les comptes administrateur et vendeur ne peuvent pas ajouter de favoris.");
+      return;
+    }
+
     if (liked) {
       removeFavorite(product.id);
     } else {
@@ -95,6 +114,18 @@ export const ProductDetailPage = () => {
 
   const handleSubmitReview = async (event) => {
     event.preventDefault();
+
+    if (!isAuthenticated) {
+      setAuthModalMessage('Connectez-vous pour laisser un avis');
+      setAuthModalOpen(true);
+      return;
+    }
+
+    if (isAdmin?.() || isBoutiqueOwner?.()) {
+      toast.error("Les comptes administrateur et vendeur ne peuvent pas laisser d'avis.");
+      return;
+    }
+
     const comment = newComment.trim();
     if (!comment || !product?.id || reviewSubmitting) {
       return;
@@ -138,7 +169,6 @@ export const ProductDetailPage = () => {
   );
 
   const images = product.images || [];
-  const currentImage = images[selectedImage];
   const uniqueSizes = [...new Set(product.variants?.map(v => v.size))];
   const uniqueColors = [...new Set(product.variants?.map(v => v.color))];
   const avgRating = reviews.length ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1) : product.rating;
@@ -165,40 +195,13 @@ export const ProductDetailPage = () => {
 
         <div className="bg-white rounded-[2rem] shadow-sm border border-accent/10 p-6 md:p-10 mb-16">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
-            {/* Gallery (Left Column) */}
-            <div className="flex flex-col gap-4">
-              {/* Main Image */}
-              <div className="h-[500px] md:h-[600px] w-full bg-background/30 rounded-2xl overflow-hidden flex items-center justify-center relative group shadow-sm border border-accent/20">
-                {currentImage?.image_url ? (
-                  <img src={currentImage.image_url} alt={product.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
-                ) : (
-                  <span className="text-neutral/20 text-8xl">📷</span>
-                )}
-                {product.stock_quantity === 0 && (
-                  <div className="absolute inset-0 bg-white/60 backdrop-blur-sm flex items-center justify-center z-10">
-                    <span className="bg-text text-white font-medium tracking-widest uppercase px-6 py-3 rounded-full text-sm shadow-xl">
-                      Sold Out
-                    </span>
-                  </div>
-                )}
-              </div>
-
-              {/* Thumbnails */}
-              {images.length > 1 && (
-                <div className="flex gap-4 overflow-x-auto py-2">
-                  {images.map((img, idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => setSelectedImage(idx)}
-                      className={`w-24 h-24 rounded-xl overflow-hidden transition-all duration-300 flex-shrink-0 ${idx === selectedImage ? 'border-2 border-text shadow-md scale-105' : 'border border-transparent opacity-70 hover:opacity-100 hover:shadow-sm'
-                        }`}
-                    >
-                      <img src={img.image_url} alt={`${product.name} ${idx}`} className="w-full h-full object-cover" />
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
+            <ProductDetailGallery
+              images={images}
+              productName={product.name}
+              selectedIndex={selectedImage}
+              onSelect={setSelectedImage}
+              isOutOfStock={product.stock_quantity === 0}
+            />
 
             {/* Product Info (Right Column) */}
             <div className="flex flex-col py-2">
@@ -413,19 +416,26 @@ export const ProductDetailPage = () => {
 
         {/* Similar Products */}
         {similar.length > 0 && (
-          <section className="mb-20">
-            <div className="flex justify-between items-end mb-10">
+          <section className="mb-20 product-detail__similar">
+            <div className="flex justify-between items-end mb-10 pb-4 border-b border-accent/20">
               <h2 className="text-3xl font-serif font-bold text-text">Vous aimerez aussi</h2>
               <Link to="/products" className="text-neutral text-sm tracking-widest uppercase font-medium hover:text-text transition-colors hidden sm:block">Voir tout →</Link>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-              {similar.map(prod => (
+            <div className="product-detail__similar-grid">
+              {similar.slice(0, 3).map((prod) => (
                 <ProductCard key={prod.id} product={prod} />
               ))}
             </div>
           </section>
         )}
       </div>
+
+      {/* Auth Modal */}
+      <AuthModal
+        isOpen={authModalOpen}
+        onClose={() => setAuthModalOpen(false)}
+        message={authModalMessage}
+      />
     </main>
   );
 };

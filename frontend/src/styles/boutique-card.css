@@ -1,16 +1,20 @@
 .boutique-card {
   text-decoration: none;
   color: inherit;
+  width: 100%;
+  display: block;
 }
 
 .boutique-card__inner {
   background: #fff;
-  border-radius: 1.25rem;
+  border-radius: 12px;
   border: 1px solid rgba(183, 198, 201, 0.35);
   overflow: hidden;
   box-shadow: 0 4px 16px rgba(44, 24, 16, 0.04);
   transition: transform 0.3s, box-shadow 0.3s;
   height: 100%;
+  width: 100%;
+  min-width: 0;
   display: flex;
   flex-direction: column;
 }
@@ -21,7 +25,9 @@
 }
 
 .boutique-card__media {
-  height: 9rem;
+  height: 13.75rem; /* 220px */
+  min-height: 13.75rem;
+  flex-shrink: 0;
   background: linear-gradient(145deg, rgba(252, 165, 165, 0.12) 0%, rgba(183, 198, 201, 0.2) 100%);
   display: flex;
   align-items: center;
@@ -48,10 +54,11 @@
 }
 
 .boutique-card__body {
-  padding: 1.125rem 1.25rem 1.25rem;
+  padding: 12px 16px 16px;
   flex: 1;
   display: flex;
   flex-direction: column;
+  min-width: 0;
 }
 
 .boutique-card__name {

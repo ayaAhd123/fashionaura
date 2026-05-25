@@ -118,23 +118,7 @@
   box-shadow: 0 0 0 3px rgba(252, 165, 165, 0.15);
 }
 
-.shop-page__grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1.5rem;
-}
-
-@media (min-width: 640px) {
-  .shop-page__grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (min-width: 1024px) {
-  .shop-page__grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
+/* Grid layout: see product-cards.css (.shop-page__grid) */
 
 .shop-page__empty,
 .shop-page__loading {

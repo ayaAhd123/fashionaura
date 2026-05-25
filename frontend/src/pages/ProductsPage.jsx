@@ -50,7 +50,7 @@ export const ProductsPage = () => {
         ) : products.length === 0 ? (
           <div className="text-center py-20 text-neutral">Aucun produit trouvé.</div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+          <div className="product-cards-grid">
             {products.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
