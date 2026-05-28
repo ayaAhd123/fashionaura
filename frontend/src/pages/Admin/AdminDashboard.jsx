@@ -1,142 +1,104 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import StatsCard from '../../components/common/StatsCard';
 import RevenueChart from '../../components/charts/RevenueChart';
 import TopProductsChart from '../../components/charts/TopProductsChart';
-import LoadingSpinner from '../../components/common/LoadingSpinner';
 import { useAdminStats, useAdminAnalytics, usePendingBoutiques } from '../../hooks/useDashboardData';
 import api from '../../services/api';
+import toast from 'react-hot-toast';
 
-// ─── Icônes stats ─────────────────────────────────────────────────────────────
-const StatIcons = {
-  boutiques: (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#69807E" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-      <polyline points="9 22 9 12 15 12 15 22"/>
-    </svg>
-  ),
-  cities: (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#69807E" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-      <circle cx="12" cy="10" r="3"/>
-    </svg>
-  ),
-  users: (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#69807E" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-      <circle cx="9" cy="7" r="4"/>
-      <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-      <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-    </svg>
-  ),
-  revenue: (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#69807E" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      <line x1="12" y1="1" x2="12" y2="23"/>
-      <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-    </svg>
-  ),
-  orders: (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#69807E" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
-      <line x1="3" x2="21" y1="6" y2="6"/>
-      <path d="M16 10a4 4 0 0 1-8 0"/>
-    </svg>
-  ),
-  pending: (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#E3C8B5" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="12" r="10"/>
-      <polyline points="12 6 12 12 16 14"/>
-    </svg>
-  ),
-};
+/* ── Card configs ─────────────────────────────────────────── */
+const CARD_GRADIENTS = [
+  { gradient: 'linear-gradient(135deg,#f0fdf4,#dcfce7)', iconColor: '#16a34a', icon: <BoutiqueIcon /> },
+  { gradient: 'linear-gradient(135deg,#eff6ff,#dbeafe)', iconColor: '#2563eb', icon: <CityIcon /> },
+  { gradient: 'linear-gradient(135deg,#fdf4ff,#fae8ff)', iconColor: '#9333ea', icon: <UserIcon /> },
+  { gradient: 'linear-gradient(135deg,#fffbeb,#fef3c7)', iconColor: '#d97706', icon: <OrderIcon /> },
+  { gradient: 'linear-gradient(135deg,#fff1f2,#ffe4e6)', iconColor: '#dc2626', icon: <RevenueIcon /> },
+  { gradient: 'linear-gradient(135deg,#fff7ed,#ffedd5)', iconColor: '#ea580c', icon: <ClockIcon /> },
+];
 
-// ─── Status Badge ─────────────────────────────────────────────────────────────
-const statusConfig = {
-  pending:  { label: 'En attente', bg: '#FFF8F0', color: '#B85C00', border: '#F5C07A' },
-  approved: { label: 'Validée',    bg: '#F0FFF4', color: '#1A6B3C', border: '#6FCF97' },
-  rejected: { label: 'Refusée',    bg: '#FFF0F0', color: '#c0392b', border: '#F5A0A0' },
-};
+function BoutiqueIcon() { return <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>; }
+function CityIcon()     { return <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>; }
+function UserIcon()     { return <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>; }
+function OrderIcon()    { return <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" x2="21" y1="6" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>; }
+function RevenueIcon()  { return <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>; }
+function ClockIcon()    { return <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>; }
 
-function StatusBadge({ status }) {
-  const cfg = statusConfig[status] || statusConfig.pending;
+/* ── Status badge ─────────────────────────────────────────── */
+function Badge({ status }) {
+  const cfg = {
+    pending:  { label: 'En attente', bg: '#fff7ed', color: '#c2410c' },
+    approved: { label: 'Actif',      bg: '#f0fdf4', color: '#15803d' },
+    rejected: { label: 'Refusé',     bg: '#fef2f2', color: '#dc2626' },
+    active:   { label: 'Actif',      bg: '#f0fdf4', color: '#15803d' },
+  }[status] || { label: status, bg: '#f3f4f6', color: '#374151' };
   return (
-    <span style={{
-      padding: '4px 12px', borderRadius: 20, fontSize: 11, fontWeight: 600,
-      fontFamily: 'Raleway, sans-serif', letterSpacing: '0.06em',
-      backgroundColor: cfg.bg, color: cfg.color,
-      border: `1px solid ${cfg.border}`,
-    }}>
+    <span style={{ padding: '3px 11px', borderRadius: 20, fontSize: 11, fontWeight: 600, fontFamily: 'Inter, sans-serif', backgroundColor: cfg.bg, color: cfg.color }}>
       {cfg.label}
     </span>
   );
 }
 
-// ─── Tableau boutiques en attente ─────────────────────────────────────────────
-function PendingBoutiquesTable({ boutiques = [], loading, onValidate }) {
+/* ── Recent Boutiques table ───────────────────────────────── */
+function RecentBoutiquesTable({ boutiques = [], loading, onValidate }) {
   const MOCK = [
     { id: 1, name: 'Élégance Paris', owner: 'Amina B.', city: 'Casablanca', created_at: '2026-03-28', status: 'pending' },
     { id: 2, name: 'Luxe Maroc', owner: 'Khalid M.', city: 'Rabat', created_at: '2026-03-27', status: 'pending' },
     { id: 3, name: 'Mode & Style', owner: 'Sara F.', city: 'Marrakech', created_at: '2026-03-25', status: 'pending' },
     { id: 4, name: 'Chic Fès', owner: 'Yasmine R.', city: 'Fès', created_at: '2026-03-22', status: 'approved' },
+    { id: 5, name: 'Tailor Rabat', owner: 'Omar K.', city: 'Rabat', created_at: '2026-03-20', status: 'approved' },
   ];
-  
-  const data = boutiques && boutiques.length > 0 ? boutiques : MOCK;
-
-  if (loading) {
-    return <LoadingSpinner />;
-  }
+  const data = boutiques?.length > 0 ? boutiques : MOCK;
 
   return (
-    <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px rgba(44,58,57,0.07)', border: '1px solid rgba(147,151,144,0.12)', overflow: 'hidden' }}>
-      <div style={{ padding: '20px 28px', borderBottom: '1px solid #F3F2F5', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+    <div style={card}>
+      <div style={cardHeader}>
         <div>
-          <p style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 20, fontWeight: 500, color: '#2C2C2C' }}>Boutiques en attente</p>
-          <p style={{ fontFamily: 'Raleway, sans-serif', fontSize: 12, color: '#939790', letterSpacing: '0.05em' }}>Demandes de validation récentes</p>
+          <p style={cardTitle}>Boutiques récentes</p>
+          <p style={cardSub}>Demandes en attente de validation</p>
         </div>
-        <span style={{ backgroundColor: '#FFF8F0', color: '#B85C00', border: '1px solid #F5C07A', borderRadius: 20, padding: '4px 14px', fontFamily: 'Raleway, sans-serif', fontSize: 12, fontWeight: 600 }}>
-          {data.filter(b => b.status === 'pending').length} en attente
-        </span>
+        <Link to="/admin/boutiques" style={linkBtn}>Voir tout →</Link>
       </div>
-
       <div style={{ overflowX: 'auto' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
-            <tr style={{ backgroundColor: '#F9F8FA' }}>
+            <tr style={{ backgroundColor: '#F9FAFB' }}>
               {['Boutique', 'Propriétaire', 'Ville', 'Date', 'Statut', 'Actions'].map(h => (
-                <th key={h} style={{ padding: '12px 20px', textAlign: 'left', fontFamily: 'Raleway, sans-serif', fontSize: 11, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#939790', whiteSpace: 'nowrap' }}>{h}</th>
+                <th key={h} style={th}>{h}</th>
               ))}
             </tr>
           </thead>
           <tbody>
-            {data.map((boutique, i) => (
-              <tr key={boutique.id} style={{ borderTop: '1px solid #F3F2F5', transition: 'background 0.15s' }} className="fa-table-row">
-                <td style={{ padding: '14px 20px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                    <div style={{ width: 36, height: 36, borderRadius: 10, backgroundColor: '#D4E0E2', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Cormorant Garamond, serif', fontSize: 16, color: '#69807E', fontWeight: 500, flexShrink: 0 }}>
-                      {boutique.name ? boutique.name[0] : '?'}
-                    </div>
-                    <span style={{ fontFamily: 'Raleway, sans-serif', fontSize: 14, fontWeight: 500, color: '#2C2C2C' }}>{boutique.name || 'Nom inconnu'}</span>
-                  </div>
-                </td>
-                <td style={{ padding: '14px 20px', fontFamily: 'Raleway, sans-serif', fontSize: 13, color: '#555' }}>{boutique.owner || '-'}</td>
-                <td style={{ padding: '14px 20px', fontFamily: 'Raleway, sans-serif', fontSize: 13, color: '#555' }}>{boutique.city || '-'}</td>
-                <td style={{ padding: '14px 20px', fontFamily: 'Raleway, sans-serif', fontSize: 12, color: '#939790' }}>
-                  {boutique.created_at ? new Date(boutique.created_at).toLocaleDateString('fr-FR') : '-'}
-                </td>
-                <td style={{ padding: '14px 20px' }}><StatusBadge status={boutique.status} /></td>
-                <td style={{ padding: '14px 20px' }}>
-                  {boutique.status === 'pending' && (
-                    <div style={{ display: 'flex', gap: 8 }}>
-                      <button onClick={() => onValidate(boutique.id, 'approved')} style={{ padding: '6px 14px', borderRadius: 8, border: 'none', backgroundColor: '#D4E0E2', color: '#69807E', cursor: 'pointer', fontFamily: 'Raleway, sans-serif', fontSize: 12, fontWeight: 600, transition: 'all 0.2s' }}>
-                        Valider
-                      </button>
-                      <button onClick={() => onValidate(boutique.id, 'rejected')} style={{ padding: '6px 14px', borderRadius: 8, border: '1px solid #F5A0A0', backgroundColor: 'transparent', color: '#c0392b', cursor: 'pointer', fontFamily: 'Raleway, sans-serif', fontSize: 12, fontWeight: 600, transition: 'all 0.2s' }}>
-                        Refuser
-                      </button>
-                    </div>
-                  )}
-                </td>
-              </tr>
-            ))}
+            {loading
+              ? [1,2,3].map(i => (
+                  <tr key={i}><td colSpan={6} style={{ padding: 16 }}>
+                    <div style={{ height: 14, borderRadius: 7, background: '#F3F4F6', animation: 'fa-pulse 1.5s ease-in-out infinite' }} />
+                  </td></tr>
+                ))
+              : data.slice(0, 5).map(b => (
+                  <tr key={b.id} className="fa-table-row" style={{ borderTop: '1px solid #F3F4F6' }}>
+                    <td style={td}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                        <div style={{ width: 34, height: 34, borderRadius: 10, backgroundColor: '#dcfce7', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Playfair Display', serif", fontSize: 15, color: '#16a34a', fontWeight: 700, flexShrink: 0 }}>
+                          {b.name?.[0] || '?'}
+                        </div>
+                        <span style={{ fontFamily: 'Inter, sans-serif', fontSize: 13, fontWeight: 500, color: '#111827' }}>{b.name}</span>
+                      </div>
+                    </td>
+                    <td style={td}><span style={tdText}>{b.owner}</span></td>
+                    <td style={td}><span style={tdText}>{b.city}</span></td>
+                    <td style={td}><span style={{ ...tdText, color: '#9CA3AF' }}>{b.created_at ? new Date(b.created_at).toLocaleDateString('fr-FR') : '—'}</span></td>
+                    <td style={td}><Badge status={b.status} /></td>
+                    <td style={td}>
+                      {b.status === 'pending' && (
+                        <div style={{ display: 'flex', gap: 6 }}>
+                          <button onClick={() => onValidate(b.id, 'approved')} style={approveBtn}>Valider</button>
+                          <button onClick={() => onValidate(b.id, 'rejected')} style={rejectBtn}>Refuser</button>
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+                ))}
           </tbody>
         </table>
       </div>
@@ -144,92 +106,120 @@ function PendingBoutiquesTable({ boutiques = [], loading, onValidate }) {
   );
 }
 
-// ─── AdminDashboard ───────────────────────────────────────────────────────────
+/* ── Quick actions bar ────────────────────────────────────── */
+function QuickActions() {
+  return (
+    <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+      <Link to="/admin/boutiques" style={qBtn('#1B3A35', '#fff')}>+ Boutique</Link>
+      <Link to="/admin/categories" style={qBtn('#2A5248', '#fff')}>+ Catégorie</Link>
+      <button onClick={() => toast.success('Export en cours…')} style={{ ...qBtn('#C9A84C', '#1B3A35'), border: 'none', cursor: 'pointer', textDecoration: 'none' }}>
+        Exporter rapport
+      </button>
+    </div>
+  );
+}
+
+/* ── AdminDashboard ───────────────────────────────────────── */
 export default function AdminDashboard() {
   const { data: stats, loading: statsLoading } = useAdminStats();
   const { data: analytics, loading: analyticsLoading } = useAdminAnalytics();
   const { data: boutiques, loading: boutiquesLoading, refetch } = usePendingBoutiques();
 
-  // Fallback stats pour le dev
   const s = stats || {
-    total_boutiques: 142,
-    total_cities: 28,
-    total_users: 3847,
-    total_orders: 1204,
-    total_revenue: 894500,
+    total_boutiques:  142,
+    total_cities:      28,
+    total_users:     3847,
+    total_orders:    1204,
+    total_revenue:  894500,
     pending_boutiques: 3,
   };
 
   const handleValidate = async (id, action) => {
     try {
       await api.post(`/admin/boutiques/${id}/${action}`);
+      toast.success(action === 'approved' ? 'Boutique validée' : 'Boutique refusée');
       refetch();
     } catch (err) {
-      console.error('Validation error:', err);
+      toast.error('Erreur lors de la validation');
     }
   };
 
   const today = new Date().toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
+  const statsCards = [
+    { label: 'Boutiques',    value: s.total_boutiques,   change: 8.2,  suffix: '',      ...CARD_GRADIENTS[0] },
+    { label: 'Villes',       value: s.total_cities,      change: 4.5,  suffix: '',      ...CARD_GRADIENTS[1] },
+    { label: 'Utilisateurs', value: s.total_users,        change: 12.7, suffix: '',      ...CARD_GRADIENTS[2] },
+    { label: 'Commandes',    value: s.total_orders,       change: -2.1, suffix: '',      ...CARD_GRADIENTS[3] },
+    { label: 'Revenus',      value: s.total_revenue,      change: 15.3, suffix: ' MAD',  ...CARD_GRADIENTS[4] },
+    { label: 'En Attente',   value: s.pending_boutiques,  change: undefined, suffix: '', ...CARD_GRADIENTS[5] },
+  ];
 
-      {/* ── Salutation ── */}
-      <div style={{ animation: 'fa-fade-in 0.4s ease forwards' }}>
-        <p style={{ fontFamily: 'Raleway, sans-serif', fontSize: 12, color: '#939790', letterSpacing: '0.1em', textTransform: 'capitalize', marginBottom: 4 }}>{today}</p>
-        <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 28, fontWeight: 400, color: '#2C2C2C' }}>
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+      {/* Header */}
+      <div className="fa-animate">
+        <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 11.5, color: '#9CA3AF', letterSpacing: '0.08em', textTransform: 'capitalize', marginBottom: 4 }}>{today}</p>
+        <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 26, fontWeight: 700, color: '#111827', margin: 0 }}>
           Vue d'ensemble de la plateforme
         </h2>
+        <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 13, color: '#6B7280', marginTop: 4 }}>
+          Tableau de bord administrateur · données en temps réel
+        </p>
       </div>
 
-      {/* ── Cartes stats ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 20 }}>
-        {[
-          { label: 'Boutiques', value: s.total_boutiques, icon: StatIcons.boutiques, change: 8.2 },
-          { label: 'Villes couvertes', value: s.total_cities, icon: StatIcons.cities, change: 4.5 },
-          { label: 'Utilisateurs', value: s.total_users, icon: StatIcons.users, change: 12.7 },
-          { label: 'Commandes', value: s.total_orders, icon: StatIcons.orders, change: -2.1 },
-          { label: 'Revenus', value: s.total_revenue, icon: StatIcons.revenue, change: 15.3, prefix: '', suffix: ' MAD' },
-          {
-            label: 'En attente',
-            value: s.pending_boutiques,
-            icon: <div style={{ ...iconWrapper, backgroundColor: '#FFF8F0' }}>{StatIcons.pending}</div>,
-            change: undefined,
-          },
-        ].map((card, i) => (
-          <div key={i} style={{ animation: `fa-fade-in 0.4s ease ${i * 0.08}s forwards`, opacity: 0 }}>
+      {/* Quick actions */}
+      <QuickActions />
+
+      {/* 3×2 Stat cards grid */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20 }} className="stats-grid">
+        {statsCards.map((card, i) => (
+          <div key={i} style={{ animation: `fa-fade-in 0.4s ease ${i * 0.06}s both` }}>
             <StatsCard {...card} loading={statsLoading} />
           </div>
         ))}
       </div>
 
-      {/* ── Graphiques ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
-        <div style={{ animation: 'fa-fade-in 0.5s ease 0.3s forwards', opacity: 0 }}>
+      {/* Charts */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }} className="charts-grid">
+        <div style={{ animation: 'fa-fade-in 0.5s ease 0.35s both' }}>
           <RevenueChart data={analytics?.daily_stats} loading={analyticsLoading} />
         </div>
-        <div style={{ animation: 'fa-fade-in 0.5s ease 0.4s forwards', opacity: 0 }}>
+        <div style={{ animation: 'fa-fade-in 0.5s ease 0.45s both' }}>
           <TopProductsChart data={analytics?.category_stats} loading={analyticsLoading} />
         </div>
       </div>
 
-      {/* ── Tableau boutiques en attente ── */}
-      <div style={{ animation: 'fa-fade-in 0.5s ease 0.5s forwards', opacity: 0 }}>
-        <PendingBoutiquesTable boutiques={boutiques || []} loading={boutiquesLoading} onValidate={handleValidate} />
+      {/* Recent boutiques */}
+      <div style={{ animation: 'fa-fade-in 0.5s ease 0.55s both' }}>
+        <RecentBoutiquesTable boutiques={boutiques || []} loading={boutiquesLoading} onValidate={handleValidate} />
       </div>
 
-      {/* CSS hover table rows */}
       <style>{`
-        .fa-table-row:hover { background-color: #FAFAF9 !important; }
-        @media (max-width: 900px) {
-          div[style*="gridTemplateColumns: '1fr 1fr'"] { grid-template-columns: 1fr !important; }
-        }
+        @media (max-width: 1100px) { .stats-grid { grid-template-columns: repeat(2, 1fr) !important; } }
+        @media (max-width: 700px)  { .stats-grid { grid-template-columns: 1fr !important; } }
+        @media (max-width: 900px)  { .charts-grid { grid-template-columns: 1fr !important; } }
       `}</style>
     </div>
   );
 }
 
-const iconWrapper = {
-  width: 48, height: 48, borderRadius: 12, backgroundColor: '#D4E0E2',
-  display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+/* ── Shared styles ────────────────────────────────────────── */
+const card = {
+  background: '#fff', borderRadius: 16,
+  boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
+  border: '1px solid rgba(0,0,0,0.06)', overflow: 'hidden',
 };
+const cardHeader = {
+  padding: '18px 24px', borderBottom: '1px solid #F3F4F6',
+  display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+};
+const cardTitle = { fontFamily: "'Playfair Display', serif", fontSize: 17, fontWeight: 600, color: '#111827', margin: 0 };
+const cardSub   = { fontFamily: 'Inter, sans-serif', fontSize: 12, color: '#9CA3AF', margin: '2px 0 0' };
+const th = { padding: '11px 18px', textAlign: 'left', fontFamily: 'Inter, sans-serif', fontSize: 10.5, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#9CA3AF', whiteSpace: 'nowrap' };
+const td = { padding: '13px 18px' };
+const tdText = { fontFamily: 'Inter, sans-serif', fontSize: 13, color: '#374151' };
+const linkBtn = { padding: '6px 14px', borderRadius: 20, border: '1px solid #D1D5DB', fontFamily: 'Inter, sans-serif', fontSize: 12, fontWeight: 500, color: '#374151', textDecoration: 'none', backgroundColor: 'transparent', whiteSpace: 'nowrap' };
+const approveBtn = { padding: '5px 12px', borderRadius: 8, border: 'none', backgroundColor: '#dcfce7', color: '#15803d', cursor: 'pointer', fontFamily: 'Inter, sans-serif', fontSize: 11.5, fontWeight: 600 };
+const rejectBtn  = { padding: '5px 12px', borderRadius: 8, border: '1px solid #fecaca', backgroundColor: 'transparent', color: '#dc2626', cursor: 'pointer', fontFamily: 'Inter, sans-serif', fontSize: 11.5, fontWeight: 600 };
+const qBtn = (bg, color) => ({ display: 'inline-block', padding: '9px 20px', borderRadius: 20, backgroundColor: bg, color, fontFamily: 'Inter, sans-serif', fontSize: 13, fontWeight: 600, textDecoration: 'none', transition: 'opacity 0.18s' });

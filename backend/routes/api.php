@@ -20,6 +20,21 @@ use App\Http\Controllers\Boutique\BoutiqueDashboardController;
 use App\Http\Controllers\Boutique\AIAdvisorController;
 use App\Http\Controllers\Boutique\NotificationController;
 
+use App\Http\Controllers\Admin\AdminBoutiqueController;
+use App\Http\Controllers\Admin\AdminOrderController;
+use App\Http\Controllers\Admin\AdminUserController;
+use App\Http\Controllers\Admin\AdminCategoryController;
+use App\Http\Controllers\Admin\AdminSettingsController;
+
+use App\Http\Controllers\Boutique\BoutiqueOrderController;
+use App\Http\Controllers\Boutique\BoutiqueClientController;
+use App\Http\Controllers\Boutique\BoutiqueReviewController;
+use App\Http\Controllers\Boutique\BoutiqueProfileController;
+
+use App\Http\Controllers\API\CategoryController as ApiCategoryController;
+use App\Http\Controllers\API\NotificationController as ApiNotificationController;
+
+
 // ── Public API (site + e-commerce) ───────────────────────────────────────────
 Route::get('/stats', [ApiCityController::class, 'stats']);
 Route::get('/cities', [ApiCityController::class, 'index']);
@@ -38,6 +53,7 @@ Route::get('/products-similar/{id}', [ProductController::class, 'similar']);
 Route::get('/boutiques/{boutiqueId}/products', [ProductController::class, 'byBoutique']);
 
 Route::post('/chatbot', [ChatbotController::class, 'chat']);
+Route::get('/categories', [ApiCategoryController::class, 'index']);
 
 Route::post('/reviews', [ReviewController::class, 'store'])->middleware('auth:sanctum');
 
@@ -73,11 +89,37 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::apiResource('cities', AdminCityController::class);
 
+        // Specific boutique-validation routes MUST come before apiResource to avoid conflicts
         Route::get('/boutiques/pending', [BoutiqueValidationController::class, 'pending']);
         Route::post('/boutiques/{id}/approve', [BoutiqueValidationController::class, 'approve']);
         Route::post('/boutiques/{id}/reject', [BoutiqueValidationController::class, 'reject']);
         Route::get('/boutique-requests', [BoutiqueValidationController::class, 'index']);
+        Route::apiResource('boutiques', AdminBoutiqueController::class);
+
+        // Orders
+        Route::get('/orders', [AdminOrderController::class, 'index']);
+        Route::put('/orders/{id}/status', [AdminOrderController::class, 'updateStatus']);
+
+        // Users
+        Route::get('/users', [AdminUserController::class, 'index']);
+        Route::put('/users/{id}', [AdminUserController::class, 'update']);
+        Route::delete('/users/{id}', [AdminUserController::class, 'destroy']);
+
+        // Categories
+        Route::apiResource('categories', AdminCategoryController::class);
+
+        // Settings
+        Route::get('/settings', [AdminSettingsController::class, 'index']);
+        Route::put('/settings', [AdminSettingsController::class, 'update']);
+        Route::post('/settings/clear-cache', [AdminSettingsController::class, 'clearCache']);
+        Route::post('/settings/backup', [AdminSettingsController::class, 'backupDatabase']);
+        Route::get('/settings/logs', [AdminSettingsController::class, 'getLogs']);
     });
+
+    // Shared notification routes (available to all authenticated users)
+    Route::get('/notifications', [ApiNotificationController::class, 'index']);
+    Route::put('/notifications/{id}/read', [ApiNotificationController::class, 'markAsRead']);
+    Route::delete('/notifications/{id}', [ApiNotificationController::class, 'destroy']);
 
     // Boutique owner dashboard
     Route::middleware('boutique.owner')->prefix('boutique')->group(function () {
@@ -102,5 +144,20 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/notifications/check-stock', [NotificationController::class, 'checkStock']);
         Route::put('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
         Route::put('/notifications/read-all', [NotificationController::class, 'markAllAsRead']);
+
+        // Orders
+        Route::get('/orders', [BoutiqueOrderController::class, 'index']);
+        Route::put('/orders/{id}/status', [BoutiqueOrderController::class, 'updateStatus']);
+
+        // Clients
+        Route::get('/clients', [BoutiqueClientController::class, 'index']);
+
+        // Reviews
+        Route::get('/reviews', [BoutiqueReviewController::class, 'index']);
+        Route::post('/reviews/{id}/reply', [BoutiqueReviewController::class, 'reply']);
+
+        // Profile
+        Route::get('/profile', [BoutiqueProfileController::class, 'show']);
+        Route::put('/profile', [BoutiqueProfileController::class, 'update']);
     });
 });
