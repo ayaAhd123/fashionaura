@@ -5,10 +5,15 @@ use App\Http\Controllers\API\CityController as ApiCityController;
 use App\Http\Controllers\API\BoutiqueController;
 use App\Http\Controllers\API\ProductController;
 use App\Http\Controllers\API\CartController;
+use App\Http\Controllers\API\OrderController;
+use App\Http\Controllers\API\ConversationController;
+use App\Http\Controllers\API\MessageController;
+use App\Http\Controllers\API\PostCommentController;
 use App\Http\Controllers\API\FavoriteController;
 use App\Http\Controllers\API\BoutiqueFollowerController;
 use App\Http\Controllers\API\ReviewController;
 use App\Http\Controllers\API\ChatbotController;
+use App\Http\Controllers\API\ContactController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\Admin\AdminDashboardController;
@@ -16,6 +21,7 @@ use App\Http\Controllers\Admin\CityController as AdminCityController;
 use App\Http\Controllers\Admin\BoutiqueValidationController;
 use App\Http\Controllers\Boutique\BoutiqueCopilotController;
 use App\Http\Controllers\Boutique\BoutiqueProductController;
+use App\Http\Controllers\Boutique\BoutiquePostController;
 use App\Http\Controllers\Boutique\BoutiqueDashboardController;
 use App\Http\Controllers\Boutique\AIAdvisorController;
 use App\Http\Controllers\Boutique\NotificationController;
@@ -46,11 +52,15 @@ Route::get('/boutiques/{slug}', [BoutiqueController::class, 'show']);
 Route::get('/boutiques-reviews/{id}', [BoutiqueController::class, 'reviews']);
 Route::get('/cities/{cityId}/boutiques', [BoutiqueController::class, 'byCity']);
 
+Route::post('/contact', [ContactController::class, 'store']);
+
 Route::get('/products', [ProductController::class, 'index']);
 Route::get('/products/{slug}', [ProductController::class, 'show']);
 Route::get('/products-reviews/{id}', [ProductController::class, 'reviews']);
 Route::get('/products-similar/{id}', [ProductController::class, 'similar']);
 Route::get('/boutiques/{boutiqueId}/products', [ProductController::class, 'byBoutique']);
+Route::get('/boutiques/{boutiqueId}/posts', [BoutiquePostController::class, 'feed']);
+Route::get('/boutiques/{boutiqueId}/posts/{postId}/comments', [PostCommentController::class, 'index']);
 
 Route::post('/chatbot', [ChatbotController::class, 'chat']);
 Route::get('/categories', [ApiCategoryController::class, 'index']);
@@ -66,6 +76,24 @@ Route::post('/reset-password', [PasswordResetController::class, 'resetPassword']
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/me', [AuthController::class, 'me']);
+
+    // Compte client : profil + mot de passe
+    Route::put('/account/profile', [AuthController::class, 'updateProfile']);
+    Route::put('/account/password', [AuthController::class, 'updatePassword']);
+
+    // Commandes de l'utilisateur connecté
+    Route::get('/orders', [OrderController::class, 'index']);
+    Route::get('/orders/{id}', [OrderController::class, 'show']);
+    Route::post('/orders', [OrderController::class, 'store']);
+    Route::get('/orders/{orderId}/conversation', [ConversationController::class, 'forOrder']);
+    Route::get('/conversations', [ConversationController::class, 'index']);
+    Route::get('/boutiques/{boutiqueId}/conversation', [ConversationController::class, 'forBoutique']);
+    Route::get('/conversations/{conversation}/messages', [MessageController::class, 'index']);
+    Route::post('/conversations/{conversation}/messages', [MessageController::class, 'store']);
+    Route::post('/boutiques/{boutiqueId}/posts/{postId}/comments', [PostCommentController::class, 'store']);
+
+    // Boutiques suivies
+    Route::get('/my/following', [BoutiqueFollowerController::class, 'following']);
 
     // Cart & favorites
     Route::get('/cart', [CartController::class, 'index']);
@@ -132,6 +160,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/products/{id}', [BoutiqueProductController::class, 'update']);
         Route::delete('/products/{id}', [BoutiqueProductController::class, 'destroy']);
 
+        Route::get('/posts', [BoutiquePostController::class, 'index']);
+        Route::post('/posts', [BoutiquePostController::class, 'store']);
+        Route::put('/posts/{id}', [BoutiquePostController::class, 'update']);
+        Route::delete('/posts/{id}', [BoutiquePostController::class, 'destroy']);
+
         Route::get('/ai-advisor/recommendations', [AIAdvisorController::class, 'recommendations']);
         Route::get('/ai-advisor/analysis', [AIAdvisorController::class, 'analysis']);
 
@@ -148,6 +181,8 @@ Route::middleware('auth:sanctum')->group(function () {
         // Orders
         Route::get('/orders', [BoutiqueOrderController::class, 'index']);
         Route::put('/orders/{id}/status', [BoutiqueOrderController::class, 'updateStatus']);
+        Route::get('/orders/{id}/messages', [BoutiqueOrderController::class, 'messages']);
+        Route::post('/orders/{id}/messages', [BoutiqueOrderController::class, 'sendMessage']);
 
         // Clients
         Route::get('/clients', [BoutiqueClientController::class, 'index']);

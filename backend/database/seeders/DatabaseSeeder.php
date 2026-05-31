@@ -8,24 +8,17 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        $this->command?->info('Starting database seeding...');
+        $this->command?->info('Phase test — seeders minimaux (admin + Sarah uniquement)…');
 
         $this->call([
             CitySeeder::class,
             CategorySeeder::class,
-            BoutiqueSeeder::class,
-            BoutiqueDeliverySeeder::class,
-            ProductSeeder::class,
-            ProductImageSeeder::class,
-            ProductVariantSeeder::class,
-            TangerFashionSeeder::class,
-            ReviewSeeder::class,
             AdminUserSeeder::class,
-            BoutiqueOwnerSeeder::class,
-            DashboardDummyDataSeeder::class,
-            StockAlertTestSeeder::class,
+            SarahBoutiqueSeeder::class,
         ]);
 
-        $this->command?->info('Database seeding completed.');
+        $this->command?->info('Terminé. Comptes :');
+        $this->command?->line('  Admin  → admin@fashionaura.com / password123');
+        $this->command?->line('  Sarah  → sarah@luxuryfashion.com / password123');
     }
 }

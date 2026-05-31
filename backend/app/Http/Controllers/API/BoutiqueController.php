@@ -29,10 +29,26 @@ class BoutiqueController extends Controller
             $query->where('name', 'like', '%' . request('search') . '%');
         }
 
+        // Filtre par type/catégorie : boutiques proposant un produit de cette catégorie,
+        // ou dont la spécialité (category) correspond.
+        if (request('category')) {
+            $cat = request('category');
+            $query->where(function ($q) use ($cat) {
+                $q->where('category', $cat)
+                  ->orWhereHas('products', function ($p) use ($cat) {
+                      $p->where('is_active', true)
+                        ->whereHas('category', fn ($c) => $c->where('slug', $cat));
+                  });
+            });
+        }
+
         $boutiques = $query
             ->with('city:id,name,slug')
             ->withCount('products')
-            ->select(['id', 'name', 'slug', 'logo', 'description', 'category', 'city_id', 'rating', 'reviews_count', 'followers_count', 'offers_delivery', 'delivery_scope', 'delivery_note'])
+            ->orderByDesc('rating')
+            ->orderByDesc('followers_count')
+            ->orderByDesc('reviews_count')
+            ->select(['id', 'name', 'slug', 'logo', 'description', 'category', 'city_id', 'rating', 'reviews_count', 'followers_count', 'offers_delivery', 'delivery_scope', 'delivery_note', 'messages_enabled'])
             ->paginate(12);
 
         return response()->json($boutiques);
@@ -42,6 +58,7 @@ class BoutiqueController extends Controller
     public function show($slug)
     {
         $boutique = Boutique::where('slug', $slug)
+            ->where('is_active', true)
             ->with([
                 'city:id,name,slug',
                 'products' => function ($q) {
@@ -75,7 +92,10 @@ class BoutiqueController extends Controller
             ->where('is_active', true)
             ->with('city:id,name,slug')
             ->withCount('products')
-            ->select(['id', 'name', 'slug', 'logo', 'description', 'category', 'rating', 'followers_count'])
+            ->orderByDesc('rating')
+            ->orderByDesc('followers_count')
+            ->orderByDesc('reviews_count')
+            ->select(['id', 'name', 'slug', 'logo', 'description', 'category', 'rating', 'reviews_count', 'followers_count'])
             ->get();
 
         return response()->json($boutiques);

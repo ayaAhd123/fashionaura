@@ -280,6 +280,16 @@ const LandingPage = () => {
         document.getElementById('explore')?.scrollIntoView({ behavior: 'smooth' });
     }, []);
 
+    // Si on arrive avec #explore (ex. clic sur "Boutiques"), on défile vers la carte des villes
+    useEffect(() => {
+        if (window.location.hash === '#explore') {
+            const timer = setTimeout(() => {
+                document.getElementById('explore')?.scrollIntoView({ behavior: 'smooth' });
+            }, 350);
+            return () => clearTimeout(timer);
+        }
+    }, []);
+
     const scrollToSection = useCallback((id) => {
         if (id === 'stylist') {
             openFashionBot();

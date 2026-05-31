@@ -14,12 +14,13 @@ import BoutiqueLayout from '../layouts/BoutiqueLayout';
 import LandingPage from '../pages/LandingPage';
 import CityPage from '../pages/CityPage';
 import TopBoutiquesPage from '../pages/TopBoutiquesPage';
-import { BoutiquesPage } from '../pages/BoutiquesPage';
 import { ProductsPage } from '../pages/ProductsPage';
 import { BoutiqueDetailPage } from '../pages/BoutiqueDetailPage';
 import { ProductDetailPage } from '../pages/ProductDetailPage';
 import { FavoritesPage } from '../pages/FavoritesPage';
 import { CartPage } from '../pages/CartPage';
+import { AccountPage } from '../pages/AccountPage';
+import HelpPage from '../pages/HelpPage';
 import Login from '../pages/Login';
 import Register from '../pages/Register';
 import ForgotPassword from '../pages/ForgotPassword';
@@ -43,11 +44,15 @@ import BoutiqueClientsPage from '../pages/boutique/BoutiqueClientsPage';
 import BoutiqueReviewsPage from '../pages/boutique/BoutiqueReviewsPage';
 import BoutiqueAnalyticsPage from '../pages/boutique/BoutiqueAnalyticsPage';
 import NotificationsList from '../pages/boutique/NotificationsList';
+import BoutiquePostsPage from '../pages/boutique/BoutiquePostsPage';
+import BoutiqueMessagesPage from '../pages/boutique/BoutiqueMessagesPage';
 import BoutiqueSettingsPage from '../pages/boutique/BoutiqueSettingsPage';
+import ClientMessagesPage from '../pages/ClientMessagesPage';
 import AIAdvisor from '../pages/boutique/AIAdvisor';
 
 import ChatbotWindow from '../components/AI/ChatbotWindow';
 import MerchantCopilotWindow from '../components/AI/MerchantCopilotWindow';
+import OnboardingTour from '../components/onboarding/OnboardingTour';
 import { Toaster } from 'react-hot-toast';
 
 const NotFound = () => (
@@ -61,10 +66,6 @@ const NotFound = () => (
 );
 
 function RootRedirect() {
-  const { isAuthenticated, user } = useAuth();
-  if (!isAuthenticated) return <LandingPage />;
-  if (user?.role === 'admin') return <Navigate to="/admin/dashboard" replace />;
-  if (user?.role === 'boutique_owner') return <Navigate to="/boutique/dashboard" replace />;
   return <LandingPage />;
 }
 
@@ -118,12 +119,17 @@ const AppRouter = () => (
                 <Route path="/meilleures-boutiques" element={<TopBoutiquesPage />} />
 
                 <Route element={<MainLayout />}>
-                  <Route path="/boutiques" element={<BoutiquesPage />} />
+                  <Route path="/boutiques" element={<Navigate to="/#explore" replace />} />
                   <Route path="/boutiques/:slug" element={<BoutiqueDetailPage />} />
                   <Route path="/products" element={<ProductsPage />} />
                   <Route path="/products/:slug" element={<ProductDetailPage />} />
                   <Route path="/favoris" element={<FavoritesPage />} />
                   <Route path="/panier" element={<CartPage />} />
+                  <Route path="/aide" element={<HelpPage variant="customer" />} />
+                  <Route element={<ProtectedRoute />}>
+                    <Route path="/compte" element={<AccountPage />} />
+                    <Route path="/compte/messagerie" element={<ClientMessagesPage />} />
+                  </Route>
                 </Route>
 
                 <Route path="/login" element={<Login />} />
@@ -158,8 +164,10 @@ const AppRouter = () => (
                     <Route path="/boutique/dashboard" element={<BoutiqueDashboard />} />
                     <Route path="/boutique/produits" element={<DashboardProductsPage />} />
                     <Route path="/boutique/products" element={<DashboardProductsPage />} />
+                    <Route path="/boutique/publications" element={<BoutiquePostsPage />} />
                     <Route path="/boutique/commandes" element={<BoutiqueOrdersPage />} />
                     <Route path="/boutique/orders" element={<BoutiqueOrdersPage />} />
+                    <Route path="/boutique/messagerie" element={<BoutiqueMessagesPage />} />
                     <Route path="/boutique/clients" element={<BoutiqueClientsPage />} />
                     <Route path="/boutique/avis" element={<BoutiqueReviewsPage />} />
                     <Route path="/boutique/analytics" element={<BoutiqueAnalyticsPage />} />
@@ -167,12 +175,14 @@ const AppRouter = () => (
                     <Route path="/boutique/parametres" element={<BoutiqueSettingsPage />} />
                     <Route path="/boutique/settings" element={<BoutiqueSettingsPage />} />
                     <Route path="/boutique/ai-advisor" element={<AIAdvisor />} />
+                    <Route path="/boutique/aide" element={<HelpPage variant="owner" />} />
                   </Route>
                 </Route>
 
                 <Route path="*" element={<NotFound />} />
               </Routes>
               <ChatbotGate />
+              <OnboardingTour variant="customer" />
             </BrowserRouter>
           </ToastProvider>
         </FavoritesProvider>

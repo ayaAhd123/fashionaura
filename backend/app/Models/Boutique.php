@@ -24,6 +24,11 @@ class Boutique extends Model
         'opening_hours',
         'is_verified',
         'is_active',
+        'messages_enabled',
+        'plan',
+        'subscription_status',
+        'subscription_paid_at',
+        'payment_reference',
         'stock_alert_threshold',
         'offers_delivery',
         'delivery_scope',
@@ -34,8 +39,10 @@ class Boutique extends Model
         'opening_hours' => 'array',
         'is_verified' => 'boolean',
         'is_active' => 'boolean',
+        'messages_enabled' => 'boolean',
         'offers_delivery' => 'boolean',
         'rating' => 'decimal:1',
+        'subscription_paid_at' => 'datetime',
     ];
 
     public function city()
@@ -56,6 +63,11 @@ class Boutique extends Model
     public function followers()
     {
         return $this->hasMany(BoutiqueFollower::class);
+    }
+
+    public function posts()
+    {
+        return $this->hasMany(BoutiquePost::class);
     }
 
     public function owner()

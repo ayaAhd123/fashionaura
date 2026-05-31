@@ -31,9 +31,15 @@ export function TopGoldCard({ boutique, city, rank }) {
         <h3 className="top-gold-card__name">{boutique.name}</h3>
         <div className="top-gold-card__meta">
           <span>{boutique.products_count ?? 0} {t('top_boutiques.creations')}</span>
-          <span className="top-gold-card__rating">
-            <Star size={12} className="fill-current" />
-            {boutique.rating || '5.0'}
+          <span className="top-gold-card__rating" title={`${Number(boutique.rating || 0).toFixed(1)} / 5`}>
+            {[...Array(5)].map((_, i) => (
+              <Star
+                key={i}
+                size={12}
+                className={i < Math.round(Number(boutique.rating) || 0) ? 'fill-current' : 'opacity-30'}
+              />
+            ))}
+            <span className="top-gold-card__rating-num">{Number(boutique.rating || 0).toFixed(1)}</span>
           </span>
         </div>
         {boutique.offers_delivery && (

@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
-import { NavLink, useNavigate, useLocation, Outlet } from 'react-router-dom';
+import { NavLink, Link, useNavigate, useLocation, Outlet } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
+import OnboardingTour from '../components/onboarding/OnboardingTour';
 import i18n from '../i18n';
 
 /* ── helpers ───────────────────────────────────────────────── */
@@ -11,6 +12,7 @@ const ROUTE_LABELS = {
   '/boutique/products':      'Produits',
   '/boutique/commandes':     'Commandes',
   '/boutique/orders':        'Commandes',
+  '/boutique/messagerie':    'Messagerie',
   '/boutique/clients':       'Clients',
   '/boutique/avis':          'Avis',
   '/boutique/analytics':     'Analytics',
@@ -37,8 +39,12 @@ const Ico = {
   analytics:   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>,
   bell:        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>,
   settings:    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>,
+  help:        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>,
+  messages:    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>,
+  posts:       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>,
   menu:        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>,
   logout:      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>,
+  home:        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>,
   chevLeft:    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>,
   chevRight:   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>,
   sun:         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>,
@@ -48,12 +54,15 @@ const Ico = {
 const NAV_ITEMS = [
   { to: '/boutique/dashboard',     label: 'Dashboard',     icon: 'dashboard' },
   { to: '/boutique/produits',      label: 'Produits',      icon: 'products'  },
+  { to: '/boutique/publications',  label: 'Publications',  icon: 'posts'     },
   { to: '/boutique/commandes',     label: 'Commandes',     icon: 'orders'    },
+  { to: '/boutique/messagerie',    label: 'Messagerie',    icon: 'messages'  },
   { to: '/boutique/clients',       label: 'Clients',       icon: 'clients'   },
   { to: '/boutique/avis',          label: 'Avis',          icon: 'star'      },
   { to: '/boutique/analytics',     label: 'Analytics',     icon: 'analytics' },
   { to: '/boutique/notifications', label: 'Notifications', icon: 'bell', badge: true },
   { to: '/boutique/parametres',    label: 'Paramètres',    icon: 'settings'  },
+  { to: '/boutique/aide',          label: 'Aide',          icon: 'help'      },
 ];
 
 /* ── useClickOutside ─────────────────────────────────────── */
@@ -73,16 +82,14 @@ function Sidebar({ collapsed, onToggle }) {
   const handleLogout = async () => { await logout(); navigate('/login'); };
 
   return (
-    <aside style={{
+    <aside className="fa-boutique-sidebar" style={{
       width: collapsed ? 64 : 240,
       minHeight: '100vh',
-      height: '100vh',
+      alignSelf: 'stretch',
       backgroundColor: '#1B3A35',
       display: 'flex',
       flexDirection: 'column',
       flexShrink: 0,
-      position: 'sticky',
-      top: 0,
       transition: 'width 0.25s ease',
       overflow: 'hidden',
       zIndex: 20,
@@ -129,10 +136,31 @@ function Sidebar({ collapsed, onToggle }) {
             {!collapsed && <span style={{ fontFamily: 'Inter, sans-serif', fontSize: 13, fontWeight: 500, whiteSpace: 'nowrap' }}>{label}</span>}
           </NavLink>
         ))}
+
       </nav>
 
+      {/* Retour au site + User + Logout */}
+      <div style={{ flexShrink: 0, marginTop: 'auto', backgroundColor: '#1B3A35' }}>
+        <div style={{ borderTop: '1px solid rgba(255,255,255,0.07)', padding: collapsed ? '8px 0' : '8px 8px' }}>
+          <Link
+            to="/"
+            title="Retour au site"
+            style={{
+              display: 'flex', alignItems: 'center', gap: 10,
+              padding: collapsed ? '10px 0' : '9px 10px',
+              justifyContent: collapsed ? 'center' : 'flex-start',
+              borderRadius: 9, textDecoration: 'none', transition: 'all 0.18s',
+              color: 'rgba(255,255,255,0.52)',
+              borderLeft: '3px solid transparent',
+            }}
+          >
+            {Ico.home}
+            {!collapsed && <span style={{ fontFamily: 'Inter, sans-serif', fontSize: 13, fontWeight: 500, whiteSpace: 'nowrap' }}>Retour au site</span>}
+          </Link>
+        </div>
+
       {/* User + Logout */}
-      <div style={{ borderTop: '1px solid rgba(255,255,255,0.07)', padding: collapsed ? '10px 0' : '10px 8px', flexShrink: 0 }}>
+      <div style={{ borderTop: '1px solid rgba(255,255,255,0.07)', padding: collapsed ? '10px 0' : '10px 8px' }}>
         {!collapsed ? (
           <>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 10px', borderRadius: 9, marginBottom: 2 }}>
@@ -159,6 +187,7 @@ function Sidebar({ collapsed, onToggle }) {
             </button>
           </div>
         )}
+      </div>
       </div>
     </aside>
   );
@@ -244,6 +273,24 @@ function Header({ onMenuToggle, isDark }) {
       </div>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+        <Link
+          to="/"
+          style={{
+            ...iconBtn,
+            width: 'auto',
+            padding: '0 14px',
+            borderRadius: 20,
+            textDecoration: 'none',
+            fontFamily: 'Inter, sans-serif',
+            fontSize: 12,
+            fontWeight: 500,
+            gap: 6,
+          }}
+        >
+          {Ico.chevLeft}
+          <span className="fa-back-site-label">Retour au site</span>
+        </Link>
+
         {/* Language */}
         <div ref={langRef} style={{ position: 'relative' }}>
           <button onClick={() => { setShowLang(v => !v); setShowBell(false); setShowUser(false); }} style={{ ...iconBtn, width: 'auto', padding: '0 12px', borderRadius: 20, fontFamily: 'Inter, sans-serif', fontSize: 12, fontWeight: 500, gap: 4 }}>
@@ -357,10 +404,17 @@ export default function BoutiqueLayout() {
         @media (max-width: 768px) {
           .fa-menu-btn { display: flex !important; }
           .fa-main-content { padding: 20px 16px !important; }
+          .fa-boutique-sidebar {
+            position: fixed !important;
+            left: 0 !important;
+            top: 0 !important;
+            height: 100vh !important;
+            min-height: 100vh !important;
+          }
         }
       `}</style>
 
-      <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: bg }}>
+      <div style={{ display: 'flex', minHeight: '100vh', alignItems: 'stretch', backgroundColor: bg }}>
         <Sidebar collapsed={collapsed} onToggle={toggle} />
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, overflow: 'hidden' }}>
           <Header onMenuToggle={toggle} isDark={isDark} />
@@ -369,6 +423,7 @@ export default function BoutiqueLayout() {
           </main>
         </div>
       </div>
+      <OnboardingTour variant="owner" />
     </>
   );
 }

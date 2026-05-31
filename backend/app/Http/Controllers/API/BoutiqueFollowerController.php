@@ -48,5 +48,18 @@ class BoutiqueFollowerController extends Controller
     
             return response()->json(['is_following' => $isFollowing]);
         }
+
+        // GET /api/my/following - Boutiques suivies par l'utilisateur connecté
+        public function following()
+        {
+            $boutiques = Boutique::whereIn(
+                'id',
+                BoutiqueFollower::where('user_id', Auth::id())->pluck('boutique_id')
+            )
+                ->withCount('products')
+                ->get(['id', 'name', 'slug', 'logo', 'category', 'rating', 'followers_count', 'is_active']);
+
+            return response()->json($boutiques);
+        }
     }
 

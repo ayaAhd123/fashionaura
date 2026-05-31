@@ -1,12 +1,18 @@
-import React, { createContext, useState, useCallback, useEffect } from 'react';
+import React, { createContext, useState, useCallback, useEffect, useRef } from 'react';
+import { useAuth } from './AuthContext';
 
 export const CartContext = createContext();
 
-const CART_STORAGE_KEY = 'fashionaura_cart';
+const CART_KEY_PREFIX = 'fashionaura_cart';
 
-const getStoredCart = () => {
+// Chaque compte possède son propre panier. Les visiteurs non connectés
+// partagent un panier « invité » distinct.
+const cartKeyForUser = (user) =>
+  user?.id ? `${CART_KEY_PREFIX}_user_${user.id}` : `${CART_KEY_PREFIX}_guest`;
+
+const getStoredCart = (key) => {
   try {
-    const stored = localStorage.getItem(CART_STORAGE_KEY);
+    const stored = localStorage.getItem(key);
     return stored ? JSON.parse(stored) : null;
   } catch {
     return null;
@@ -14,15 +20,42 @@ const getStoredCart = () => {
 };
 
 export const CartProvider = ({ children }) => {
-  const [cart, setCart] = useState(() => getStoredCart());
+  const { user } = useAuth();
+  const storageKey = cartKeyForUser(user);
+
+  const [cart, setCart] = useState(() => getStoredCart(storageKey));
   const [loading, setLoading] = useState(false);
 
-  // Persister dans localStorage à chaque changement
+  // Migration : supprime l'ancien panier global partagé entre tous les comptes.
   useEffect(() => {
+    localStorage.removeItem(CART_KEY_PREFIX);
+  }, []);
+
+  // Clé réellement active pour la persistance (suit le compte courant)
+  const activeKeyRef = useRef(storageKey);
+  // Ignore la prochaine écriture lorsqu'on vient de charger un autre panier
+  const skipPersistRef = useRef(false);
+
+  // Changement de compte (connexion / déconnexion / nouveau compte) :
+  // on charge le panier propre à ce compte.
+  useEffect(() => {
+    if (activeKeyRef.current === storageKey) return;
+    activeKeyRef.current = storageKey;
+    skipPersistRef.current = true;
+    setCart(getStoredCart(storageKey));
+  }, [storageKey]);
+
+  // Persiste le panier dans la clé du compte courant uniquement.
+  useEffect(() => {
+    if (skipPersistRef.current) {
+      skipPersistRef.current = false;
+      return;
+    }
+    const key = activeKeyRef.current;
     if (cart) {
-      localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
+      localStorage.setItem(key, JSON.stringify(cart));
     } else {
-      localStorage.removeItem(CART_STORAGE_KEY);
+      localStorage.removeItem(key);
     }
   }, [cart]);
 
@@ -66,7 +99,6 @@ export const CartProvider = ({ children }) => {
 
   const clearCart = useCallback(() => {
     setCart(null);
-    localStorage.removeItem(CART_STORAGE_KEY);
   }, []);
 
   return (
@@ -75,4 +107,3 @@ export const CartProvider = ({ children }) => {
     </CartContext.Provider>
   );
 };
-

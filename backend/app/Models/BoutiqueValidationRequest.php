@@ -55,7 +55,7 @@ class BoutiqueValidationRequest extends Model
             'reviewed_at' => now(),
         ]);
 
-        $this->boutique->update(['is_verified' => true]);
+        $this->boutique->update(['is_verified' => true, 'is_active' => true]);
     }
 
     public function reject($adminId, $comment = null)

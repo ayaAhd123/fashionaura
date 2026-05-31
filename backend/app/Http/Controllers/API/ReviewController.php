@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Models\Review;
 use App\Models\Product;
+use App\Models\Boutique;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -32,6 +33,14 @@ class ReviewController extends Controller
             $product->update([
                 'rating' => round($avgRating, 2),
                 'reviews_count' => $reviews->count(),
+            ]);
+        }
+
+        if ($validated['boutique_id'] ?? null) {
+            $boutique = Boutique::findOrFail($validated['boutique_id']);
+            $boutique->update([
+                'rating' => round($boutique->reviews()->avg('rating') ?? 0, 2),
+                'reviews_count' => $boutique->reviews()->count(),
             ]);
         }
 

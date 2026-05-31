@@ -6,8 +6,10 @@ import { useTranslation } from 'react-i18next';
 import { getCity, getCities } from '../api/cityService';
 
 import { boutiqueService } from '../services/boutiqueService';
+import { productService } from '../services/productService';
 
 import { BoutiqueCard } from '../components/BoutiqueCard';
+import { ProductCard } from '../components/ProductCard';
 
 import '../styles/city.css';
 
@@ -16,60 +18,15 @@ import FashionAuraLogo from '../components/common/FashionAuraLogo';
 import LanguageSwitcher from '../components/LanguageSwitcher';
 
 import zelligeImage from '../images/zellige-marocain.jpg';
-import { Sparkles } from 'lucide-react';
-import { getCitySlug, cityName, cityRegion, cityHeroTitle, cityNickname, cityPoetic, getCityTheme } from '../utils/cityI18n';
+import { Sparkles, Search, Store } from 'lucide-react';
+import { getCitySlug, cityName, cityRegion, cityHeroTitle, cityNickname, cityPoetic } from '../utils/cityI18n';
+import { THEME_CLASS_NAMES, getCityTheme } from '../utils/cityThemes';
+import { PRODUCT_TYPES, OCCASION_TYPES, buildArticleFilters } from '../config/articleTypes';
 import { openFashionBot } from '../utils/openFashionBot';
-
-const FILTER_OPTIONS = [
-    { id: 'Tout', labelKey: 'city.filter_all' },
-    { id: 'Femme', labelKey: 'city.filter_women' },
-    { id: 'Homme', labelKey: 'city.filter_men' },
-    { id: 'Accessoires', labelKey: 'city.filter_accessories' },
-    { id: 'Luxe', labelKey: 'city.filter_luxury' },
-];
-
-
-
-const CITY_THEMES = {
-    tanger: {
-        bg: '#273462', bgRgb: '39, 52, 98', main: '#045490', mid: '#84B7CE', light: '#FFFFFF', accent: '#FFF08C',
-        effect: 'waves',
-    },
-    casablanca: {
-        bg: '#0D0D0B', bgRgb: '13, 13, 11', main: '#C4A882', mid: '#D4D0C8', light: '#F0EEE8', accent: '#FFFFFF',
-        effect: 'artdeco',
-    },
-    rabat: {
-        bg: '#061A0E', bgRgb: '6, 26, 14', main: '#1A7A44', mid: '#7AC49A', light: '#E8F5EC', accent: '#D4AF6A',
-        effect: 'garden',
-    },
-    fes: {
-        bg: '#1A0E00', bgRgb: '26, 14, 0', main: '#C4821B', mid: '#D4AF6A', light: '#FBF0CC', accent: '#3A2800',
-        effect: 'zellige',
-    },
-    marrakech: {
-        bg: '#0F0200', bgRgb: '15, 2, 0', main: '#C04820', mid: '#E07840', light: '#F5D5C0', accent: '#F0C898',
-        effect: 'heat',
-    },
-    agadir: {
-        bg: '#0A1628', bgRgb: '10, 22, 40', main: '#3B82C4', mid: '#7CB9E8', light: '#E8F4FC', accent: '#F5D0A0',
-        effect: 'coast',
-    },
-    meknes: {
-        bg: '#1A1208', bgRgb: '26, 18, 8', main: '#8B6914', mid: '#C4A035', light: '#F5E6C8', accent: '#D4AF6A',
-        effect: 'imperial',
-    },
-    oujda: {
-        bg: '#120818', bgRgb: '18, 8, 24', main: '#7B3FA0', mid: '#B87FD4', light: '#F0E0F8', accent: '#E8C872',
-        effect: 'dawn',
-    },
-};
-
-const THEME_CLASS_NAMES = Object.keys(CITY_THEMES).map((slug) => `theme-${slug}`);
 
 function OtherCityCard({ city }) {
     const { t } = useTranslation();
-    const theme = getCityTheme(city, CITY_THEMES);
+    const theme = getCityTheme(city);
     const boutiqueCount = city.boutiques?.length ?? 0;
 
     return (
@@ -119,9 +76,13 @@ const CityPage = () => {
 
     const [loading, setLoading] = useState(true);
 
-    const [filtering, setFiltering] = useState(false);
+    const [articleType, setArticleType] = useState(null);
 
-    const [filter, setFilter] = useState('Tout');
+    const [articleSearch, setArticleSearch] = useState('');
+
+    const [cityProducts, setCityProducts] = useState([]);
+
+    const [productsLoading, setProductsLoading] = useState(false);
 
     const [error, setError] = useState(false);
 
@@ -141,7 +102,7 @@ const CityPage = () => {
 
         if (!city) return;
 
-        const theme = getCityTheme(city, CITY_THEMES);
+        const theme = getCityTheme(city);
 
         const root = document.documentElement;
 
@@ -192,6 +153,10 @@ const CityPage = () => {
         }
 
 
+
+        setArticleType(null);
+        setArticleSearch('');
+        setCityProducts([]);
 
         const loadPageData = async () => {
 
@@ -290,7 +255,7 @@ const CityPage = () => {
             observerRef.current?.disconnect();
         };
 
-    }, [loading, boutiques, filter]);
+    }, [loading, boutiques, articleType]);
 
 
 
@@ -342,20 +307,47 @@ const CityPage = () => {
 
 
 
-    const handleFilterChange = (cat) => {
+    const isArticleMode = Boolean(articleType) || articleSearch.trim().length > 0;
 
-        if (cat === filter) return;
+    // Récupère les produits de toutes les boutiques de la ville quand on filtre par article
+    useEffect(() => {
 
-        setFiltering(true);
+        if (loading || !slug) return;
 
-        setTimeout(() => {
+        if (!(Boolean(articleType) || articleSearch.trim().length > 0)) {
+            setCityProducts([]);
+            return;
+        }
 
-            setFilter(cat);
-
-            setFiltering(false);
-
+        let active = true;
+        const timer = setTimeout(async () => {
+            try {
+                setProductsLoading(true);
+                const data = await productService.getProducts(
+                    buildArticleFilters({ city: slug }, articleType, articleSearch)
+                );
+                if (active) setCityProducts(data?.data ?? data ?? []);
+            } catch (err) {
+                console.error('Erreur produits ville:', err);
+                if (active) setCityProducts([]);
+            } finally {
+                if (active) setProductsLoading(false);
+            }
         }, 300);
 
+        return () => { active = false; clearTimeout(timer); };
+
+    }, [slug, articleType, articleSearch, loading]);
+
+    const resetArticleFilters = () => {
+        setArticleType(null);
+        setArticleSearch('');
+    };
+
+    const handleTypeSelect = (list, event) => {
+        const value = event.target.value;
+        if (value) setArticleType(list.find((x) => x.id === value) || null);
+        else if (list.some((x) => x.id === articleType?.id)) setArticleType(null);
     };
 
 
@@ -428,13 +420,7 @@ const CityPage = () => {
 
 
 
-    const theme = getCityTheme(city, CITY_THEMES);
-
-    const filteredBoutiques = filter === 'Tout'
-
-        ? boutiques
-
-        : boutiques.filter(b => b.category?.toLowerCase() === filter.toLowerCase());
+    const theme = getCityTheme(city);
 
 
 
@@ -675,25 +661,52 @@ const CityPage = () => {
 
             <div className={`sticky-nav-wrapper ${navHidden ? 'hidden' : ''}`}>
 
+                <div className="city-search">
+                    <Search size={17} className="city-search__icon" aria-hidden="true" />
+                    <input
+                        type="search"
+                        className="city-search__input"
+                        placeholder="Rechercher un article (ex. robe, caftan, sac…)"
+                        value={articleSearch}
+                        onChange={(e) => setArticleSearch(e.target.value)}
+                    />
+                </div>
+
                 <nav className="filter-bar">
 
-                    {FILTER_OPTIONS.map(({ id, labelKey }) => (
+                    <button
+                        className={`filter-pill ${!isArticleMode ? 'active' : ''}`}
+                        onClick={resetArticleFilters}
+                    >
+                        <Store size={13} style={{ marginRight: 4, verticalAlign: '-2px' }} />
+                        Boutiques
+                    </button>
 
-                        <button
-
-                            key={id}
-
-                            className={`filter-pill ${filter === id ? 'active' : ''}`}
-
-                            onClick={() => handleFilterChange(id)}
-
+                    <div className="city-filter-selects">
+                        <select
+                            className="city-filter-select"
+                            aria-label="Type de pièce"
+                            value={PRODUCT_TYPES.some((x) => x.id === articleType?.id) ? articleType.id : ''}
+                            onChange={(e) => handleTypeSelect(PRODUCT_TYPES, e)}
                         >
+                            <option value="">Type de pièce</option>
+                            {PRODUCT_TYPES.map((type) => (
+                                <option key={type.id} value={type.id}>{type.label}</option>
+                            ))}
+                        </select>
 
-                            {t(labelKey)}
-
-                        </button>
-
-                    ))}
+                        <select
+                            className="city-filter-select"
+                            aria-label="Occasion"
+                            value={OCCASION_TYPES.some((x) => x.id === articleType?.id) ? articleType.id : ''}
+                            onChange={(e) => handleTypeSelect(OCCASION_TYPES, e)}
+                        >
+                            <option value="">Occasion</option>
+                            {OCCASION_TYPES.map((type) => (
+                                <option key={type.id} value={type.id}>{type.label}</option>
+                            ))}
+                        </select>
+                    </div>
 
                 </nav>
 
@@ -715,51 +728,92 @@ const CityPage = () => {
 
                 )}
 
-                <div className={`city-boutiques-grid ${filtering ? 'filtering' : ''}`}>
+                {isArticleMode ? (
 
-                    {filteredBoutiques.length > 0 ? (
+                    productsLoading ? (
 
-                        filteredBoutiques.map((boutique) => (
+                        <div className="city-boutiques-empty">
+                            <div className="city-boutiques-empty-line" />
+                            <p className="city-boutiques-empty-text">Recherche des créations…</p>
+                        </div>
 
-                            <div key={boutique.id} className="city-boutique-item">
+                    ) : cityProducts.length > 0 ? (
 
-                                <BoutiqueCard
-
-                                    boutique={{
-
-                                        ...boutique,
-
-                                        city: boutique.city || { ...city, slug: citySlug },
-
-                                        products_count: boutique.products_count ?? 0,
-
-                                    }}
-
-                                    onFollow={handleFollow}
-
-                                    isFollowing={following[boutique.id] || false}
-                                    showDelivery
-                                />
-
+                        <>
+                            <p className="city-article-count">
+                                {cityProducts.length} création{cityProducts.length > 1 ? 's' : ''}
+                                {articleType ? ` · ${articleType.label}` : ''} dans {cityName(t, city)}
+                            </p>
+                            <div className="product-cards-grid city-article-grid">
+                                {cityProducts.map((product) => (
+                                    <ProductCard key={product.id} product={product} />
+                                ))}
                             </div>
-
-                        ))
+                        </>
 
                     ) : (
 
                         <div className="city-boutiques-empty">
-
                             <div className="city-boutiques-empty-line" />
-
-                            <p className="city-boutiques-empty-text">{t('city.coming_soon')}</p>
-
-                            <Link to="/boutiques" className="city-boutiques-empty-link">Voir toutes les boutiques</Link>
-
+                            <p className="city-boutiques-empty-text">
+                                Aucune création trouvée pour ce filtre dans {cityName(t, city)}.
+                            </p>
+                            <button type="button" className="city-boutiques-empty-link" onClick={resetArticleFilters}>
+                                Réinitialiser
+                            </button>
                         </div>
 
-                    )}
+                    )
 
-                </div>
+                ) : (
+
+                    <div className="city-boutiques-grid">
+
+                        {boutiques.length > 0 ? (
+
+                            boutiques.map((boutique) => (
+
+                                <div key={boutique.id} className="city-boutique-item">
+
+                                    <BoutiqueCard
+
+                                        boutique={{
+
+                                            ...boutique,
+
+                                            city: boutique.city || { ...city, slug: citySlug },
+
+                                            products_count: boutique.products_count ?? 0,
+
+                                        }}
+
+                                        onFollow={handleFollow}
+
+                                        isFollowing={following[boutique.id] || false}
+                                        showDelivery
+                                    />
+
+                                </div>
+
+                            ))
+
+                        ) : (
+
+                            <div className="city-boutiques-empty">
+
+                                <div className="city-boutiques-empty-line" />
+
+                                <p className="city-boutiques-empty-text">{t('city.coming_soon')}</p>
+
+                                <Link to="/boutiques" className="city-boutiques-empty-link">Voir toutes les villes</Link>
+
+                            </div>
+
+                        )}
+
+                    </div>
+
+                )}
 
             </main>
 

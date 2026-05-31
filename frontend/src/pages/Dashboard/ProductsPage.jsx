@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import api from '../../services/api';
 import toast from 'react-hot-toast';
+import { resolveMediaUrl } from '../../utils/imageUtils';
 
 /* ── helpers ───────────────────────────────────────────────── */
 function StockBadge({ stock, threshold = 5 }) {
@@ -33,25 +34,50 @@ function ProductModal({ product, categories, onClose, onSave }) {
     category_id: product.category_id||'', style: product.style||'casual',
     is_active: product.is_active!==false, threshold: product.threshold||5,
   } : { ...EMPTY_FORM });
+  const [imageFile, setImageFile] = useState(null);
+  const [preview, setPreview] = useState(product?.image_url ? resolveMediaUrl(product.image_url) : null);
   const [saving, setSaving] = useState(false);
   const set = (k,v) => setForm(f=>({...f,[k]:v}));
   const isEdit = !!product;
 
+  const onImageChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setImageFile(file);
+    setPreview(URL.createObjectURL(file));
+  };
+
   const handleSave = async () => {
     if (!form.name.trim()) { toast.error('Nom requis'); return; }
     if (!form.price || isNaN(Number(form.price))) { toast.error('Prix invalide'); return; }
+    if (!form.category_id) { toast.error('Catégorie requise'); return; }
+    if (!isEdit && !imageFile) { toast.error('Photo du produit requise'); return; }
     setSaving(true);
     try {
+      const fd = new FormData();
+      fd.append('name', form.name);
+      fd.append('description', form.description || '');
+      fd.append('price', form.price);
+      fd.append('stock_quantity', form.stock_quantity || 0);
+      fd.append('category_id', form.category_id);
+      fd.append('style', form.style || 'casual');
+      fd.append('is_active', form.is_active ? '1' : '0');
+      if (imageFile) fd.append('image', imageFile);
+
       if (isEdit) {
-        await api.put(`/boutique/products/${form.id}`, form);
+        fd.append('_method', 'PUT');
+        await api.post(`/boutique/products/${form.id}`, fd, { headers: { 'Content-Type': 'multipart/form-data' } });
         toast.success('Produit mis à jour');
       } else {
-        await api.post('/boutique/products', form);
+        await api.post('/boutique/products', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
         toast.success('Produit créé');
       }
       onSave();
       onClose();
-    } catch { toast.error('Erreur lors de l\'enregistrement'); }
+    } catch (err) {
+      const msg = err.response?.data?.message || err.response?.data?.errors?.image?.[0];
+      toast.error(msg || 'Erreur lors de l\'enregistrement');
+    }
     finally { setSaving(false); }
   };
 
@@ -64,6 +90,15 @@ function ProductModal({ product, categories, onClose, onSave }) {
           <button onClick={onClose} style={closeBtn}>✕</button>
         </div>
         <div style={{ flex:1,overflowY:'auto',padding:'20px 28px',display:'flex',flexDirection:'column',gap:14 }}>
+          <div>
+            <label style={lbl}>Photo du produit {!isEdit && '*'}</label>
+            <div style={{ display:'flex', gap:14, alignItems:'center' }}>
+              <div style={{ width:88, height:88, borderRadius:12, background:'#F3F4F6', overflow:'hidden', flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
+                {preview ? <img src={preview} alt="" style={{ width:'100%', height:'100%', objectFit:'cover' }}/> : <span style={{ fontSize:11, color:'#9CA3AF' }}>Aperçu</span>}
+              </div>
+              <input type="file" accept="image/*" onChange={onImageChange} style={{ fontFamily:'Inter, sans-serif', fontSize:12.5 }}/>
+            </div>
+          </div>
           <div>
             <label style={lbl}>Nom du produit *</label>
             <input value={form.name} onChange={e=>set('name',e.target.value)} style={inp} placeholder="Ex: Robe Émeraude"/>
@@ -132,7 +167,7 @@ export default function ProductsPage() {
       try {
         const [prodRes, catRes] = await Promise.all([
           api.get('/boutique/products'),
-          api.get('/categories'),
+          api.get('/boutique/products/categories'),
         ]);
         if (prodRes.data?.data?.length) setProducts(prodRes.data.data);
         if (catRes.data?.data?.length)  setCategories(catRes.data.data);
@@ -213,8 +248,8 @@ export default function ProductsPage() {
           {loading ? [1,2,3,4,5,6].map(i=><div key={i} style={{ height:260,borderRadius:16,backgroundColor:'#F3F4F6',animation:'fa-pulse 1.5s ease-in-out infinite' }}/>) :
             paged.map(p=>(
               <div key={p.id} className="fa-stats-card" style={{ backgroundColor:'#fff',borderRadius:16,border:'1px solid rgba(0,0,0,0.06)',boxShadow:'0 2px 10px rgba(0,0,0,0.06)',overflow:'hidden' }}>
-                <div style={{ height:140,backgroundColor:'#F9FAFB',display:'flex',alignItems:'center',justifyContent:'center',fontSize:48 }}>
-                  {p.image ? <img src={p.image} alt={p.name} style={{ width:'100%',height:'100%',objectFit:'cover' }}/> : '🏷️'}
+                <div style={{ height:140,backgroundColor:'#F9FAFB',display:'flex',alignItems:'center',justifyContent:'center',fontSize:48,overflow:'hidden' }}>
+                  {p.image_url ? <img src={resolveMediaUrl(p.image_url)} alt={p.name} style={{ width:'100%',height:'100%',objectFit:'cover' }}/> : '🏷️'}
                 </div>
                 <div style={{ padding:'14px 16px' }}>
                   <p style={{ fontFamily:'Inter, sans-serif',fontSize:13.5,fontWeight:600,color:'#111827',margin:'0 0 4px',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap' }}>{p.name}</p>
@@ -246,7 +281,9 @@ export default function ProductsPage() {
                     <tr key={p.id} className="fa-table-row" style={{ borderTop:'1px solid #F3F4F6' }}>
                       <td style={td}>
                         <div style={{ display:'flex',alignItems:'center',gap:10 }}>
-                          <div style={{ width:38,height:38,borderRadius:8,backgroundColor:'#F9FAFB',display:'flex',alignItems:'center',justifyContent:'center',fontSize:20,flexShrink:0 }}>🏷️</div>
+                          <div style={{ width:38,height:38,borderRadius:8,backgroundColor:'#F9FAFB',display:'flex',alignItems:'center',justifyContent:'center',fontSize:20,flexShrink:0,overflow:'hidden' }}>
+                            {p.image_url ? <img src={resolveMediaUrl(p.image_url)} alt="" style={{ width:'100%',height:'100%',objectFit:'cover' }}/> : '🏷️'}
+                          </div>
                           <span style={{ fontFamily:'Inter, sans-serif',fontSize:13,fontWeight:500,color:'#111827' }}>{p.name}</span>
                         </div>
                       </td>

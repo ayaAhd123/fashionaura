@@ -25,6 +25,7 @@ class NotificationController extends Controller
                 'read' => (bool)$n->is_read,
                 'time' => $n->created_at ? $n->created_at->diffForHumans() : '',
                 'type' => $n->type,
+                'action_url' => $n->action_url,
             ];
         });
 

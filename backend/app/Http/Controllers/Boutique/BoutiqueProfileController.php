@@ -38,6 +38,7 @@ class BoutiqueProfileController extends Controller
             'delivery_scope' => 'nullable|string',
             'delivery_note' => 'nullable|string',
             'stock_alert_threshold' => 'sometimes|integer|min:0',
+            'messages_enabled' => 'sometimes|boolean',
         ]);
 
         $boutique->update($data);

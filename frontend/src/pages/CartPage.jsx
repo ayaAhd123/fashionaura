@@ -1,39 +1,70 @@
 import React, { useContext, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ShoppingCart, Trash2, ArrowLeft, ShoppingBag } from 'lucide-react';
+import { ArrowLeft, ShoppingBag, Shirt, X, RotateCcw } from 'lucide-react';
 import { CartContext } from '../contexts/CartContext';
+import { useAuth } from '../contexts/AuthContext';
+import { createOrder } from '../services/api';
 import CheckoutModal from '../components/CheckoutModal';
+import AuthModal from '../components/AuthModal';
 
 export const CartPage = () => {
   const { cart, removeItem, updateItem, clearCart } = useContext(CartContext);
+  const { isAuthenticated } = useAuth();
   const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const [authOpen, setAuthOpen] = useState(false);
+  const [promo, setPromo] = useState('');
+  const [promoMsg, setPromoMsg] = useState('');
 
   const items = cart?.items || [];
   const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
 
-  const handleCheckoutSuccess = () => {
+  const handleApplyPromo = (e) => {
+    e.preventDefault();
+    if (!promo.trim()) return;
+    setPromoMsg(`Code « ${promo.trim().toUpperCase()} » enregistré — il sera validé au paiement.`);
+  };
+
+  const handleCheckoutSuccess = async (form) => {
+    await createOrder({
+      items: items.map((i) => ({
+        product_id: i.product_id,
+        quantity: i.quantity,
+        size: i.size || null,
+        color: i.color || null,
+      })),
+      address: form.address,
+      phone: form.phone,
+    });
     clearCart();
   };
 
+  const handleFinalize = () => {
+    if (!isAuthenticated) {
+      setAuthOpen(true);
+      return;
+    }
+    setCheckoutOpen(true);
+  };
+
+  const buildMeta = (item) =>
+    [item.size, item.color, `× ${item.quantity}`].filter(Boolean).join(' / ');
+
   if (items.length === 0 && !checkoutOpen) {
     return (
-      <main className="min-h-screen bg-background py-16">
-        <div className="container mx-auto px-4 text-center">
-          <div className="max-w-md mx-auto">
-            <div className="w-32 h-32 bg-accent/20 rounded-full flex items-center justify-center mx-auto mb-8">
-              <ShoppingCart size={56} className="text-primary/40" />
+      <main className="cart-page">
+        <div className="cart-wrap">
+          <Link to="/boutiques" className="cart-back">
+            <ArrowLeft size={15} /> Retour
+          </Link>
+          <h1 className="cart-heading">Votre panier</h1>
+          <div className="cart-empty">
+            <div className="cart-empty__icon" aria-hidden="true">
+              <ShoppingBag size={42} strokeWidth={1.4} />
             </div>
-            <h1 className="text-3xl font-bold text-primary mb-3">Votre panier est vide</h1>
-            <p className="text-gray-500 mb-8">
-              Découvrez nos boutiques et ajoutez vos articles préférés au panier.
-            </p>
-            <Link
-              to="/boutiques"
-              className="inline-flex items-center gap-2 bg-primary text-white px-8 py-4 rounded-xl font-semibold hover:bg-primary/90 transition shadow-lg"
-            >
-              <ShoppingBag size={20} />
-              Découvrir les boutiques
+            <p className="cart-empty__text">Votre panier est vide pour le moment.</p>
+            <Link to="/boutiques" className="cart-empty__cta">
+              <ShoppingBag size={18} /> Découvrir les boutiques
             </Link>
           </div>
         </div>
@@ -42,54 +73,44 @@ export const CartPage = () => {
   }
 
   return (
-    <main className="min-h-screen bg-background py-16">
-      <div className="container mx-auto px-4 max-w-7xl">
-        <div className="cart-page__layout">
-          <div className="cart-page__main">
-            <div className="mb-10 flex items-center justify-between pb-6 border-b border-accent/20">
-              <h1 className="text-4xl font-serif font-bold text-text flex items-center gap-4 flex-wrap">
-                Panier
-                <span className="text-sm font-sans font-medium text-text bg-white px-3 py-1 rounded-full border border-accent/20">
-                  {itemCount} {itemCount === 1 ? 'article' : 'articles'}
-                </span>
-              </h1>
-              <button
-                type="button"
-                onClick={clearCart}
-                className="text-sm text-neutral hover:text-heart transition-colors font-medium tracking-wide uppercase flex items-center gap-2"
-              >
-                <Trash2 size={16} /> Vider
-              </button>
-            </div>
+    <main className="cart-page">
+      <div className="cart-wrap">
+        <Link to="/boutiques" className="cart-back">
+          <ArrowLeft size={15} /> Retour
+        </Link>
+        <h1 className="cart-heading">Votre panier</h1>
 
-            <ul className="cart-page__list">
+        <div className="cart-grid">
+          {/* ── Articles ─────────────────────────────────────────── */}
+          <section className="cart-items">
+            <ul className="cart-lines">
               {items.map((item) => (
-                <li key={item.localId} className="cart-item-row">
-                  <div className="cart-item-row__thumb">
+                <li key={item.localId} className="cart-line">
+                  <button
+                    type="button"
+                    className="cart-line__remove"
+                    onClick={() => removeItem(item.localId)}
+                    aria-label="Retirer l'article"
+                  >
+                    <X size={16} />
+                  </button>
+
+                  <div className="cart-line__thumb">
                     {item.image ? (
                       <img src={item.image} alt={item.name} />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center text-2xl opacity-25" />
+                      <span className="cart-line__thumb-ph" aria-hidden="true">
+                        <Shirt size={22} strokeWidth={1.5} />
+                      </span>
                     )}
                   </div>
 
-                  <div className="cart-item-row__info">
-                    <h3 className="cart-item-row__title">{item.name}</h3>
-                    <div className="cart-item-row__meta">
-                      {item.size && (
-                        <span>
-                          Taille: <span className="cart-item-row__meta-value">{item.size}</span>
-                        </span>
-                      )}
-                      {item.color && (
-                        <span>
-                          Couleur: <span className="cart-item-row__meta-value">{item.color}</span>
-                        </span>
-                      )}
-                    </div>
+                  <div className="cart-line__info">
+                    <h3 className="cart-line__name">{item.name}</h3>
+                    <p className="cart-line__meta">{buildMeta(item)}</p>
                   </div>
 
-                  <div className="cart-item-row__qty">
+                  <div className="cart-line__qty">
                     <button
                       type="button"
                       onClick={() => updateItem(item.localId, item.quantity - 1)}
@@ -107,85 +128,74 @@ export const CartPage = () => {
                     </button>
                   </div>
 
-                  <div className="cart-item-row__price">
-                    <p className="cart-item-row__price-total">
+                  <div className="cart-line__price">
+                    <span className="cart-line__price-now">
                       {(item.price * item.quantity).toFixed(2)} DH
-                    </p>
+                    </span>
                     {item.quantity > 1 && (
-                      <p className="cart-item-row__price-unit">{item.price} DH /u</p>
+                      <span className="cart-line__price-unit">{item.price} DH /u</span>
                     )}
                   </div>
-
-                  <button
-                    type="button"
-                    onClick={() => removeItem(item.localId)}
-                    className="cart-item-row__remove"
-                    title="Retirer"
-                    aria-label="Retirer du panier"
-                  >
-                    <Trash2 size={18} />
-                  </button>
                 </li>
               ))}
             </ul>
 
-            <Link
-              to="/boutiques"
-              className="inline-flex items-center gap-2 text-text font-medium text-sm tracking-wide hover:underline mt-10"
-            >
-              <ArrowLeft size={16} /> Poursuivre mes achats
-            </Link>
-          </div>
-
-          <aside className="cart-page__summary">
-            <div className="cart-page__summary-panel">
-              <h2 className="cart-summary__title">Votre Commande</h2>
-
-              <div className="cart-summary__items">
-                {items.map((item) => (
-                  <div key={item.localId} className="cart-summary__item">
-                    <p className="cart-summary__item-name">
-                      <strong>{item.name}</strong>
-                      <span className="cart-summary__item-qty"> × {item.quantity}</span>
-                    </p>
-                    <span className="cart-summary__item-price">
-                      {(item.price * item.quantity).toFixed(2)} DH
-                    </span>
-                  </div>
-                ))}
-              </div>
-
-              <div className="cart-summary__divider" />
-
-              <div className="cart-summary__rows">
-                <div className="cart-summary__row">
-                  <span className="cart-summary__row-label">Sous-total</span>
-                  <span className="cart-summary__row-value">{total.toFixed(2)} DH</span>
-                </div>
-                <div className="cart-summary__row">
-                  <span className="cart-summary__row-label">Frais de livraison</span>
-                  <span className="cart-summary__badge">Offerts</span>
-                </div>
-              </div>
-
-              <div className="cart-summary__divider" />
-
-              <div className="cart-summary__total-block">
-                <span className="cart-summary__total-label">Total</span>
-                <div className="cart-summary__total-right">
-                  <span className="cart-summary__total-amount">{total.toFixed(2)} DH</span>
-                  <p className="cart-summary__total-note">TVA incluse</p>
-                </div>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => setCheckoutOpen(true)}
-                className="cart-checkout-btn"
-              >
-                Finaliser l&apos;achat
+            <p className="cart-coupon__label">Vous avez un code promo ? Entrez-le ci-dessous.</p>
+            <form className="cart-coupon" onSubmit={handleApplyPromo}>
+              <input
+                type="text"
+                className="cart-coupon__input"
+                placeholder="Code promo"
+                value={promo}
+                onChange={(e) => { setPromo(e.target.value); setPromoMsg(''); }}
+                aria-label="Code promo"
+              />
+              <button type="submit" className="cart-coupon__apply">Appliquer</button>
+              <button type="button" className="cart-coupon__update" onClick={clearCart}>
+                <RotateCcw size={14} /> Vider le panier
               </button>
+            </form>
+            {promoMsg && <p className="cart-coupon__msg">{promoMsg}</p>}
+          </section>
+
+          {/* ── Totaux ───────────────────────────────────────────── */}
+          <aside className="cart-totals">
+            <h2 className="cart-totals__title">Totaux du panier</h2>
+
+            <div className="cart-totals__rows">
+              <div className="cart-totals__row">
+                <span className="cart-totals__lbl">Livraison (3-5 jours)</span>
+                <span className="cart-totals__val cart-totals__free">Offerte</span>
+              </div>
+              <div className="cart-totals__row">
+                <span className="cart-totals__lbl">TVA (incluse)</span>
+                <span className="cart-totals__val">0 DH</span>
+              </div>
+              <div className="cart-totals__row">
+                <span className="cart-totals__lbl">Sous-total ({itemCount})</span>
+                <span className="cart-totals__val">{total.toFixed(2)} DH</span>
+              </div>
             </div>
+
+            <div className="cart-totals__rule" />
+
+            <div className="cart-totals__grand">
+              <span>Total</span>
+              <strong>{total.toFixed(2)} DH</strong>
+            </div>
+
+            <button type="button" className="cart-checkout-btn" onClick={handleFinalize}>
+              Passer la commande
+            </button>
+            {!isAuthenticated && (
+              <p className="cart-checkout-note">
+                Connexion requise pour finaliser et suivre votre commande.
+              </p>
+            )}
+
+            <Link to="/boutiques" className="cart-continue">
+              <ArrowLeft size={14} /> Continuer mes achats
+            </Link>
           </aside>
         </div>
       </div>
@@ -194,6 +204,12 @@ export const CartPage = () => {
         isOpen={checkoutOpen}
         onClose={() => setCheckoutOpen(false)}
         onSuccess={handleCheckoutSuccess}
+      />
+
+      <AuthModal
+        isOpen={authOpen}
+        onClose={() => setAuthOpen(false)}
+        message="Connectez-vous pour finaliser votre achat et suivre votre commande."
       />
     </main>
   );

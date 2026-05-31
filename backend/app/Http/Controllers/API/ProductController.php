@@ -10,7 +10,8 @@ class ProductController extends Controller
     // GET /api/products - Retourne tous les produits avec filtres
     public function index()
     {
-        $query = Product::where('is_active', true);
+        $query = Product::where('is_active', true)
+            ->whereHas('boutique', fn ($q) => $q->where('is_active', true));
 
         // Filtre par catégorie
         if (request('category')) {
@@ -23,6 +24,13 @@ class ProductController extends Controller
         if (request('boutique')) {
             $query->whereHas('boutique', function ($q) {
                 $q->where('slug', request('boutique'));
+            });
+        }
+
+        // Filtre par ville : produits de toutes les boutiques de cette ville
+        if (request('city')) {
+            $query->whereHas('boutique.city', function ($q) {
+                $q->where('slug', request('city'));
             });
         }
 
@@ -98,6 +106,7 @@ class ProductController extends Controller
     {
         $products = Product::where('boutique_id', $boutiqueId)
             ->where('is_active', true)
+            ->whereHas('boutique', fn ($q) => $q->where('is_active', true))
             ->with('images:id,product_id,image_url,is_primary')
             ->select(['id', 'name', 'slug', 'price', 'discount_price', 'rating', 'stock_quantity'])
             ->paginate(12);

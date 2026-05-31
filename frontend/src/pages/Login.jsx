@@ -215,6 +215,21 @@ function Login() {
         <div className="fa-panel-right">
           <div style={{ width: '100%', maxWidth: '380px' }}>
 
+            <Link
+              to="/"
+              className="fa-link"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
+                marginBottom: 28,
+                fontSize: 13,
+                fontWeight: 500,
+              }}
+            >
+              ← Retour au site
+            </Link>
+
             <div className="fa-form-field" style={{ marginBottom: '48px' }}>
               <h1 style={{ fontFamily: 'Cormorant Garamond,serif', fontSize: 'clamp(36px,5vw,48px)', fontWeight: 300, color: '#2C2C2C', letterSpacing: '-0.01em', marginBottom: '12px' }}>
                 {'FashionAura'.split('').map((l,i) => (

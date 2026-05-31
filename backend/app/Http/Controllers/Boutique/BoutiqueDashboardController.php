@@ -87,7 +87,8 @@ class BoutiqueDashboardController extends Controller
                 );
 
                 return [
-                    'id' => '#'.$order->id,
+                    'id' => $order->id,
+                    'customer_id' => $order->user_id,
                     'customer' => $order->user?->name ?? 'Client',
                     'product' => $items->first()?->product?->name
                         ?? ($items->count() > 1 ? $items->count().' produits' : '—'),

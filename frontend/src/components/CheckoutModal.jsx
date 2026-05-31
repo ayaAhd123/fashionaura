@@ -60,17 +60,23 @@ const CheckoutModal = ({ isOpen, onClose, onSuccess }) => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validate()) return;
 
     setSubmitting(true);
-    // Simulate a short delay for UX
-    setTimeout(() => {
-      setSubmitting(false);
+    try {
+      // onSuccess crée la commande côté serveur (peut être asynchrone)
+      await onSuccess?.(formData);
       setSubmitted(true);
-      onSuccess?.();
-    }, 800);
+    } catch (err) {
+      setErrors((prev) => ({
+        ...prev,
+        submit: err?.response?.data?.message || 'Erreur lors de la création de la commande.',
+      }));
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handleOverlayClick = (e) => {
@@ -213,6 +219,12 @@ const CheckoutModal = ({ isOpen, onClose, onSuccess }) => {
                   ))}
                 </select>
               </div>
+
+              {errors.submit && (
+                <span className="checkout-form__error" style={{ display: 'block', marginBottom: 8 }}>
+                  {errors.submit}
+                </span>
+              )}
 
               <button
                 type="submit"

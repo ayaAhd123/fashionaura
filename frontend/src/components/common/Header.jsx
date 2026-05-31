@@ -1,9 +1,10 @@
 import React, { useState, useContext } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ShoppingCart, Heart, Menu, X } from 'lucide-react';
+import { ShoppingCart, Heart, Menu, X, User, LogIn, HelpCircle } from 'lucide-react';
 import { CartContext } from '../../contexts/CartContext';
 import { FavoritesContext } from '../../contexts/FavoritesContext';
+import { useAuth } from '../../contexts/AuthContext';
 import FashionAuraLogo from './FashionAuraLogo';
 import LanguageSwitcher from '../LanguageSwitcher';
 import { SHOP_NAV } from '../../config/navLinks';
@@ -14,6 +15,7 @@ export const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const { cart } = useContext(CartContext);
   const { favorites } = useContext(FavoritesContext);
+  const { isAuthenticated } = useAuth();
 
   const cartCount = cart?.items?.length || 0;
 
@@ -65,6 +67,20 @@ export const Header = () => {
               <span className="site-header__badge">{cartCount}</span>
             )}
           </NavLink>
+
+          <NavLink to="/aide" className="site-header__icon-btn" aria-label="Besoin d'aide ?" title="Besoin d'aide ?">
+            <HelpCircle size={21} />
+          </NavLink>
+
+          {isAuthenticated ? (
+            <NavLink to="/compte" className="site-header__icon-btn" aria-label="Mon compte" title="Mon compte">
+              <User size={21} />
+            </NavLink>
+          ) : (
+            <NavLink to="/login" className="site-header__icon-btn" aria-label="Se connecter" title="Se connecter">
+              <LogIn size={21} />
+            </NavLink>
+          )}
         </div>
       </div>
 
@@ -83,6 +99,15 @@ export const Header = () => {
               {t(labelKey)}
             </NavLink>
           ))}
+          <NavLink
+            to="/aide"
+            onClick={closeMenu}
+            className={({ isActive }) =>
+              `site-header__mobile-link${isActive ? ' site-header__mobile-link--active' : ''}`
+            }
+          >
+            Besoin d'aide ?
+          </NavLink>
           <div className="site-header__mobile-lang">
             <LanguageSwitcher variant="header" />
           </div>

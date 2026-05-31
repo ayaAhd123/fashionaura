@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { NavLink, useNavigate, useLocation, Outlet } from 'react-router-dom';
+import { NavLink, Link, useNavigate, useLocation, Outlet } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 import i18n from '../i18n';
@@ -38,6 +38,7 @@ const Ico = {
   menu:         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>,
   logout:       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>,
   chevLeft:     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>,
+  home:         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>,
   chevRight:    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>,
   sun:          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>,
   moon:         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>,
@@ -147,6 +148,24 @@ function Sidebar({ collapsed, onToggle }) {
             )}
           </NavLink>
         ))}
+
+        <div style={{ borderTop: '1px solid rgba(255,255,255,0.07)', marginTop: 10, paddingTop: 10 }}>
+          <Link
+            to="/"
+            title="Retour au site"
+            style={{
+              display: 'flex', alignItems: 'center', gap: 10,
+              padding: collapsed ? '10px 0' : '9px 10px',
+              justifyContent: collapsed ? 'center' : 'flex-start',
+              borderRadius: 9, textDecoration: 'none', transition: 'all 0.18s',
+              color: 'rgba(255,255,255,0.52)',
+              borderLeft: '3px solid transparent',
+            }}
+          >
+            {Ico.home}
+            {!collapsed && <span style={{ fontFamily: 'Inter, sans-serif', fontSize: 13, fontWeight: 500, whiteSpace: 'nowrap' }}>Retour au site</span>}
+          </Link>
+        </div>
       </nav>
 
       {/* User + Logout */}
@@ -280,6 +299,24 @@ function Header({ onMenuToggle, isDark }) {
 
       {/* Right */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+
+        <Link
+          to="/"
+          style={{
+            ...iconBtn,
+            width: 'auto',
+            padding: '0 14px',
+            borderRadius: 20,
+            textDecoration: 'none',
+            fontFamily: 'Inter, sans-serif',
+            fontSize: 12,
+            fontWeight: 500,
+            gap: 6,
+          }}
+        >
+          {Ico.chevLeft}
+          <span className="fa-back-site-label">Retour au site</span>
+        </Link>
 
         {/* Language */}
         <div ref={langRef} style={{ position: 'relative' }}>

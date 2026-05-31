@@ -67,6 +67,9 @@ class AuthController extends Controller
         if ($role === 'boutique_owner') {
             $rules['boutique_name'] = 'required|string|max:255';
             $rules['city_id'] = 'required|exists:cities,id';
+            // Le paiement est obligatoire pour ouvrir un magasin.
+            $rules['plan'] = 'required|in:mensuel,annuel';
+            $rules['payment_reference'] = 'required|string|max:255';
         }
 
         $request->validate($rules);
@@ -87,7 +90,11 @@ class AuthController extends Controller
                     'description' => '',
                     'category' => 'general',
                     'is_verified' => false,
-                    'is_active' => false,
+                    'is_active' => true,
+                    'plan' => $request->plan,
+                    'subscription_status' => 'active',
+                    'subscription_paid_at' => now(),
+                    'payment_reference' => $request->payment_reference,
                 ]);
 
                 $user = User::create([
@@ -133,12 +140,54 @@ class AuthController extends Controller
         ], 201);
     }
 
+    // PUT /api/account/profile — met à jour les infos personnelles
+    public function updateProfile(Request $request)
+    {
+        $user = $request->user();
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $user->id,
+            'phone' => 'nullable|string|max:30',
+        ]);
+
+        $user->update($validated);
+
+        return response()->json([
+            'message' => 'Profil mis à jour.',
+            'user' => $this->formatUser($user->fresh()),
+        ]);
+    }
+
+    // PUT /api/account/password — change le mot de passe
+    public function updatePassword(Request $request)
+    {
+        $user = $request->user();
+
+        $request->validate([
+            'current_password' => 'required',
+            'password' => 'required|min:6|confirmed',
+        ]);
+
+        if (! Hash::check($request->current_password, $user->password)) {
+            return response()->json([
+                'message' => 'Le mot de passe actuel est incorrect.',
+                'errors' => ['current_password' => ['Mot de passe actuel incorrect.']],
+            ], 422);
+        }
+
+        $user->update(['password' => Hash::make($request->password)]);
+
+        return response()->json(['message' => 'Mot de passe mis à jour.']);
+    }
+
     private function formatUser(User $user): array
     {
         return [
             'id' => $user->id,
             'name' => $user->name,
             'email' => $user->email,
+            'phone' => $user->phone,
             'role' => $user->role,
             'avatar' => $user->avatar,
             'boutique_id' => $user->boutique_id,

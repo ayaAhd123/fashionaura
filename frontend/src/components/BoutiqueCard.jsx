@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Users, Star, Package, Truck, MapPin } from 'lucide-react';
+import { Users, Star, Package, Truck, MapPin, MessageCircle } from 'lucide-react';
 import Image, { Avatar } from './Image';
 import { cityName } from '../utils/cityI18n';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import AuthModal from './AuthModal';
 import '../styles/boutique-card.css';
+import '../styles/messaging.css';
 
 const deliveryLabel = (boutique) => {
   if (!boutique.offers_delivery) return 'Retrait en boutique';
@@ -19,9 +20,12 @@ const deliveryLabel = (boutique) => {
 
 export const BoutiqueCard = ({ boutique, onFollow, isFollowing, showDelivery = false }) => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const { isAuthenticated, isAdmin, isBoutiqueOwner } = useAuth();
   const toast = useToast();
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [authMessage, setAuthMessage] = useState('Connectez-vous pour suivre cette boutique');
+  const canContact = boutique.messages_enabled !== false;
 
   const handleFollow = (e) => {
     e.preventDefault();
@@ -38,6 +42,29 @@ export const BoutiqueCard = ({ boutique, onFollow, isFollowing, showDelivery = f
     }
 
     onFollow?.(boutique.id);
+  };
+
+  const handleContact = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!canContact) {
+      toast.error('Cette boutique n\'accepte pas les messages pour le moment.');
+      return;
+    }
+
+    if (!isAuthenticated) {
+      setAuthMessage('Connectez-vous pour contacter cette boutique');
+      setShowAuthModal(true);
+      return;
+    }
+
+    if (isAdmin?.() || isBoutiqueOwner?.()) {
+      toast.error('Utilisez un compte client pour contacter une boutique.');
+      return;
+    }
+
+    navigate(`/compte/messagerie?boutique=${boutique.id}`);
   };
 
   return (
@@ -84,9 +111,17 @@ export const BoutiqueCard = ({ boutique, onFollow, isFollowing, showDelivery = f
                   {cityName(t, boutique.city)}
                 </p>
               )}
-              <div className="boutique-card__rating">
-                <Star size={13} className="fill-secondary text-secondary" />
-                <span>{boutique.rating || '5.0'}</span>
+              <div className="boutique-card__rating" title={`${Number(boutique.rating || 0).toFixed(1)} / 5`}>
+                {[...Array(5)].map((_, i) => (
+                  <Star
+                    key={i}
+                    size={13}
+                    className={i < Math.round(Number(boutique.rating) || 0)
+                      ? 'fill-secondary text-secondary'
+                      : 'text-accent/30'}
+                  />
+                ))}
+                <span>{Number(boutique.rating || 0).toFixed(1)}</span>
               </div>
             </div>
 
@@ -95,13 +130,21 @@ export const BoutiqueCard = ({ boutique, onFollow, isFollowing, showDelivery = f
               <span><Package size={14} /> {boutique.products_count || 0}</span>
             </div>
 
-            <button
-              type="button"
-              onClick={handleFollow}
-              className={`boutique-card__follow ${isFollowing ? 'boutique-card__follow--active' : ''}`}
-            >
-              {isFollowing ? '✓ Suivi' : '+ Suivre'}
-            </button>
+            <div className="boutique-card__actions">
+              {canContact && (
+                <button type="button" onClick={handleContact} className="boutique-card__contact">
+                  <MessageCircle size={14} style={{ verticalAlign: 'middle', marginRight: 4 }} />
+                  Contacter
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={handleFollow}
+                className={`boutique-card__follow ${isFollowing ? 'boutique-card__follow--active' : ''}`}
+              >
+                {isFollowing ? '✓ Suivi' : '+ Suivre'}
+              </button>
+            </div>
           </div>
         </div>
       </Link>
@@ -110,7 +153,7 @@ export const BoutiqueCard = ({ boutique, onFollow, isFollowing, showDelivery = f
       <AuthModal
         isOpen={showAuthModal}
         onClose={() => setShowAuthModal(false)}
-        message="Connectez-vous pour suivre cette boutique"
+        message={authMessage}
       />
     </>
   );

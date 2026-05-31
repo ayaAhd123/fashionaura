@@ -1,6 +1,28 @@
 import { useState, useEffect } from 'react';
 import api from '../../services/api';
 import toast from 'react-hot-toast';
+import { MessageCircle } from 'lucide-react';
+import { ORDER_STATUS_CFG } from '../../config/orderStatus';
+import OrderStatusSelect from '../../components/orders/OrderStatusSelect';
+import OrderChatModal from '../../components/orders/OrderChatModal';
+import { updateBoutiqueOrderStatus } from '../../services/api';
+
+function mapApiOrder(o) {
+  const name = o.customer || 'Client';
+  const initials = name.split(' ').map((p) => p[0]).join('').slice(0, 2).toUpperCase() || '?';
+  return {
+    id: o.id,
+    client: name,
+    email: o.customer_email || '',
+    avatar: initials,
+    products: (o.items || []).map((i) => ({ name: i.name, qty: i.quantity, price: i.price })),
+    total: o.amount,
+    status: o.status || 'pending',
+    date: o.date ? new Date(o.date).toLocaleDateString('fr-FR') : '',
+    address: o.address || '',
+    phone: o.phone || '',
+  };
+}
 
 const MOCK = [
   { id:1047, client:'Nadia Chraibi',    email:'nadia@email.com', avatar:'NC', products:[{name:'Robe Élégante',qty:1,price:890},{name:'Ceinture dorée',qty:1,price:120}], total:1010, status:'delivered',  date:'2026-05-26', address:'12 Rue Hassan II, Casablanca' },
@@ -13,14 +35,7 @@ const MOCK = [
   { id:1040, client:'Zineb Alaoui',     email:'zineb@email.com', avatar:'ZA', products:[{name:'Robe Maxi',qty:1,price:760}],                                              total:760,  status:'delivered',  date:'2026-05-19', address:'15 Rue Ibn Batouta, Rabat' },
 ];
 
-const STATUS_CFG = {
-  pending:    { label:'En attente',  bg:'#fffbeb', color:'#d97706', border:'#fde68a' },
-  confirmed:  { label:'Confirmée',   bg:'#eff6ff', color:'#2563eb', border:'#bfdbfe' },
-  processing: { label:'En cours',    bg:'#f5f3ff', color:'#7c3aed', border:'#ddd6fe' },
-  shipped:    { label:'Expédiée',    bg:'#ecfdf5', color:'#059669', border:'#a7f3d0' },
-  delivered:  { label:'Livrée',      bg:'#f0fdf4', color:'#16a34a', border:'#bbf7d0' },
-  cancelled:  { label:'Annulée',     bg:'#fef2f2', color:'#dc2626', border:'#fecaca' },
-};
+const STATUS_CFG = ORDER_STATUS_CFG;
 
 const TIMELINE_STEPS = ['pending','confirmed','processing','shipped','delivered'];
 
@@ -70,14 +85,12 @@ function OrderModal({ order, onClose, onUpdate }) {
   const handleUpdate = async () => {
     setSaving(true);
     try {
-      await api.put(`/boutique/orders/${order.id}/status`, { status });
+      await updateBoutiqueOrderStatus(order.id, status);
       onUpdate(order.id, status);
       toast.success('Statut mis à jour');
       onClose();
     } catch {
-      onUpdate(order.id, status);
-      toast.success('Statut mis à jour');
-      onClose();
+      toast.error('Impossible de mettre à jour le statut');
     } finally { setSaving(false); }
   };
 
@@ -177,19 +190,23 @@ function OrderModal({ order, onClose, onUpdate }) {
 }
 
 export default function BoutiqueOrdersPage() {
-  const [orders, setOrders] = useState(MOCK);
-  const [loading, setLoading] = useState(false);
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [selected, setSelected] = useState(null);
+  const [chatOrder, setChatOrder] = useState(null);
   const [page, setPage] = useState(1);
   const PER_PAGE = 10;
 
   useEffect(() => {
     setLoading(true);
-    api.get('/boutique/orders').then(r => {
-      if (r.data?.data?.length) setOrders(r.data.data);
-    }).catch(()=>{}).finally(()=>setLoading(false));
+    api.get('/boutique/orders').then((r) => {
+      const rows = r.data?.data || [];
+      if (rows.length) setOrders(rows.map(mapApiOrder));
+    }).catch(() => {
+      setOrders(MOCK);
+    }).finally(() => setLoading(false));
   }, []);
 
   const filtered = orders.filter(o => {
@@ -275,10 +292,24 @@ export default function BoutiqueOrdersPage() {
                     </div>
                   </td>
                   <td style={td}><span style={{ fontFamily:"'Playfair Display', serif", fontSize:14, fontWeight:700, color:'#111827' }}>{o.total.toLocaleString('fr-FR')} MAD</span></td>
-                  <td style={td}><StatusBadge status={o.status}/></td>
+                  <td style={td} onClick={(e) => e.stopPropagation()}>
+                    <OrderStatusSelect
+                      orderId={o.id}
+                      status={o.status}
+                      updateFn={updateBoutiqueOrderStatus}
+                      onChange={handleUpdate}
+                      compact
+                    />
+                  </td>
                   <td style={td}><span style={{ fontFamily:'Inter, sans-serif', fontSize:12, color:'#6B7280' }}>{o.date}</span></td>
-                  <td style={td} onClick={e=>e.stopPropagation()}>
-                    <button onClick={()=>setSelected(o)} style={actionBtn}>Détails</button>
+                  <td style={td} onClick={(e) => e.stopPropagation()}>
+                    <div style={{ display: 'flex', gap: 6 }}>
+                      <button type="button" onClick={() => setChatOrder(o)} style={actionBtn}>
+                        <MessageCircle size={14} style={{ verticalAlign: 'middle', marginRight: 4 }} />
+                        Message
+                      </button>
+                      <button type="button" onClick={() => setSelected(o)} style={actionBtn}>Détails</button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -299,6 +330,14 @@ export default function BoutiqueOrdersPage() {
       </div>
 
       {selected && <OrderModal order={selected} onClose={()=>setSelected(null)} onUpdate={handleUpdate}/>}
+
+      <OrderChatModal
+        open={!!chatOrder}
+        onClose={() => setChatOrder(null)}
+        orderId={chatOrder?.id}
+        orderLabel={chatOrder ? `Commande #${chatOrder.id}` : ''}
+        counterpartName={chatOrder?.client}
+      />
 
       <style>{`.fa-table-row:hover{background:#FAFAFA}`}</style>
     </div>

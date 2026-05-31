@@ -1,6 +1,9 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState, useContext, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Heart, Share2, ShoppingCart, ArrowLeft, Star } from 'lucide-react';
+import {
+  Heart, Share2, ShoppingCart, ArrowLeft, Star,
+  Truck, RotateCcw, ShieldCheck, Minus, Plus, Check, ImageIcon,
+} from 'lucide-react';
 import { productService } from '../services/productService';
 import { reviewService } from '../services/reviewService';
 import { CartContext } from '../contexts/CartContext';
@@ -8,8 +11,38 @@ import { FavoritesContext } from '../contexts/FavoritesContext';
 import { useToast } from '../contexts/ToastContext';
 import { useAuth } from '../contexts/AuthContext';
 import { ProductCard } from '../components/ProductCard';
-import { ProductDetailGallery } from '../components/ProductDetailGallery';
+import { resolveMediaUrl } from '../utils/imageUtils';
 import AuthModal from '../components/AuthModal';
+import '../styles/product-detail-lux.css';
+
+const COLOR_MAP = {
+  noir: '#1C1C1C', blanc: '#FFFFFF', rouge: '#9b2c2c', bleu: '#3b5a6b',
+  vert: '#5b6e58', beige: '#D2B8A3', gris: '#8a847c', marron: '#5C4033',
+  rose: '#d99', jaune: '#cda64f', orange: '#c47a44', violet: '#6f5e76',
+  bordeaux: '#3D0C0C', doré: '#C9A96E', or: '#C9A96E', creme: '#F5EFE6',
+};
+
+const LIGHT_SWATCHES = ['#FFFFFF', '#D2B8A3', '#F5EFE6', '#C9A96E', '#cda64f'];
+
+/* Étoiles réutilisables */
+const Stars = ({ value = 0, size = 17, animated = false }) => (
+  <span className={`pdp__stars${animated ? ' pdp__stars--anim' : ''}`}>
+    {[...Array(5)].map((_, i) => (
+      <Star key={i} size={size} className={i < Math.round(value) ? 'pdp__star-on' : 'pdp__star-off'} />
+    ))}
+  </span>
+);
+
+const Placeholder = () => (
+  <div className="pdp__ph"><ImageIcon strokeWidth={1.2} /></div>
+);
+
+const GalleryImg = ({ src }) => {
+  const [failed, setFailed] = useState(false);
+  const resolved = resolveMediaUrl(src);
+  if (!resolved || failed) return <Placeholder />;
+  return <img src={resolved} alt="" onError={() => setFailed(true)} />;
+};
 
 export const ProductDetailPage = () => {
   const { slug } = useParams();
@@ -23,7 +56,6 @@ export const ProductDetailPage = () => {
   const [similar, setSimilar] = useState([]);
   const [reviews, setReviews] = useState([]);
 
-  // State pour les variantes
   const [selectedSize, setSelectedSize] = useState(null);
   const [selectedColor, setSelectedColor] = useState(null);
   const [quantity, setQuantity] = useState(1);
@@ -32,15 +64,35 @@ export const ProductDetailPage = () => {
   const [newComment, setNewComment] = useState('');
   const [reviewSubmitting, setReviewSubmitting] = useState(false);
 
-  // Auth modal state
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [authModalMessage, setAuthModalMessage] = useState('');
 
+  const rootRef = useRef(null);
   const liked = isFavorited(product?.id);
 
   useEffect(() => {
     fetchProductDetails();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [slug]);
+
+  /* Staggered fade-in au scroll */
+  useEffect(() => {
+    if (!rootRef.current) return;
+    const els = rootRef.current.querySelectorAll('.reveal');
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            e.target.classList.add('is-visible');
+            io.unobserve(e.target);
+          }
+        });
+      },
+      { threshold: 0.12 }
+    );
+    els.forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, [loading, product, reviews, similar]);
 
   const fetchProductDetails = async () => {
     try {
@@ -49,28 +101,21 @@ export const ProductDetailPage = () => {
       setProduct(data);
       setSelectedImage(0);
 
-      // Set default size and color
       if (data.variants && data.variants.length > 0) {
         const firstVariant = data.variants[0];
         setSelectedSize(firstVariant.size);
         setSelectedColor(firstVariant.color);
       }
 
-      // Get similar products
       try {
         const similarData = await productService.getSimilarProducts(data.id);
         setSimilar(Array.isArray(similarData) ? similarData : similarData.data || []);
-      } catch (e) {
-        // Pas d'erreur si pas de similaires
-      }
+      } catch (e) { /* pas de similaires */ }
 
-      // Get reviews
       try {
         const reviewsData = await productService.getProductReviews(data.id);
         setReviews(Array.isArray(reviewsData) ? reviewsData : reviewsData.data || []);
-      } catch (e) {
-        // Pas d'erreur si pas de reviews
-      }
+      } catch (e) { /* pas de reviews */ }
     } catch (error) {
       console.error('Erreur:', error);
     } finally {
@@ -99,37 +144,27 @@ export const ProductDetailPage = () => {
       setAuthModalOpen(true);
       return;
     }
-
     if (isAdmin?.() || isBoutiqueOwner?.()) {
       toast.error("Les comptes administrateur et vendeur ne peuvent pas ajouter de favoris.");
       return;
     }
-
-    if (liked) {
-      removeFavorite(product.id);
-    } else {
-      addFavorite(product.id);
-    }
+    if (liked) removeFavorite(product.id);
+    else addFavorite(product.id);
   };
 
   const handleSubmitReview = async (event) => {
     event.preventDefault();
-
     if (!isAuthenticated) {
       setAuthModalMessage('Connectez-vous pour laisser un avis');
       setAuthModalOpen(true);
       return;
     }
-
     if (isAdmin?.() || isBoutiqueOwner?.()) {
       toast.error("Les comptes administrateur et vendeur ne peuvent pas laisser d'avis.");
       return;
     }
-
     const comment = newComment.trim();
-    if (!comment || !product?.id || reviewSubmitting) {
-      return;
-    }
+    if (!comment || !product?.id || reviewSubmitting) return;
 
     try {
       setReviewSubmitting(true);
@@ -151,277 +186,290 @@ export const ProductDetailPage = () => {
   };
 
   if (loading) return (
-    <div className="min-h-screen bg-background flex items-center justify-center">
-      <div className="text-center">
-        <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-        <p className="text-gray-500">Chargement du produit...</p>
+    <main className="pdp">
+      <div className="pdp__center">
+        <div>
+          <div className="pdp__spinner" />
+          <p style={{ color: 'var(--muted)' }}>Chargement du produit…</p>
+        </div>
       </div>
-    </div>
-  );
-  if (!product) return (
-    <div className="min-h-screen bg-background flex items-center justify-center">
-      <div className="text-center">
-        <p className="text-5xl mb-4">😕</p>
-        <h2 className="text-2xl font-bold text-primary mb-2">Produit non trouvé</h2>
-        <Link to="/boutiques" className="text-primary underline">Retour aux boutiques</Link>
-      </div>
-    </div>
+    </main>
   );
 
-  const images = product.images || [];
-  const uniqueSizes = [...new Set(product.variants?.map(v => v.size))];
-  const uniqueColors = [...new Set(product.variants?.map(v => v.color))];
-  const avgRating = reviews.length ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1) : product.rating;
+  if (!product) return (
+    <main className="pdp">
+      <div className="pdp__center">
+        <div>
+          <p style={{ fontSize: '3rem', marginBottom: '0.5rem' }}>😕</p>
+          <h2 style={{ fontFamily: "'Playfair Display', serif", color: 'var(--bordeaux)', marginBottom: '0.5rem' }}>Produit non trouvé</h2>
+          <Link to="/boutiques" style={{ color: 'var(--gold)' }}>Retour aux boutiques</Link>
+        </div>
+      </div>
+    </main>
+  );
+
+  const images = (product.images && product.images.length > 0) ? product.images : [{ id: 'ph', image_url: null }];
+  const uniqueSizes = [...new Set(product.variants?.map(v => v.size))].filter(Boolean);
+  const uniqueColors = [...new Set(product.variants?.map(v => v.color))].filter(Boolean);
+  const avgRating = reviews.length
+    ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)
+    : Number(product.rating || 0).toFixed(1);
+  const hasDiscount = !!product.discount_price && Number(product.discount_price) < Number(product.price);
+  const discountPct = hasDiscount
+    ? Math.round((1 - Number(product.discount_price) / Number(product.price)) * 100)
+    : 0;
+  const inStock = product.stock_quantity !== 0;
+  const lowStock = inStock && product.stock_quantity != null && product.stock_quantity <= 5;
+  const current = images[selectedImage] || images[0];
 
   return (
-    <main className="bg-background min-h-screen py-12 md:py-20">
-      <div className="container mx-auto px-4 max-w-7xl">
-        {/* Breadcrumb */}
-        <div className="flex items-center gap-2 text-sm text-neutral mb-10 font-medium tracking-wide">
-          <Link to="/boutiques" className="hover:text-text transition-colors flex items-center gap-1.5">
-            <ArrowLeft size={16} /> Boutiques
-          </Link>
-          {product.boutique && (
-            <>
-              <span className="text-accent">/</span>
-              <Link to={`/boutiques/${product.boutique.slug}`} className="hover:text-text transition-colors">
-                {product.boutique.name}
-              </Link>
-            </>
-          )}
-          <span className="text-accent">/</span>
-          <span className="text-text font-semibold truncate max-w-xs">{product.name}</span>
-        </div>
-
-        <div className="bg-white rounded-[2rem] shadow-sm border border-accent/10 p-6 md:p-10 mb-16">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
-            <ProductDetailGallery
-              images={images}
-              productName={product.name}
-              selectedIndex={selectedImage}
-              onSelect={setSelectedImage}
-              isOutOfStock={product.stock_quantity === 0}
-            />
-
-            {/* Product Info (Right Column) */}
-            <div className="flex flex-col py-2">
-
-              {/* Boutique */}
-              {product.boutique && (
-                <Link to={`/boutiques/${product.boutique.slug}`} className="text-neutral text-sm tracking-widest uppercase font-semibold hover:text-text transition-colors mb-4 block">
-                  {product.boutique.name}
-                </Link>
-              )}
-
-              <h1 className="text-4xl md:text-5xl font-serif font-bold text-text mb-4 leading-tight">{product.name}</h1>
-
-              {/* Rating */}
-              <div className="flex items-center gap-3 mb-8">
-                <div className="flex gap-1">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} size={18} className={i < Math.floor(avgRating) ? 'fill-secondary text-secondary' : 'text-accent/30'} />
-                  ))}
-                </div>
-                <p className="text-neutral text-sm">({reviews.length} avis clients)</p>
-              </div>
-
-              {/* Price */}
-              <div className="flex items-end gap-4 mb-8">
-                <span className="text-4xl font-serif font-bold text-text">
-                  {product.discount_price ? `${product.discount_price}` : `${product.price}`} DH
-                </span>
-                {product.discount_price && (
-                  <span className="text-xl text-neutral/60 line-through font-light mb-1">{product.price} DH</span>
-                )}
-              </div>
-
-              {/* Description */}
-              <div className="h-px w-full bg-accent/20 mb-8" />
-              <p className="text-text font-light leading-relaxed mb-8 text-lg">
-                {product.description}
-              </p>
-              <div className="h-px w-full bg-accent/20 mb-8" />
-
-              {/* Variants */}
-              {product.variants && product.variants.length > 0 && (
-                <div className="mb-10 flex flex-col gap-8">
-                  {/* Colors */}
-                  {uniqueColors.length > 0 && (
-                    <div>
-                      <div className="flex justify-between items-end mb-4">
-                        <label className="block text-sm font-semibold tracking-widest uppercase text-text">Couleur</label>
-                        <span className="text-neutral text-sm">{selectedColor || 'Sélectionner'}</span>
-                      </div>
-                      <div className="flex flex-wrap gap-4">
-                        {uniqueColors.map(color => {
-                          // Simple color mapping logic for demo/UI
-                          const colorMap = {
-                            'noir': '#000000', 'blanc': '#FFFFFF', 'rouge': '#E2725B', 'bleu': '#B7C6C9', 'vert': '#6E7F78', 'beige': '#D2B8A3', 'gris': '#8A908C'
-                          };
-                          const hexColor = colorMap[color.toLowerCase()] || '#D9DDDF';
-
-                          return (
-                            <button
-                              key={color}
-                              onClick={() => setSelectedColor(color)}
-                              className={`w-12 h-12 rounded-full border border-background shadow-sm transition-all duration-300 relative ${selectedColor === color ? 'ring-2 ring-offset-4 ring-text scale-110' : 'hover:scale-110 hover:shadow-md'
-                                }`}
-                              style={{ backgroundColor: hexColor }}
-                              title={color}
-                            />
-                          );
-                        })}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Sizes */}
-                  {uniqueSizes.length > 0 && (
-                    <div>
-                      <div className="flex justify-between items-end mb-4">
-                        <label className="block text-sm font-semibold tracking-widest uppercase text-text">Taille</label>
-                        <span className="text-neutral text-sm hover:underline cursor-pointer">Guide des tailles</span>
-                      </div>
-                      <div className="flex flex-wrap gap-3">
-                        {uniqueSizes.map(size => (
-                          <button
-                            key={size}
-                            onClick={() => setSelectedSize(size)}
-                            className={`min-w-[4rem] px-4 py-3 rounded-xl border transition-all duration-300 text-sm font-medium ${selectedSize === size
-                              ? 'border-text bg-text text-white shadow-md'
-                              : 'border-accent/40 bg-white text-text hover:border-text hover:bg-background'
-                              }`}
-                          >
-                            {size}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* Quantity & Actions */}
-              <div className="flex flex-col gap-6 mt-auto">
-                <div className="flex items-center gap-4">
-                  {/* Quantity */}
-                  <div className="flex items-center border border-accent/40 rounded-xl bg-background/30 h-14 w-32">
-                    <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="flex-1 h-full flex items-center justify-center hover:bg-accent/20 rounded-l-xl text-xl text-neutral transition-colors">−</button>
-                    <span className="flex-1 text-center font-medium">{quantity}</span>
-                    <button onClick={() => setQuantity(quantity + 1)} className="flex-1 h-full flex items-center justify-center hover:bg-accent/20 rounded-r-xl text-xl text-neutral transition-colors">+</button>
-                  </div>
-
-                  {/* Favorite */}
-                  <button
-                    onClick={handleToggleFavorite}
-                    className={`h-14 w-14 border rounded-xl flex items-center justify-center transition-all duration-300 shadow-sm ${liked ? 'border-heart bg-heart/5' : 'border-accent/40 bg-white hover:border-heart hover:bg-heart/5'
-                      }`}
-                  >
-                    <Heart size={24} className={liked ? 'fill-heart text-heart' : 'text-text'} />
-                  </button>
-                </div>
-
-                {/* Add to Cart */}
-                <button
-                  onClick={handleAddToCart}
-                  disabled={product.stock_quantity === 0}
-                  className="w-full bg-primary text-white py-4 rounded-xl font-medium tracking-widest uppercase shadow-lg shadow-primary/20 hover:shadow-xl hover:bg-text hover:shadow-text/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-500 flex items-center justify-center gap-3"
-                >
-                  <ShoppingCart size={20} />
-                  {product.stock_quantity === 0 ? 'Indisponible' : 'Ajouter au Panier'}
-                </button>
-              </div>
-
-              {/* Social & Help */}
-              <div className="mt-10 pt-6 border-t border-accent/20 flex flex-col sm:flex-row gap-6 justify-between items-center text-sm">
-                <div className="flex items-center gap-4 text-neutral font-medium">
-                  <span className="uppercase tracking-wider text-xs">Partager :</span>
-                  <button className="hover:text-text transition-colors"><Share2 size={18} /></button>
-                </div>
-                <div className="text-neutral font-medium text-xs tracking-wider uppercase">
-                  Service Client VIP : 24/7
-                </div>
-              </div>
-
-            </div>
+    <main className="pdp" ref={rootRef}>
+      {/* Breadcrumb */}
+      <div className="pdp__crumbbar">
+        <div className="pdp__container">
+          <div className="pdp__crumb">
+            <Link to="/boutiques"><ArrowLeft size={15} /> Boutiques</Link>
+            {product.boutique && (
+              <>
+                <span className="sep">/</span>
+                <Link to={`/boutiques/${product.boutique.slug}`}>{product.boutique.name}</Link>
+              </>
+            )}
+            <span className="sep">/</span>
+            <span className="current">{product.name}</span>
           </div>
         </div>
+      </div>
 
-        {/* Reviews Section */}
-        <section className="bg-white rounded-[2rem] shadow-sm border border-accent/10 p-8 md:p-12 mb-20">
-          <h2 className="text-3xl font-serif font-bold text-text mb-10 text-center">Avis sur ce produit ({reviews.length})</h2>
-          <form onSubmit={handleSubmitReview} className="mb-10 border border-accent/20 rounded-2xl p-5 md:p-6 bg-background/20">
-            <h3 className="text-lg font-semibold text-text mb-4">Laisser votre avis</h3>
-            <div className="mb-4">
-              <label htmlFor="product-review-rating" className="block text-sm text-neutral mb-2">Note</label>
-              <select
-                id="product-review-rating"
-                value={newRating}
-                onChange={(event) => setNewRating(Number(event.target.value))}
-                className="w-full md:w-48 border border-accent/40 rounded-xl px-3 py-2 bg-white text-text"
+      <div className="pdp__container">
+        {/* Hero */}
+        <section className="pdp__hero">
+          {/* Gallery */}
+          <div className="pdp__gallery reveal">
+            <div className="pdp__thumbs">
+              {images.map((img, idx) => (
+                <button
+                  key={img.id ?? idx}
+                  type="button"
+                  className={`pdp__thumb${idx === selectedImage ? ' is-active' : ''}`}
+                  onClick={() => setSelectedImage(idx)}
+                  aria-label={`Image ${idx + 1}`}
+                >
+                  <GalleryImg src={img.image_url} />
+                </button>
+              ))}
+            </div>
+            <div className="pdp__main">
+              <GalleryImg src={current?.image_url} />
+              {product.boutique && <span className="pdp__main-tag">{product.boutique.name}</span>}
+              {!inStock && <div className="pdp__soldout"><span>Rupture de stock</span></div>}
+            </div>
+          </div>
+
+          {/* Info */}
+          <div className="pdp__info reveal" style={{ '--delay': '0.1s' }}>
+            {product.boutique && (
+              <Link to={`/boutiques/${product.boutique.slug}`} className="pdp__eyebrow">
+                {product.boutique.name}
+              </Link>
+            )}
+
+            <h1 className="pdp__title">{product.name}</h1>
+
+            <div className="pdp__rating">
+              <Stars value={avgRating} animated />
+              <span className="score">{avgRating}</span>
+              <span>·</span>
+              <a href="#avis">{reviews.length} avis</a>
+            </div>
+
+            <div className="pdp__price-row">
+              <span className="pdp__price">{hasDiscount ? product.discount_price : product.price} DH</span>
+              {hasDiscount && (
+                <>
+                  <span className="pdp__price-old">{product.price} DH</span>
+                  <span className="pdp__price-off">−{discountPct}%</span>
+                </>
+              )}
+            </div>
+
+            <div className={`pdp__stock${inStock ? '' : ' is-out'}`}>
+              <span className="dot" />
+              {inStock ? (lowStock ? `Plus que ${product.stock_quantity} en stock` : 'En stock') : 'Rupture de stock'}
+            </div>
+
+            {product.description && <p className="pdp__desc">{product.description}</p>}
+
+            <div className="pdp__divider" />
+
+            {/* Colors */}
+            {uniqueColors.length > 0 && (
+              <div className="pdp__field">
+                <div className="pdp__label">
+                  <span className="k">Couleur</span>
+                  <span className="v">{selectedColor || 'Sélectionner'}</span>
+                </div>
+                <div className="pdp__colors">
+                  {uniqueColors.map(color => {
+                    const hex = COLOR_MAP[String(color).toLowerCase()] || '#cabfae';
+                    const active = selectedColor === color;
+                    const tick = LIGHT_SWATCHES.includes(hex) ? 'var(--bordeaux)' : '#fff';
+                    return (
+                      <button
+                        key={color}
+                        type="button"
+                        title={color}
+                        onClick={() => setSelectedColor(color)}
+                        className={`pdp__color${active ? ' is-active' : ''}`}
+                        style={{ backgroundColor: hex }}
+                      >
+                        {active && <Check style={{ color: tick }} />}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Sizes */}
+            {uniqueSizes.length > 0 && (
+              <div className="pdp__field">
+                <div className="pdp__label">
+                  <span className="k">Taille — <span className="v" style={{ textTransform: 'none' }}>{selectedSize || 'Sélectionner'}</span></span>
+                  <button type="button" className="pdp__guide">Guide des tailles</button>
+                </div>
+                <div className="pdp__sizes">
+                  {uniqueSizes.map(size => (
+                    <button
+                      key={size}
+                      type="button"
+                      onClick={() => setSelectedSize(size)}
+                      className={`pdp__size${selectedSize === size ? ' is-active' : ''}`}
+                    >
+                      {size}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Actions */}
+            <div className="pdp__actions">
+              <div className="pdp__qty">
+                <button onClick={() => setQuantity(Math.max(1, quantity - 1))} aria-label="Diminuer"><Minus size={16} /></button>
+                <span className="val">{quantity}</span>
+                <button onClick={() => setQuantity(quantity + 1)} aria-label="Augmenter"><Plus size={16} /></button>
+              </div>
+              <button className="pdp__cart" onClick={handleAddToCart} disabled={!inStock}>
+                <ShoppingCart size={18} className="ic" />
+                {inStock ? 'Ajouter au panier' : 'Indisponible'}
+              </button>
+              <button
+                className={`pdp__fav${liked ? ' is-liked' : ''}`}
+                onClick={handleToggleFavorite}
+                aria-label="Favori"
               >
-                <option value={5}>5 / 5</option>
-                <option value={4}>4 / 5</option>
-                <option value={3}>3 / 5</option>
-                <option value={2}>2 / 5</option>
-                <option value={1}>1 / 5</option>
-              </select>
+                <Heart size={22} />
+              </button>
             </div>
-            <div className="mb-4">
-              <label htmlFor="product-review-comment" className="block text-sm text-neutral mb-2">Commentaire</label>
-              <textarea
-                id="product-review-comment"
-                value={newComment}
-                onChange={(event) => setNewComment(event.target.value)}
-                rows={4}
-                placeholder="Partagez votre experience..."
-                className="w-full border border-accent/40 rounded-xl px-3 py-2 bg-white text-text"
-                required
-              />
-            </div>
-            <button
-              type="submit"
-              disabled={reviewSubmitting}
-              className="bg-primary text-white px-5 py-2.5 rounded-xl font-medium disabled:opacity-60"
-            >
-              {reviewSubmitting ? 'Publication...' : 'Publier'}
-            </button>
-          </form>
-          {reviews.length === 0 ? (
-            <div className="text-center py-10">
-              <span className="text-4xl opacity-30 mb-4 block">✧</span>
-              <p className="text-neutral italic">Aucun avis pour le moment. Soyez le premier à partager votre expérience.</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {reviews.map(review => (
-                <div key={review.id} className="p-6 rounded-2xl bg-background/30 border border-transparent hover:border-accent/20 transition-colors">
-                  <div className="flex justify-between items-start mb-4">
-                    <div>
-                      <p className="font-semibold text-text uppercase tracking-wide text-sm mb-1">{review.user?.name || 'Client Anonyme'}</p>
-                      <div className="flex gap-0.5">
-                        {[...Array(5)].map((_, i) => (
-                          <span key={i} className={i < review.rating ? 'text-secondary' : 'text-accent/30'}>★</span>
-                        ))}
-                      </div>
-                    </div>
-                    <p className="text-xs text-neutral tracking-wider">{new Date(review.created_at).toLocaleDateString('fr-FR')}</p>
-                  </div>
-                  <p className="text-text font-light leading-relaxed italic">"{review.comment}"</p>
+
+            {/* Trust */}
+            <div className="pdp__trust">
+              {[
+                { Icon: Truck, t: 'Livraison', s: '24–72h au Maroc' },
+                { Icon: RotateCcw, t: 'Retours', s: 'Sous 14 jours' },
+                { Icon: ShieldCheck, t: 'Paiement', s: '100% sécurisé' },
+              ].map(({ Icon, t, s }, i) => (
+                <div className="pdp__trust-card" key={i}>
+                  <Icon />
+                  <span className="t">{t}</span>
+                  <span className="s">{s}</span>
                 </div>
               ))}
             </div>
-          )}
+
+            <div className="pdp__share">
+              <span className="k">Partager</span>
+              <button aria-label="Partager"><Share2 size={18} /></button>
+            </div>
+          </div>
         </section>
 
-        {/* Similar Products */}
-        {similar.length > 0 && (
-          <section className="mb-20 product-detail__similar">
-            <div className="flex justify-between items-end mb-10 pb-4 border-b border-accent/20">
-              <h2 className="text-3xl font-serif font-bold text-text">Vous aimerez aussi</h2>
-              <Link to="/products" className="text-neutral text-sm tracking-widest uppercase font-medium hover:text-text transition-colors hidden sm:block">Voir tout →</Link>
+        {/* Reviews */}
+        <section id="avis" className="pdp__section reveal">
+          <div className="pdp__reviews">
+            <div className="pdp__reviews-head">
+              <div>
+                <h2 className="pdp__h2">Avis clients</h2>
+                <p className="sub">{reviews.length} avis · note moyenne {avgRating}/5</p>
+              </div>
+              <Stars value={avgRating} size={22} animated />
             </div>
-            <div className="product-detail__similar-grid">
+
+            <form className="pdp__review-form" onSubmit={handleSubmitReview}>
+              <h3>Laisser votre avis</h3>
+              <div className="pdp__form-grid">
+                <div>
+                  <label className="pdp__form-label" htmlFor="rev-rating">Note</label>
+                  <select id="rev-rating" value={newRating} onChange={(e) => setNewRating(Number(e.target.value))}>
+                    <option value={5}>5 / 5</option>
+                    <option value={4}>4 / 5</option>
+                    <option value={3}>3 / 5</option>
+                    <option value={2}>2 / 5</option>
+                    <option value={1}>1 / 5</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="pdp__form-label" htmlFor="rev-comment">Commentaire</label>
+                  <textarea
+                    id="rev-comment"
+                    value={newComment}
+                    onChange={(e) => setNewComment(e.target.value)}
+                    placeholder="Partagez votre expérience…"
+                    required
+                  />
+                </div>
+              </div>
+              <button type="submit" className="pdp__submit" disabled={reviewSubmitting}>
+                {reviewSubmitting ? 'Publication…' : 'Publier mon avis'}
+              </button>
+            </form>
+
+            {reviews.length === 0 ? (
+              <div className="pdp__empty">
+                <span>✧</span>
+                Aucun avis pour le moment. Soyez le premier à partager votre expérience.
+              </div>
+            ) : (
+              <div className="pdp__reviews-grid">
+                {reviews.map(review => (
+                  <div key={review.id} className="pdp__review">
+                    <div className="pdp__review-top">
+                      <div className="pdp__review-meta">
+                        <div className="pdp__avatar">{(review.user?.name || 'C')[0].toUpperCase()}</div>
+                        <div>
+                          <p className="pdp__review-name">{review.user?.name || 'Client Anonyme'}</p>
+                          <Stars value={review.rating} size={13} />
+                        </div>
+                      </div>
+                      <span className="pdp__review-date">{new Date(review.created_at).toLocaleDateString('fr-FR')}</span>
+                    </div>
+                    <p className="pdp__review-text">{review.comment}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </section>
+
+        {/* Similar */}
+        {similar.length > 0 && (
+          <section className="pdp__section reveal product-detail__similar">
+            <div className="pdp__similar-head">
+              <h2 className="pdp__h2">Vous aimerez aussi</h2>
+              <Link to="/products">Voir tout →</Link>
+            </div>
+            <div className="pdp__similar-grid">
               {similar.slice(0, 3).map((prod) => (
                 <ProductCard key={prod.id} product={prod} />
               ))}
@@ -430,7 +478,6 @@ export const ProductDetailPage = () => {
         )}
       </div>
 
-      {/* Auth Modal */}
       <AuthModal
         isOpen={authModalOpen}
         onClose={() => setAuthModalOpen(false)}

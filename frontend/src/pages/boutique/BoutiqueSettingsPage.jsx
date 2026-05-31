@@ -147,9 +147,43 @@ function AppearanceTab() {
 }
 
 function NotificationsTab() {
-  const [prefs, setPrefs] = useState({ newOrder:true, newReview:true, lowStock:true, weeklyReport:true, sms:false, push:true });
+  const [prefs, setPrefs] = useState({ newOrder:true, newReview:true, lowStock:true, weeklyReport:true, sms:false, push:true, messagesEnabled:true });
+  const [saving, setSaving] = useState(false);
   const toggle = k => setPrefs(p=>({...p,[k]:!p[k]}));
+
+  useEffect(() => {
+    api.get('/boutique/profile')
+      .then(({ data }) => {
+        setPrefs((p) => ({ ...p, messagesEnabled: data.messages_enabled !== false }));
+      })
+      .catch(() => {});
+  }, []);
+
+  const saveMessagesSetting = async () => {
+    setSaving(true);
+    try {
+      await api.put('/boutique/profile', { messages_enabled: prefs.messagesEnabled });
+      toast.success('Paramètre messages enregistré');
+    } catch {
+      toast.error('Impossible d\'enregistrer');
+    } finally {
+      setSaving(false);
+    }
+  };
+
   return (
+    <>
+    <Section title="Messages clients">
+      <SettingRow
+        label="Accepter les messages (DM)"
+        sub="Comme Instagram : les clients peuvent vous écrire. Vous pouvez toujours contacter un client sur ses commandes."
+      >
+        <Toggle value={prefs.messagesEnabled} onChange={(v) => setPrefs((p) => ({ ...p, messagesEnabled: v }))} />
+      </SettingRow>
+      <button onClick={saveMessagesSetting} disabled={saving} style={{ ...saveBtn, marginTop:16 }}>
+        {saving ? 'Enregistrement…' : 'Enregistrer les messages'}
+      </button>
+    </Section>
     <Section title="Préférences de notifications">
       {[
         ['newOrder',     'Nouvelle commande',        'Email pour chaque nouvelle commande reçue'],
@@ -165,6 +199,7 @@ function NotificationsTab() {
       ))}
       <button onClick={()=>toast.success('Préférences sauvegardées')} style={{ ...saveBtn, marginTop:16 }}>Enregistrer</button>
     </Section>
+    </>
   );
 }
 

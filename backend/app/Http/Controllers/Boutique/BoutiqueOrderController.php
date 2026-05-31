@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Boutique;
 
+use App\Events\OrderStatusUpdated;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use Illuminate\Http\Request;
@@ -45,6 +46,7 @@ class BoutiqueOrderController extends Controller
 
             return [
                 'id' => $order->id,
+                'customer_id' => $order->user_id,
                 'customer' => $order->user ? $order->user->name : 'Client Inconnu',
                 'customer_email' => $order->user ? $order->user->email : '',
                 'product' => $firstItem && $firstItem->product ? $firstItem->product->name : 'Produit supprimé',
@@ -93,10 +95,11 @@ class BoutiqueOrderController extends Controller
         })->findOrFail($id);
 
         $data = $request->validate([
-            'status' => 'required|string|in:pending,processing,shipped,delivered,cancelled',
+            'status' => 'required|string|in:pending,confirmed,processing,shipped,delivered,cancelled',
         ]);
 
         $order->update(['status' => $data['status']]);
+        OrderStatusUpdated::dispatch($order->fresh());
 
         return response()->json([
             'message' => 'Statut de la commande mis à jour avec succès',

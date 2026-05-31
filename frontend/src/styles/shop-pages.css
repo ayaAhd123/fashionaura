@@ -118,6 +118,200 @@
   box-shadow: 0 0 0 3px rgba(252, 165, 165, 0.15);
 }
 
+/* Search bar with icon */
+.shop-search {
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.shop-search__icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--neutral);
+  pointer-events: none;
+}
+
+.shop-search__input {
+  width: 100%;
+  padding: 0.8rem 1rem 0.8rem 2.75rem;
+  border-radius: 0.875rem;
+  border: 1px solid rgba(183, 198, 201, 0.4);
+  background: rgba(217, 221, 223, 0.35);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.9375rem;
+  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+}
+
+.shop-search__input:focus {
+  outline: none;
+  background: #fff;
+  border-color: rgba(252, 165, 165, 0.6);
+  box-shadow: 0 0 0 3px rgba(252, 165, 165, 0.15);
+}
+
+/* Type chips */
+.shop-types {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.shop-type-chip {
+  padding: 0.45rem 0.95rem;
+  border-radius: 999px;
+  border: 1px solid rgba(183, 198, 201, 0.5);
+  background: #fff;
+  color: var(--text);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1;
+  transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.15s;
+}
+
+.shop-type-chip:hover {
+  border-color: rgba(252, 165, 165, 0.7);
+  background: rgba(252, 165, 165, 0.08);
+  transform: translateY(-1px);
+}
+
+.shop-type-chip--active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+/* City discovery tiles */
+.city-tiles {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+}
+
+@media (min-width: 560px) {
+  .city-tiles { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (min-width: 900px) {
+  .city-tiles { grid-template-columns: repeat(3, 1fr); }
+}
+
+.city-tile {
+  display: block;
+  border-radius: 1.1rem;
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid rgba(183, 198, 201, 0.35);
+  box-shadow: 0 4px 18px rgba(44, 24, 16, 0.05);
+  text-decoration: none;
+  transition: transform 0.25s, box-shadow 0.25s;
+}
+
+.city-tile:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 30px rgba(44, 24, 16, 0.12);
+}
+
+.city-tile__media {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  background: linear-gradient(135deg, rgba(252, 165, 165, 0.25), rgba(217, 221, 223, 0.5));
+  overflow: hidden;
+}
+
+.city-tile__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s;
+}
+
+.city-tile:hover .city-tile__img { transform: scale(1.06); }
+
+.city-tile__placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(44, 24, 16, 0.35);
+}
+
+.city-tile__count {
+  position: absolute;
+  bottom: 0.625rem;
+  left: 0.625rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.3rem 0.65rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--text);
+  font-size: 0.7rem;
+  font-weight: 600;
+  backdrop-filter: blur(4px);
+}
+
+.city-tile__body {
+  padding: 0.9rem 1rem 1.1rem;
+}
+
+.city-tile__region {
+  display: block;
+  font-size: 0.65rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--secondary);
+  font-weight: 600;
+  margin-bottom: 0.3rem;
+}
+
+.city-tile__name {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: var(--font-serif, 'Playfair Display', serif);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+}
+
+.city-tile__arrow {
+  color: var(--primary);
+  transition: transform 0.2s;
+}
+
+.city-tile:hover .city-tile__arrow { transform: translateX(4px); }
+
+/* Filtered results sections */
+.shop-results {
+  margin-bottom: 2.75rem;
+}
+
+.shop-results__title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-serif, 'Playfair Display', serif);
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 1.25rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(183, 198, 201, 0.4);
+}
+
+.shop-results__title span {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--neutral);
+}
+
 /* Grid layout: see product-cards.css (.shop-page__grid) */
 
 .shop-page__empty,

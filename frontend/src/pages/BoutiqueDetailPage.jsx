@@ -1,17 +1,24 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
-  Star, MapPin, ArrowLeft, UserCheck, UserPlus, Truck,
+  Star, MapPin, ArrowLeft, UserCheck, UserPlus, Truck, Search, Lock, Tag, MessageCircle,
 } from 'lucide-react';
 import { boutiqueService } from '../services/boutiqueService';
+import { productService } from '../services/productService';
 import { reviewService } from '../services/reviewService';
+import { getBoutiqueFeed } from '../services/api';
 import { useToast } from '../contexts/ToastContext';
 import { useAuth } from '../contexts/AuthContext';
 import { ProductCard } from '../components/ProductCard';
-import { cityName } from '../utils/cityI18n';
+import { cityName, getCitySlug } from '../utils/cityI18n';
+import { applyCityTheme } from '../utils/cityThemes';
+import { resolveMediaUrl } from '../utils/imageUtils';
+import { PRODUCT_TYPES, OCCASION_TYPES, buildArticleFilters } from '../config/articleTypes';
 import AuthModal from '../components/AuthModal';
+import PostComments from '../components/posts/PostComments';
 import '../styles/boutique.css';
+import '../styles/messaging.css';
 
 const deliveryLabel = (boutique) => {
   if (!boutique.offers_delivery) return 'Retrait en boutique uniquement';
@@ -23,8 +30,9 @@ const deliveryLabel = (boutique) => {
 export const BoutiqueDetailPage = () => {
   const { t } = useTranslation();
   const { slug } = useParams();
+  const navigate = useNavigate();
   const toast = useToast();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isAdmin, isBoutiqueOwner } = useAuth();
   const [boutique, setBoutique] = useState(null);
   const [loading, setLoading] = useState(true);
   const [following, setFollowing] = useState(false);
@@ -35,13 +43,81 @@ export const BoutiqueDetailPage = () => {
   const [newComment, setNewComment] = useState('');
   const [reviewSubmitting, setReviewSubmitting] = useState(false);
 
+  // Recherche / filtres d'articles dans ce magasin
+  const [articleType, setArticleType] = useState(null);
+  const [articleSearch, setArticleSearch] = useState('');
+  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [productsLoading, setProductsLoading] = useState(false);
+
+  // Fil de publications (réseau social boutique)
+  const [posts, setPosts] = useState([]);
+  const [postsLoading, setPostsLoading] = useState(false);
+
   // Auth modal state
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [authModalMessage, setAuthModalMessage] = useState('');
 
   useEffect(() => {
+    setArticleType(null);
+    setArticleSearch('');
+    setFilteredProducts([]);
     fetchBoutiqueDetails();
   }, [slug]);
+
+  // Applique le thème de la ville de la boutique
+  useEffect(() => {
+    if (!boutique?.city) return;
+    return applyCityTheme(boutique.city);
+  }, [boutique]);
+
+  // Charge le fil de publications (re-fetch quand on suit/ne suit plus → déverrouille l'exclusif)
+  useEffect(() => {
+    if (!boutique?.id) return;
+    let active = true;
+    setPostsLoading(true);
+    getBoutiqueFeed(boutique.id)
+      .then((res) => { if (active) setPosts(res.data?.data || []); })
+      .catch(() => { if (active) setPosts([]); })
+      .finally(() => { if (active) setPostsLoading(false); });
+    return () => { active = false; };
+  }, [boutique, following]);
+
+  const isArticleMode = Boolean(articleType) || articleSearch.trim().length > 0;
+
+  // Filtre les produits de CE magasin (recherche par produit / occasion)
+  useEffect(() => {
+    if (!boutique || !(Boolean(articleType) || articleSearch.trim().length > 0)) {
+      setFilteredProducts([]);
+      return;
+    }
+    let active = true;
+    const timer = setTimeout(async () => {
+      try {
+        setProductsLoading(true);
+        const data = await productService.getProducts(
+          buildArticleFilters({ boutique: slug }, articleType, articleSearch)
+        );
+        if (active) setFilteredProducts(data?.data ?? data ?? []);
+      } catch (err) {
+        console.error('Erreur produits boutique:', err);
+        if (active) setFilteredProducts([]);
+      } finally {
+        if (active) setProductsLoading(false);
+      }
+    }, 300);
+    return () => { active = false; clearTimeout(timer); };
+  }, [slug, articleType, articleSearch, boutique]);
+
+  const resetArticleFilters = () => {
+    setArticleType(null);
+    setArticleSearch('');
+  };
+
+  const handleTypeSelect = (list, event) => {
+    const value = event.target.value;
+    if (value) setArticleType(list.find((x) => x.id === value) || null);
+    else if (list.some((x) => x.id === articleType?.id)) setArticleType(null);
+  };
 
   const fetchBoutiqueDetails = async () => {
     try {
@@ -90,6 +166,26 @@ export const BoutiqueDetailPage = () => {
     } finally {
       setFollowLoading(false);
     }
+  };
+
+  const handleContact = () => {
+    if (boutique?.messages_enabled === false) {
+      toast.error('Cette boutique n\'accepte pas les messages pour le moment.');
+      return;
+    }
+
+    if (!isAuthenticated) {
+      setAuthModalMessage('Connectez-vous pour contacter cette boutique');
+      setAuthModalOpen(true);
+      return;
+    }
+
+    if (isAdmin?.() || isBoutiqueOwner?.()) {
+      toast.error('Utilisez un compte client pour contacter une boutique.');
+      return;
+    }
+
+    navigate(`/compte/messagerie?boutique=${boutique.id}`);
   };
 
   const handleSubmitReview = async (event) => {
@@ -150,9 +246,11 @@ export const BoutiqueDetailPage = () => {
     ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)
     : boutique.rating || '5.0';
   const productCount = boutique.products?.length || 0;
+  const citySlug = getCitySlug(boutique.city);
+  const displayProducts = isArticleMode ? filteredProducts : (boutique.products || []);
 
   return (
-    <article className="boutique-detail">
+    <article className={`boutique-detail boutique-detail--themed theme-${citySlug}`}>
       {/* Hero */}
       <section className="boutique-detail__hero">
         {boutique.banner ? (
@@ -244,6 +342,12 @@ export const BoutiqueDetailPage = () => {
 
           {/* Follow */}
           <div className="boutique-detail__actions">
+            {boutique.messages_enabled !== false && (
+              <button type="button" onClick={handleContact} className="boutique-detail__contact">
+                <MessageCircle size={18} />
+                <span>Contacter</span>
+              </button>
+            )}
             <button
               type="button"
               onClick={handleFollow}
@@ -267,32 +371,160 @@ export const BoutiqueDetailPage = () => {
           </div>
         </section>
 
-        {/* Products */}
+        {/* Products + recherche/filtres (mêmes que la page ville) */}
         <section className="boutique-detail__section">
+          {/* Barre de recherche d'article */}
+          <div className="boutique-filter">
+            <div className="boutique-filter__search">
+              <Search size={17} className="boutique-filter__search-icon" aria-hidden="true" />
+              <input
+                type="search"
+                placeholder="Rechercher dans cette boutique (robe, caftan, soirée…)"
+                value={articleSearch}
+                onChange={(e) => setArticleSearch(e.target.value)}
+                className="boutique-filter__input"
+              />
+            </div>
+
+            <div className="boutique-filter__chips">
+              <button
+                type="button"
+                className={`boutique-chip ${!isArticleMode ? 'boutique-chip--active' : ''}`}
+                onClick={resetArticleFilters}
+              >
+                Tout
+              </button>
+
+              <select
+                className="boutique-filter__select"
+                aria-label="Type de pièce"
+                value={PRODUCT_TYPES.some((x) => x.id === articleType?.id) ? articleType.id : ''}
+                onChange={(e) => handleTypeSelect(PRODUCT_TYPES, e)}
+              >
+                <option value="">Type de pièce</option>
+                {PRODUCT_TYPES.map((type) => (
+                  <option key={type.id} value={type.id}>{type.label}</option>
+                ))}
+              </select>
+
+              <select
+                className="boutique-filter__select"
+                aria-label="Occasion"
+                value={OCCASION_TYPES.some((x) => x.id === articleType?.id) ? articleType.id : ''}
+                onChange={(e) => handleTypeSelect(OCCASION_TYPES, e)}
+              >
+                <option value="">Occasion</option>
+                {OCCASION_TYPES.map((type) => (
+                  <option key={type.id} value={type.id}>{type.label}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
           <div className="boutique-detail__section-head">
-            <h2 className="boutique-detail__section-title">Dernières créations</h2>
-            {productCount > 0 && (
+            <h2 className="boutique-detail__section-title">
+              {isArticleMode ? 'Résultats' : 'Dernières créations'}
+            </h2>
+            {displayProducts.length > 0 && (
               <span className="boutique-detail__section-sub">
-                {productCount} pièce{productCount > 1 ? 's' : ''}
+                {displayProducts.length} pièce{displayProducts.length > 1 ? 's' : ''}
+                {isArticleMode && articleType ? ` · ${articleType.label}` : ''}
               </span>
             )}
           </div>
 
-          {productCount > 0 ? (
+          {productsLoading ? (
+            <div className="boutique-detail__empty">
+              <div className="boutique-detail__spinner" />
+              <p className="boutique-detail__empty-text">Recherche en cours…</p>
+            </div>
+          ) : displayProducts.length > 0 ? (
             <div className="boutique-detail__products-grid">
-              {boutique.products.map((product) => (
+              {displayProducts.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}
             </div>
           ) : (
             <div className="boutique-detail__empty">
-              <div className="boutique-detail__empty-icon">✨</div>
+              <div className="boutique-detail__empty-icon">{isArticleMode ? '🔍' : '✨'}</div>
               <p className="boutique-detail__empty-text">
-                Aucune création publiée pour le moment. Revenez bientôt !
+                {isArticleMode
+                  ? `Aucune pièce ne correspond à ce filtre dans ${boutique.name}.`
+                  : 'Aucune création publiée pour le moment. Revenez bientôt !'}
               </p>
+              {isArticleMode && (
+                <button type="button" className="boutique-chip boutique-chip--active" onClick={resetArticleFilters}>
+                  Réinitialiser
+                </button>
+              )}
             </div>
           )}
         </section>
+
+        {/* Fil de publications (actualités & offres) */}
+        {(postsLoading || posts.length > 0) && (
+          <section className="boutique-feed">
+            <div className="boutique-detail__section-head">
+              <h2 className="boutique-detail__section-title">Actualités &amp; offres</h2>
+              {posts.length > 0 && (
+                <span className="boutique-detail__section-sub">{posts.length} publication{posts.length > 1 ? 's' : ''}</span>
+              )}
+            </div>
+
+            {postsLoading ? (
+              <div className="boutique-detail__empty">
+                <div className="boutique-detail__spinner" />
+                <p className="boutique-detail__empty-text">Chargement des publications…</p>
+              </div>
+            ) : (
+              <div className="boutique-feed__grid">
+                {posts.map((post) => (
+                  <article key={post.id} className={`feed-post ${post.is_locked ? 'feed-post--locked' : ''}`}>
+                    <div className="feed-post__media">
+                      {post.image_url && (
+                        <img src={resolveMediaUrl(post.image_url)} alt="" className="feed-post__img" />
+                      )}
+                      {post.is_exclusive && (
+                        <span className="feed-post__exclusive"><Tag size={12} /> Exclusif abonnés</span>
+                      )}
+                      {post.is_locked && (
+                        <div className="feed-post__lock">
+                          <Lock size={22} />
+                          <p>Offre réservée aux abonnés</p>
+                          <button type="button" className="feed-post__lock-btn" onClick={handleFollow}>
+                            {isAuthenticated ? 'Suivre pour débloquer' : 'Connectez-vous & suivez'}
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                    {!post.is_locked && (
+                      <div className="feed-post__body">
+                        {post.caption && <p className="feed-post__caption">{post.caption}</p>}
+                        {post.promo_text && (
+                          <p className="feed-post__promo">
+                            <Tag size={13} /> {post.promo_text}
+                            {post.promo_code && <code className="feed-post__code">{post.promo_code}</code>}
+                          </p>
+                        )}
+                        {post.product && (
+                          <Link to={`/products/${post.product.slug}`} className="feed-post__product">
+                            Voir « {post.product.name} » →
+                          </Link>
+                        )}
+                        <PostComments
+                          boutiqueId={boutique.id}
+                          postId={post.id}
+                          initialCount={post.comments_count || 0}
+                        />
+                        <span className="feed-post__time">{post.created_at}</span>
+                      </div>
+                    )}
+                  </article>
+                ))}
+              </div>
+            )}
+          </section>
+        )}
 
         {/* Reviews */}
         <section className="boutique-detail__reviews">

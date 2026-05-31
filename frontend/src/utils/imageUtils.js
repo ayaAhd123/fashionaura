@@ -91,7 +91,15 @@ export const resolveMediaUrl = (url) => {
   if (!url || typeof url !== 'string') return null;
   const trimmed = url.trim();
   if (!trimmed) return null;
-  if (/^(https?:|data:|blob:)/i.test(trimmed)) return trimmed;
+  if (/^(https?:|data:|blob:)/i.test(trimmed)) {
+    // Corrige http://localhost/storage → http://localhost:8000/storage
+    if (/^https?:\/\/localhost\//i.test(trimmed) && !/^https?:\/\/localhost:\d+/i.test(trimmed)) {
+      const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+      const origin = apiBase.replace(/\/api\/?$/, '');
+      return trimmed.replace(/^https?:\/\/localhost/i, origin);
+    }
+    return trimmed;
+  }
 
   const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
   const origin = apiBase.replace(/\/api\/?$/, '');

@@ -5,7 +5,7 @@ import { useAuth } from '../../contexts/AuthContext';
 function getDashboardPath(role) {
     if (role === 'admin') return '/admin/dashboard';
     if (role === 'boutique_owner') return '/boutique/dashboard';
-    return '/';
+    return '/compte';
 }
 
 export default function LandingAuthNav({ onNavigate, className = '' }) {

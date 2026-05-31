@@ -6,7 +6,7 @@
     align-items: baseline;
     text-decoration: none;
     line-height: 1;
-    gap: 0.06em;
+    gap: 0;                 /* l'espacement est géré par le retrait du script */
     white-space: nowrap;
     direction: ltr;
     unicode-bidi: isolate;
@@ -15,28 +15,29 @@
 .fa-logo__fashion {
     font-family: 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
     font-weight: 600;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.03em;
     color: #2C2A22;
 }
 
 .fa-logo__aura {
     font-family: 'Pinyon Script', cursive;
     font-weight: 400;
-    color: #A8A59D;
+    color: #8C8980;         /* gris un peu plus soutenu, plus lisible (cf. maquette) */
     line-height: 1;
     position: relative;
-    top: 0.06em;
+    top: 0.1em;             /* niché légèrement plus bas */
+    margin-left: -0.06em;   /* le script vient se lover contre le mot */
 }
 
-/* Tailles */
-.fa-logo--sm .fa-logo__fashion { font-size: 1.35rem; }
-.fa-logo--sm .fa-logo__aura { font-size: 1.65rem; }
+/* Tailles — le script est nettement plus grand que le serif (effet signature) */
+.fa-logo--sm .fa-logo__fashion { font-size: 1.3rem; }
+.fa-logo--sm .fa-logo__aura { font-size: 1.75rem; }
 
-.fa-logo--md .fa-logo__fashion { font-size: 1.75rem; }
-.fa-logo--md .fa-logo__aura { font-size: 2.15rem; }
+.fa-logo--md .fa-logo__fashion { font-size: 1.7rem; }
+.fa-logo--md .fa-logo__aura { font-size: 2.35rem; }
 
 .fa-logo--lg .fa-logo__fashion { font-size: 2rem; }
-.fa-logo--lg .fa-logo__aura { font-size: 2.5rem; }
+.fa-logo--lg .fa-logo__aura { font-size: 2.75rem; }
 
 /* Fond clair (défaut) — header e-commerce, landing navbar */
 .fa-logo--default:hover .fa-logo__fashion {

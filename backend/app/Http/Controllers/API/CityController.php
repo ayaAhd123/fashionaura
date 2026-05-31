@@ -53,7 +53,7 @@ class CityController extends Controller
                 ->get([
                     'id', 'name', 'slug', 'logo', 'description', 'category',
                     'city_id', 'rating', 'reviews_count', 'followers_count',
-                    'offers_delivery', 'delivery_scope', 'delivery_note', 'is_verified',
+                    'offers_delivery', 'delivery_scope', 'delivery_note', 'is_verified', 'messages_enabled',
                 ]);
 
             return [
@@ -88,7 +88,10 @@ class CityController extends Controller
 
         if ($this->hasBoutiquesTable()) {
             $query->with(['boutiques' => function ($q) {
-                $q->where('is_active', true)->select(['id', 'name', 'slug', 'logo', 'rating', 'city_id']);
+                $q->where('is_active', true)
+                  ->orderByDesc('rating')
+                  ->orderByDesc('followers_count')
+                  ->select(['id', 'name', 'slug', 'logo', 'rating', 'reviews_count', 'followers_count', 'city_id', 'messages_enabled']);
             }]);
         }
 

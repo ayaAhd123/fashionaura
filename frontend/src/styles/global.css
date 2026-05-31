@@ -91,13 +91,15 @@ html {
   animation: spin 0.8s linear infinite;
 }
 
-button {
-  cursor: pointer;
-  border: none;
-  border-radius: var(--border-radius);
-  padding: 0.5rem 1rem;
-  font-weight: 500;
-  transition: all 0.2s;
+@layer base {
+  button {
+    cursor: pointer;
+    border: none;
+    border-radius: var(--border-radius);
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+    transition: all 0.2s;
+  }
 }
 
 .btn-primary {

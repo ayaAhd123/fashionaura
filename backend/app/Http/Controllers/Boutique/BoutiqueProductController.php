@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductImage;
+use App\Support\MediaUrl;
+use App\Services\FollowerNotificationService;
 use App\Services\StockAlertService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -64,7 +66,7 @@ class BoutiqueProductController extends Controller
         ]);
     }
 
-    public function store(Request $request, StockAlertService $stockAlerts)
+    public function store(Request $request, StockAlertService $stockAlerts, FollowerNotificationService $followerNotifications)
     {
         $boutique = $this->boutiqueOrFail();
         $data = $this->validateProduct($request, requiredImage: true);
@@ -83,16 +85,22 @@ class BoutiqueProductController extends Controller
         $threshold = $stockAlerts->thresholdForBoutique($boutique);
         $stockAlerts->run($boutique->id);
 
+        // Prévenir les abonnés de la boutique d'une nouveauté (produit visible uniquement)
+        if ($product->is_active) {
+            $followerNotifications->newProduct($boutique, $product);
+        }
+
         return response()->json([
             'message' => 'Produit créé.',
             'data' => $this->formatProduct($product, $threshold),
         ], 201);
     }
 
-    public function update(Request $request, int $id, StockAlertService $stockAlerts)
+    public function update(Request $request, int $id, StockAlertService $stockAlerts, FollowerNotificationService $followerNotifications)
     {
         $boutique = $this->boutiqueOrFail();
         $product = $this->findOwnedProduct($boutique->id, $id);
+        $previousStock = (int) $product->stock_quantity;
         $data = $this->validateProduct($request, $product);
 
         if ($product->name !== $data['name']) {
@@ -108,6 +116,11 @@ class BoutiqueProductController extends Controller
         $product->load(['category:id,name,slug', 'images']);
         $threshold = $stockAlerts->thresholdForBoutique($boutique);
         $stockAlerts->run($boutique->id);
+
+        // Retour en stock : on prévient les abonnés (transition 0 -> >0)
+        if ($previousStock <= 0 && (int) $product->stock_quantity > 0 && $product->is_active) {
+            $followerNotifications->backInStock($boutique, $product);
+        }
 
         return response()->json([
             'message' => 'Produit mis à jour.',
@@ -183,7 +196,7 @@ class BoutiqueProductController extends Controller
         }
 
         $path = $file->store('products', 'public');
-        $url = Storage::disk('public')->url($path);
+        $url = MediaUrl::fromStoragePath($path);
 
         $primary = $product->images()->where('is_primary', true)->first();
         if ($primary) {
@@ -251,7 +264,7 @@ class BoutiqueProductController extends Controller
             'category' => $product->category?->name,
             'style' => $product->style,
             'is_active' => (bool) $product->is_active,
-            'image_url' => $this->resolveImageUrl($primary?->image_url),
+            'image_url' => MediaUrl::resolve($primary?->image_url),
             'stock_alert' => $alert,
             'threshold' => $threshold,
         ];
@@ -259,18 +272,6 @@ class BoutiqueProductController extends Controller
 
     private function resolveImageUrl(?string $url): ?string
     {
-        if (! $url) {
-            return null;
-        }
-
-        if (str_starts_with($url, 'http://') || str_starts_with($url, 'https://')) {
-            return $url;
-        }
-
-        if (str_starts_with($url, '/')) {
-            return rtrim(config('app.url'), '/').$url;
-        }
-
-        return $url;
+        return MediaUrl::resolve($url);
     }
 }
