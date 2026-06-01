@@ -1,0 +1,117 @@
+.order-tracking {
+  display: flex;
+  align-items: flex-start;
+  gap: 0;
+  width: 100%;
+  padding: 8px 0 4px;
+}
+
+.order-tracking--compact {
+  padding: 4px 0 0;
+}
+
+.order-tracking--compact .order-tracking__node {
+  width: 22px;
+  height: 22px;
+}
+
+.order-tracking--compact .order-tracking__label {
+  font-size: 9px;
+}
+
+.order-tracking__step {
+  display: flex;
+  align-items: flex-start;
+  flex: 1;
+  min-width: 0;
+}
+
+.order-tracking__step:last-child {
+  flex: 0 0 auto;
+}
+
+.order-tracking__node-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-width: 52px;
+  z-index: 1;
+}
+
+.order-tracking__node {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid #d1d5db;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  transition: background 0.25s, border-color 0.25s;
+}
+
+.order-tracking__step.is-done .order-tracking__node {
+  background: #1b3a35;
+  border-color: #1b3a35;
+}
+
+.order-tracking__step.is-active .order-tracking__node {
+  box-shadow: 0 0 0 4px rgba(27, 58, 53, 0.15);
+}
+
+.order-tracking__label {
+  font-family: Inter, sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+  color: #9ca3af;
+  text-align: center;
+  line-height: 1.2;
+  max-width: 64px;
+}
+
+.order-tracking__step.is-done .order-tracking__label,
+.order-tracking__step.is-active .order-tracking__label {
+  color: #1b3a35;
+  font-weight: 600;
+}
+
+.order-tracking__line {
+  flex: 1;
+  height: 2px;
+  background: #e5e7eb;
+  margin: 13px 4px 0;
+  min-width: 8px;
+  transition: background 0.25s;
+}
+
+.order-tracking__line.is-done {
+  background: #1b3a35;
+}
+
+.order-tracking--cancelled {
+  padding: 12px 16px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 12px;
+}
+
+.order-tracking__cancelled-msg {
+  margin: 0;
+  font-family: Inter, sans-serif;
+  font-size: 14px;
+  color: #dc2626;
+  text-align: center;
+}
+
+@media (max-width: 520px) {
+  .order-tracking__node-wrap {
+    min-width: 44px;
+  }
+
+  .order-tracking__label {
+    font-size: 8px;
+    max-width: 52px;
+  }
+}

@@ -395,6 +395,64 @@
   color: var(--neutral);
 }
 
+/* Section tabs (Dernières créations | Offres spéciales) */
+.boutique-detail__tabs-head {
+  align-items: flex-end;
+}
+
+.boutique-detail__tabs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 1.25rem 2rem;
+}
+
+.boutique-detail__tab {
+  position: relative;
+  margin: 0;
+  padding: 0 0 0.5rem;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-family: var(--font-serif, 'Playfair Display', serif);
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-weight: 700;
+  color: rgba(44, 24, 16, 0.38);
+  transition: color 0.2s ease;
+}
+
+.boutique-detail__tab:hover {
+  color: rgba(44, 24, 16, 0.62);
+}
+
+.boutique-detail__tab--active {
+  color: var(--text);
+}
+
+.boutique-detail__tab--active::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 42px;
+  height: 2px;
+  background: var(--primary, #1B3A35);
+}
+
+.boutique-detail--themed .boutique-detail__tab--active::after {
+  background: var(--city-main, var(--primary));
+}
+
+@media (max-width: 520px) {
+  .boutique-detail__tabs {
+    gap: 0.75rem 1.25rem;
+  }
+
+  .boutique-detail__tab {
+    font-size: clamp(1.15rem, 4.5vw, 1.5rem);
+  }
+}
+
 /* Product grid layout: see product-cards.css (.boutique-detail__products-grid) */
 
 .boutique-detail__empty {
@@ -675,6 +733,10 @@
   background: var(--city-main, var(--primary));
 }
 
+.boutique-detail--themed .boutique-detail__tab--active {
+  color: var(--text);
+}
+
 .boutique-detail--themed .boutique-detail__follow--active {
   background: var(--city-main, var(--primary));
   border-color: var(--city-main, var(--primary));
@@ -692,6 +754,94 @@
 
 @media (max-width: 600px) {
   .boutique-filter__label { padding-left: 0.25rem; }
+}
+
+/* ── Rayon Offres spéciales ───────────────────────────────────────────────── */
+.boutique-offers {
+  margin-top: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+.boutique-offers__lane {
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 20px;
+  padding: 1.25rem 1.35rem 1.5rem;
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.05);
+}
+.boutique-offers__lane--exclusive {
+  background: linear-gradient(180deg, #fff 0%, rgba(201, 168, 76, 0.06) 100%);
+  border-color: rgba(201, 168, 76, 0.25);
+}
+.boutique-offers__lane-head {
+  margin-bottom: 1rem;
+}
+.boutique-offers__lane-title {
+  margin: 0;
+  font-family: 'Playfair Display', serif;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--city-main, #6b1e1e);
+}
+.boutique-offers__lane-desc {
+  margin: 0.35rem 0 0;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.82rem;
+  color: #6b7280;
+}
+.boutique-offers__empty-lane {
+  margin: 0;
+  padding: 1.25rem;
+  text-align: center;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.85rem;
+  color: #9ca3af;
+  background: #f9fafb;
+  border-radius: 12px;
+  border: 1px dashed #e5e7eb;
+}
+.boutique-offers__follow-cta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  text-align: center;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1rem;
+  border-radius: 14px;
+  background: rgba(107, 30, 30, 0.06);
+  border: 1px solid rgba(107, 30, 30, 0.12);
+}
+.boutique-offers__follow-cta p {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.88rem;
+  color: #374151;
+  max-width: 36rem;
+}
+.boutique-offers__follow-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  border: none;
+  background: var(--city-main, #6b1e1e);
+  color: #fff;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 0.65rem 1.25rem;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: filter 0.2s, transform 0.2s;
+}
+.boutique-offers__follow-btn:hover:not(:disabled) {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+.boutique-offers__follow-btn:disabled {
+  opacity: 0.7;
+  cursor: wait;
 }
 
 /* ── Fil de publications (réseau social boutique) ───────────────────────── */

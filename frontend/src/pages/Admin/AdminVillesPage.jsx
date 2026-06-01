@@ -111,7 +111,7 @@ export default function AdminVillesPage() {
         <button onClick={()=>setModal({})} style={primaryBtn}>+ Ajouter une ville</button>
       </div>
 
-      <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="🔍 Rechercher une ville ou région…" style={{ ...inp, width:320 }} />
+      <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Rechercher une ville ou région…" style={{ ...inp, width:320 }} />
 
       <div style={card}>
         <div style={{ overflowX:'auto' }}>
@@ -123,7 +123,7 @@ export default function AdminVillesPage() {
                   <tr key={v.id} className="fa-table-row" style={{ borderTop:'1px solid #F3F4F6' }}>
                     <td style={td}>
                       <div style={{ display:'flex',alignItems:'center',gap:10 }}>
-                        <div style={{ width:34,height:34,borderRadius:10,backgroundColor:'#dbeafe',display:'flex',alignItems:'center',justifyContent:'center',fontSize:16 }}>📍</div>
+                        <div style={{ width:34,height:34,borderRadius:10,backgroundColor:'#dbeafe',display:'flex',alignItems:'center',justifyContent:'center',fontSize:16 }}></div>
                         <span style={{ fontFamily:'Inter, sans-serif',fontSize:13,fontWeight:500,color:'#111827' }}>{v.name}</span>
                       </div>
                     </td>
@@ -155,7 +155,7 @@ export default function AdminVillesPage() {
         <>
           <div onClick={()=>setDelVille(null)} style={{ position:'fixed',inset:0,backgroundColor:'rgba(0,0,0,0.5)',zIndex:90 }}/>
           <div style={{ position:'fixed',top:'50%',left:'50%',transform:'translate(-50%,-50%)',width:360,backgroundColor:'#fff',borderRadius:20,zIndex:100,boxShadow:'0 20px 60px rgba(0,0,0,0.2)',padding:28,textAlign:'center' }}>
-            <div style={{ fontSize:36,marginBottom:12 }}>📍</div>
+            <div style={{ fontSize:36,marginBottom:12 }}></div>
             <p style={{ fontFamily:"'Playfair Display', serif",fontSize:17,fontWeight:700,color:'#111827',marginBottom:8 }}>Supprimer {delVille.name} ?</p>
             <p style={{ fontFamily:'Inter, sans-serif',fontSize:13,color:'#6B7280',marginBottom:20 }}>{delVille.boutiques} boutiques seront dissociées.</p>
             <div style={{ display:'flex',gap:10 }}>

@@ -28,8 +28,8 @@ export const Header = () => {
         <div className="flex items-center justify-between mb-4">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 group">
-            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-sage-green to-dusty-blue flex items-center justify-center text-white font-bold text-lg">
-              ✨
+            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-sage-green to-dusty-blue flex items-center justify-center text-white font-bold text-sm">
+              FA
             </div>
             <span className="font-bold text-xl text-dark-brown group-hover:text-sage-green transition-colors">
               FashionAura

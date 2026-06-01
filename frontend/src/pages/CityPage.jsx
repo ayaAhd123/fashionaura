@@ -846,7 +846,7 @@ const CityPage = () => {
 
                     <FashionAuraLogo to="/" size="md" variant="onDark" className="footer-logo" />
 
-                    <p className="footer-copyright">© 2026 L'excellence de la mode marocaine</p>
+                    <p className="footer-copyright"> 2026 L'excellence de la mode marocaine</p>
 
                 </footer>
 

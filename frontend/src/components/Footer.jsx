@@ -13,8 +13,8 @@ export const Footer = () => {
           {/* Brand */}
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-sage-green to-dusty-blue flex items-center justify-center text-white font-bold">
-                ✨
+              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-sage-green to-dusty-blue flex items-center justify-center text-white font-bold text-sm">
+                FA
               </div>
               <span className="font-bold text-xl">FashionAura</span>
             </div>

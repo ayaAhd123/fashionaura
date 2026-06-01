@@ -37,6 +37,10 @@ function PostModal({ post, products, onClose, onSaved }) {
   const handleSave = async () => {
     if (!isEdit && !file) { toast.error('Une image est requise'); return; }
     if (!form.caption.trim() && !form.promo_text.trim()) { toast.error('Ajoutez une légende ou une offre'); return; }
+    if (!form.is_exclusive && !form.promo_text.trim() && !form.promo_code.trim()) {
+      toast.error('Pour une offre publique, renseignez le détail ou le code promo');
+      return;
+    }
     setSaving(true);
     try {
       const fd = new FormData();
@@ -69,7 +73,7 @@ function PostModal({ post, products, onClose, onSaved }) {
       <div onClick={onClose} style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 90 }} />
       <div style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', width: 540, maxHeight: '92vh', backgroundColor: '#fff', borderRadius: 20, zIndex: 100, boxShadow: '0 20px 60px rgba(0,0,0,0.2)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         <div style={{ padding: '20px 28px', borderBottom: '1px solid #F3F4F6', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <p style={{ fontFamily: "'Playfair Display', serif", fontSize: 17, fontWeight: 700, color: '#111827', margin: 0 }}>{isEdit ? 'Modifier' : 'Nouvelle'} publication</p>
+          <p style={{ fontFamily: "'Playfair Display', serif", fontSize: 17, fontWeight: 700, color: '#111827', margin: 0 }}>{isEdit ? 'Modifier' : 'Nouvelle'} offre</p>
           <button onClick={onClose} style={{ border: 'none', background: '#F3F4F6', borderRadius: 8, width: 30, height: 30, cursor: 'pointer' }}>✕</button>
         </div>
         <div style={{ flex: 1, overflowY: 'auto', padding: '20px 28px', display: 'flex', flexDirection: 'column', gap: 14 }}>
@@ -103,10 +107,31 @@ function PostModal({ post, products, onClose, onSaved }) {
               <input value={form.promo_text} onChange={(e) => set('promo_text', e.target.value)} style={inp} placeholder="-20% sur les caftans" />
             </div>
           </div>
-          <label style={{ display: 'flex', alignItems: 'center', gap: 9, cursor: 'pointer', fontFamily: 'Inter, sans-serif', fontSize: 13.5, color: '#374151' }}>
-            <input type="checkbox" checked={form.is_exclusive} onChange={(e) => set('is_exclusive', e.target.checked)} />
-            Réservé aux abonnés (offre exclusive — floutée pour les non-abonnés)
-          </label>
+          <div>
+            <label style={lbl}>Type d&apos;offre</label>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <label style={{ display: 'flex', alignItems: 'flex-start', gap: 9, cursor: 'pointer', fontFamily: 'Inter, sans-serif', fontSize: 13.5, color: '#374151' }}>
+                <input
+                  type="radio"
+                  name="offer_type"
+                  checked={!form.is_exclusive}
+                  onChange={() => set('is_exclusive', false)}
+                  style={{ marginTop: 3 }}
+                />
+                <span><strong>Offre pour tous</strong> — visible par tous les visiteurs (rayon « Offres pour tous »).</span>
+              </label>
+              <label style={{ display: 'flex', alignItems: 'flex-start', gap: 9, cursor: 'pointer', fontFamily: 'Inter, sans-serif', fontSize: 13.5, color: '#374151' }}>
+                <input
+                  type="radio"
+                  name="offer_type"
+                  checked={form.is_exclusive}
+                  onChange={() => set('is_exclusive', true)}
+                  style={{ marginTop: 3 }}
+                />
+                <span><strong>Offre exclusive abonnés</strong> — floutée avec bouton « Suivre » pour les non-abonnés.</span>
+              </label>
+            </div>
+          </div>
           <label style={{ display: 'flex', alignItems: 'center', gap: 9, cursor: 'pointer', fontFamily: 'Inter, sans-serif', fontSize: 13.5, color: '#374151' }}>
             <input type="checkbox" checked={form.is_published} onChange={(e) => set('is_published', e.target.checked)} />
             Publier immédiatement (notifie vos abonnés)
@@ -160,10 +185,10 @@ export default function BoutiquePostsPage() {
     <div className="fa-animate">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 22, flexWrap: 'wrap', gap: 12 }}>
         <div>
-          <h1 style={{ fontFamily: "'Playfair Display', serif", fontSize: 26, fontWeight: 700, color: DARK, margin: 0 }}>Publications</h1>
-          <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 13.5, color: '#6B7280', margin: '4px 0 0' }}>Partagez vos actualités et offres. Vos abonnés sont notifiés à chaque publication.</p>
+          <h1 style={{ fontFamily: "'Playfair Display', serif", fontSize: 26, fontWeight: 700, color: DARK, margin: 0 }}>Offres spéciales</h1>
+          <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 13.5, color: '#6B7280', margin: '4px 0 0' }}>Publiez des offres pour tous ou des offres exclusives réservées à vos abonnés.</p>
         </div>
-        <button onClick={() => setModal({ post: null })} style={{ padding: '11px 22px', borderRadius: 12, border: 'none', background: DARK, color: '#fff', cursor: 'pointer', fontFamily: 'Inter, sans-serif', fontSize: 13.5, fontWeight: 600 }}>+ Nouvelle publication</button>
+        <button onClick={() => setModal({ post: null })} style={{ padding: '11px 22px', borderRadius: 12, border: 'none', background: DARK, color: '#fff', cursor: 'pointer', fontFamily: 'Inter, sans-serif', fontSize: 13.5, fontWeight: 600 }}>+ Nouvelle offre</button>
       </div>
 
       {loading ? (
@@ -181,13 +206,17 @@ export default function BoutiquePostsPage() {
               <div style={{ height: 170, background: '#F3F4F6', position: 'relative' }}>
                 {post.image_url && <img src={resolveMediaUrl(post.image_url)} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
                 <div style={{ position: 'absolute', top: 10, left: 10, display: 'flex', gap: 6 }}>
-                  {post.is_exclusive && <span style={badge('rgba(201,168,76,0.92)', '#1B3A35')}>Exclusif</span>}
+                  {post.is_exclusive
+                    ? <span style={badge('rgba(201,168,76,0.92)', '#1B3A35')}>Exclusive abonnés</span>
+                    : (post.promo_text || post.promo_code)
+                      ? <span style={badge('rgba(27,58,53,0.12)', DARK)}>Pour tous</span>
+                      : null}
                   {!post.is_published && <span style={badge('rgba(107,114,128,0.9)', '#fff')}>Brouillon</span>}
                 </div>
               </div>
               <div style={{ padding: '14px 16px' }}>
                 <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 13.5, color: '#374151', margin: 0, lineHeight: 1.5, display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{post.caption || <em style={{ color: '#9CA3AF' }}>Sans légende</em>}</p>
-                {post.promo_text && <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 12.5, color: DARK, fontWeight: 600, margin: '8px 0 0' }}>🏷️ {post.promo_text}{post.promo_code ? ` · ${post.promo_code}` : ''}</p>}
+                {post.promo_text && <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 12.5, color: DARK, fontWeight: 600, margin: '8px 0 0' }}> {post.promo_text}{post.promo_code ? ` · ${post.promo_code}` : ''}</p>}
                 {post.product && <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 12, color: '#6B7280', margin: '8px 0 0' }}>Produit : {post.product.name}</p>}
                 <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 11.5, color: '#9CA3AF', margin: '10px 0 0' }}>{post.created_at}</p>
                 <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>

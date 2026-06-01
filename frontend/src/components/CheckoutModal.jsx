@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { X, CheckCircle } from 'lucide-react';
 import '../styles/checkout-modal.css';
 
@@ -31,6 +32,7 @@ const CheckoutModal = ({ isOpen, onClose, onSuccess }) => {
   const [errors, setErrors] = useState({});
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [createdOrderId, setCreatedOrderId] = useState(null);
 
   if (!isOpen) return null;
 
@@ -66,8 +68,8 @@ const CheckoutModal = ({ isOpen, onClose, onSuccess }) => {
 
     setSubmitting(true);
     try {
-      // onSuccess crée la commande côté serveur (peut être asynchrone)
-      await onSuccess?.(formData);
+      const result = await onSuccess?.(formData);
+      if (result?.id) setCreatedOrderId(result.id);
       setSubmitted(true);
     } catch (err) {
       setErrors((prev) => ({
@@ -91,6 +93,7 @@ const CheckoutModal = ({ isOpen, onClose, onSuccess }) => {
     setFormData({ fullName: '', address: '', phone: '', email: '', deliverySlot: 'matin' });
     setErrors({});
     setSubmitted(false);
+    setCreatedOrderId(null);
     onClose();
   };
 
@@ -114,8 +117,17 @@ const CheckoutModal = ({ isOpen, onClose, onSuccess }) => {
             </div>
             <h2 className="checkout-success__title">Commande confirmée</h2>
             <p className="checkout-success__message">
-              Votre commande a été confirmée ! Nous vous contacterons bientôt.
+              Votre commande a été enregistrée. Suivez son avancement à tout moment depuis votre compte.
             </p>
+            {createdOrderId && (
+              <Link
+                to={`/compte/commandes/${createdOrderId}`}
+                className="checkout-success__track-btn"
+                onClick={handleClose}
+              >
+                Suivre ma commande
+              </Link>
+            )}
             <button
               type="button"
               className="checkout-success__close-btn"

@@ -1,0 +1,38 @@
+flowchart TB
+    subgraph PRESENTATION["Couche Présentation — Port 5173"]
+        UI["React 18 + Vite"]
+        Router["React Router"]
+        Context["Contexts Auth / Cart / Favorites"]
+        Echo["Laravel Echo"]
+    end
+
+    subgraph METIER["Couche Métier — Port 8000"]
+        API["API REST Laravel 12"]
+        Sanctum["Laravel Sanctum"]
+        Controllers["Controllers API"]
+        Services["Services Gemini / Stock / Notifications"]
+        Events["Events OrderStatusUpdated / MessageSent"]
+    end
+
+    subgraph TEMPS_REEL["Temps réel — Port 8080"]
+        Reverb["Laravel Reverb WebSocket"]
+    end
+
+    subgraph DONNEES["Couche Données"]
+        MySQL[("MySQL fashionaura_db")]
+        Storage["Storage public — images"]
+    end
+
+    subgraph EXTERNE["Services externes"]
+        Gemini["Google Gemini API"]
+    end
+
+    UI --> Router --> Context
+    Context -->|"Axios HTTPS Bearer"| API
+    Echo -->|"WebSocket"| Reverb
+    API --> Sanctum --> Controllers --> Services
+    Controllers --> MySQL
+    Controllers --> Storage
+    Services --> Gemini
+    Events --> Reverb
+    Reverb --> Echo

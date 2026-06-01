@@ -201,6 +201,24 @@
   font-weight: 300;
 }
 
+.checkout-success__track-btn {
+  display: inline-block;
+  margin-bottom: 1rem;
+  padding: 0.8125rem 2rem;
+  border-radius: 0.875rem;
+  border: none;
+  background: var(--primary, #1b3a35);
+  color: #fff;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: filter 0.2s;
+}
+
+.checkout-success__track-btn:hover {
+  filter: brightness(1.08);
+}
+
 .checkout-success__close-btn {
   display: inline-block;
   padding: 0.8125rem 2rem;

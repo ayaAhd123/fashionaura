@@ -20,6 +20,7 @@ import { ProductDetailPage } from '../pages/ProductDetailPage';
 import { FavoritesPage } from '../pages/FavoritesPage';
 import { CartPage } from '../pages/CartPage';
 import { AccountPage } from '../pages/AccountPage';
+import OrderDetailPage from '../pages/OrderDetailPage';
 import HelpPage from '../pages/HelpPage';
 import Login from '../pages/Login';
 import Register from '../pages/Register';
@@ -99,7 +100,7 @@ const AppRouter = () => (
       <CartProvider>
         <FavoritesProvider>
           <ToastProvider>
-            <BrowserRouter>
+            <BrowserRouter future={{ v7_relativeSplatPath: true }}>
               <Toaster
                 position="top-right"
                 toastOptions={{
@@ -128,6 +129,7 @@ const AppRouter = () => (
                   <Route path="/aide" element={<HelpPage variant="customer" />} />
                   <Route element={<ProtectedRoute />}>
                     <Route path="/compte" element={<AccountPage />} />
+                    <Route path="/compte/commandes/:id" element={<OrderDetailPage />} />
                     <Route path="/compte/messagerie" element={<ClientMessagesPage />} />
                   </Route>
                 </Route>

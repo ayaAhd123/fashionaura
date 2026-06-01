@@ -64,10 +64,10 @@ export default function AdminAnalyticsPage() {
   const avgOrder     = Math.round(totalRevenue / totalOrders);
 
   const kpis = [
-    { label:'Revenu total', value:`${(totalRevenue/1000).toFixed(0)}K MAD`, icon:'💰', bg:'#f0fdf4', color:'#15803d' },
-    { label:'Commandes',    value:totalOrders,                                icon:'🛍', bg:'#eff6ff', color:'#1d4ed8' },
-    { label:'Panier moyen', value:`${avgOrder.toLocaleString('fr-FR')} MAD`, icon:'📊', bg:'#fdf4ff', color:'#7e22ce' },
-    { label:'Nouveaux users',value:'+284',                                   icon:'👥', bg:'#fff7ed', color:'#c2410c' },
+    { label:'Revenu total', value:`${(totalRevenue/1000).toFixed(0)}K MAD`, icon:'', bg:'#f0fdf4', color:'#15803d' },
+    { label:'Commandes',    value:totalOrders,                                icon:'', bg:'#eff6ff', color:'#1d4ed8' },
+    { label:'Panier moyen', value:`${avgOrder.toLocaleString('fr-FR')} MAD`, icon:'', bg:'#fdf4ff', color:'#7e22ce' },
+    { label:'Nouveaux users',value:'+284',                                   icon:'', bg:'#fff7ed', color:'#c2410c' },
   ];
 
   return (
@@ -88,7 +88,7 @@ export default function AdminAnalyticsPage() {
       <div style={{ display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:14 }} className="kpi-grid">
         {kpis.map((k,i)=>(
           <div key={i} className="fa-stats-card" style={{ backgroundColor:k.bg,borderRadius:14,padding:'18px 20px',boxShadow:'0 2px 10px rgba(0,0,0,0.06)',border:'1px solid rgba(0,0,0,0.05)' }}>
-            <div style={{ fontSize:24,marginBottom:8 }}>{k.icon}</div>
+            <div style={{ fontSize:18,fontWeight:700,marginBottom:8,color:k.color }}>{k.icon || k.label.charAt(0)}</div>
             <p style={{ fontFamily:"'Playfair Display', serif",fontSize:24,fontWeight:700,color:'#111827',margin:0 }}>{k.value}</p>
             <p style={{ fontFamily:'Inter, sans-serif',fontSize:11,color:k.color,fontWeight:600,margin:'4px 0 0',textTransform:'uppercase',letterSpacing:'0.08em' }}>{k.label}</p>
           </div>

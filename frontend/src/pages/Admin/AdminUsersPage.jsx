@@ -84,7 +84,7 @@ function DeleteConfirm({ user, onClose, onDelete }) {
     <>
       <div onClick={onClose} style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 90 }} />
       <div style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', width: 380, backgroundColor: '#fff', borderRadius: 20, zIndex: 100, boxShadow: '0 20px 60px rgba(0,0,0,0.2)', padding: 32, textAlign: 'center' }}>
-        <div style={{ width: 56, height: 56, borderRadius: '50%', backgroundColor: '#fef2f2', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', fontSize: 24 }}>⚠️</div>
+        <div style={{ width: 56, height: 56, borderRadius: '50%', backgroundColor: '#fef2f2', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', fontSize: 24 }}></div>
         <p style={{ fontFamily: "'Playfair Display', serif", fontSize: 18, fontWeight: 700, color: '#111827', marginBottom: 8 }}>Supprimer {user.name} ?</p>
         <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 13, color: '#6B7280', marginBottom: 24 }}>Cette action est irréversible. L'utilisateur sera définitivement supprimé.</p>
         <div style={{ display: 'flex', gap: 10 }}>
@@ -155,7 +155,7 @@ export default function AdminUsersPage() {
         <button onClick={() => toast.success('Invitation envoyée (démo)')} style={primaryBtn}>+ Inviter un utilisateur</button>
       </div>
       <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-        <input value={search} onChange={e => { setSearch(e.target.value); setPage(1); }} placeholder="🔍 Rechercher nom, email…" style={{ ...inp, width: 280 }} />
+        <input value={search} onChange={e => { setSearch(e.target.value); setPage(1); }} placeholder="Rechercher nom, email…" style={{ ...inp, width: 280 }} />
         <select value={role} onChange={e => { setRole(e.target.value); setPage(1); }} style={{ ...inp, width: 170 }}>
           {ROLES.map(r => <option key={r} value={r}>{r==='Tous'?'Tous les rôles':r==='boutique_owner'?'Boutique':r.charAt(0).toUpperCase()+r.slice(1)}</option>)}
         </select>

@@ -65,10 +65,10 @@ export default function BoutiqueAnalyticsPage() {
   const maxRev     = Math.max(...TOP_PRODUCTS.map(p=>p.revenue));
 
   const kpis = [
-    { label:'Revenus', value:`${(totalRev/1000).toFixed(0)}K MAD`, icon:'💰', bg:'#f0fdf4', color:'#15803d', change:'+12%' },
-    { label:'Commandes', value:totalOrders, icon:'🛍', bg:'#eff6ff', color:'#1d4ed8', change:'+8%' },
-    { label:'Panier moyen', value:`${avgBasket.toLocaleString('fr-FR')} MAD`, icon:'📊', bg:'#fdf4ff', color:'#7e22ce', change:'+5%' },
-    { label:'Taux conversion', value:'3.8%', icon:'📈', bg:'#fff7ed', color:'#c2410c', change:'+0.4pp' },
+    { label:'Revenus', value:`${(totalRev/1000).toFixed(0)}K MAD`, icon:'', bg:'#f0fdf4', color:'#15803d', change:'+12%' },
+    { label:'Commandes', value:totalOrders, icon:'', bg:'#eff6ff', color:'#1d4ed8', change:'+8%' },
+    { label:'Panier moyen', value:`${avgBasket.toLocaleString('fr-FR')} MAD`, icon:'', bg:'#fdf4ff', color:'#7e22ce', change:'+5%' },
+    { label:'Taux conversion', value:'3.8%', icon:'', bg:'#fff7ed', color:'#c2410c', change:'+0.4pp' },
   ];
 
   return (
@@ -89,7 +89,7 @@ export default function BoutiqueAnalyticsPage() {
       <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:14 }} className="b-kpi-grid">
         {kpis.map((k,i)=>(
           <div key={i} style={{ backgroundColor:k.bg, borderRadius:14, padding:'18px 20px', boxShadow:'0 2px 10px rgba(0,0,0,0.06)', border:'1px solid rgba(0,0,0,0.05)' }}>
-            <div style={{ fontSize:24, marginBottom:8 }}>{k.icon}</div>
+            <div style={{ fontSize:18, fontWeight:700, marginBottom:8, color:k.color }}>{k.icon || k.label.charAt(0)}</div>
             <p style={{ fontFamily:"'Playfair Display', serif", fontSize:24, fontWeight:700, color:'#111827', margin:0 }}>{k.value}</p>
             <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginTop:4 }}>
               <p style={{ fontFamily:'Inter, sans-serif', fontSize:11, color:k.color, fontWeight:600, margin:0, textTransform:'uppercase', letterSpacing:'0.08em' }}>{k.label}</p>

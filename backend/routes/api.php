@@ -87,9 +87,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/orders', [OrderController::class, 'store']);
     Route::get('/orders/{orderId}/conversation', [ConversationController::class, 'forOrder']);
     Route::get('/conversations', [ConversationController::class, 'index']);
+    Route::get('/users/search', [ConversationController::class, 'searchUsers']);
+    Route::get('/users/{userId}/conversation', [ConversationController::class, 'forUser']);
     Route::get('/boutiques/{boutiqueId}/conversation', [ConversationController::class, 'forBoutique']);
     Route::get('/conversations/{conversation}/messages', [MessageController::class, 'index']);
     Route::post('/conversations/{conversation}/messages', [MessageController::class, 'store']);
+    Route::post('/conversations/{conversation}/messages/audio', [MessageController::class, 'storeAudio']);
+    Route::post('/conversations/{conversation}/messages/product', [MessageController::class, 'storeProduct']);
     Route::post('/boutiques/{boutiqueId}/posts/{postId}/comments', [PostCommentController::class, 'store']);
 
     // Boutiques suivies
@@ -193,6 +197,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // Profile
         Route::get('/profile', [BoutiqueProfileController::class, 'show']);
-        Route::put('/profile', [BoutiqueProfileController::class, 'update']);
+        Route::match(['put', 'post'], '/profile', [BoutiqueProfileController::class, 'update']);
     });
 });

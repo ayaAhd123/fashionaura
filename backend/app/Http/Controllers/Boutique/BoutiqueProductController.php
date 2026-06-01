@@ -167,7 +167,8 @@ class BoutiqueProductController extends Controller
             'description' => ['nullable', 'string', 'max:5000'],
             'price' => ['required', 'numeric', 'min:0'],
             'stock_quantity' => ['required', 'integer', 'min:0'],
-            'category_id' => ['required', 'integer', Rule::exists('categories', 'id')],
+            'category_id' => ['nullable', 'integer', Rule::exists('categories', 'id'), 'required_without:category_name'],
+            'category_name' => ['nullable', 'string', 'max:255', 'required_without:category_id'],
             'style' => ['nullable', 'string', Rule::in(self::STYLES)],
             'is_active' => ['sometimes', 'boolean'],
             'image' => [
@@ -180,12 +181,56 @@ class BoutiqueProductController extends Controller
 
         $validated = $request->validate($rules);
 
+        if (! empty($validated['category_name'])) {
+            $validated['category_id'] = $this->findOrCreateCategory($validated['category_name']);
+        }
+
+        unset($validated['category_name']);
+
         $validated['style'] = $validated['style'] ?? 'casual';
         $validated['is_active'] = $request->boolean('is_active', true);
 
         unset($validated['image']);
 
         return $validated;
+    }
+
+    /** Trouve une catégorie existante (insensible à la casse) ou en crée une nouvelle. */
+    private function findOrCreateCategory(string $name): int
+    {
+        $name = trim($name);
+        if ($name === '') {
+            abort(422, 'Le nom de la catégorie est requis.');
+        }
+
+        $existing = Category::query()
+            ->whereRaw('LOWER(name) = ?', [Str::lower($name)])
+            ->first();
+
+        if ($existing) {
+            if (! $existing->is_active) {
+                $existing->update(['is_active' => true]);
+            }
+
+            return $existing->id;
+        }
+
+        $slug = Str::slug($name);
+        $base = $slug !== '' ? $slug : 'categorie';
+        $candidate = $base;
+        $i = 1;
+        while (Category::where('slug', $candidate)->exists()) {
+            $candidate = $base.'-'.$i;
+            $i++;
+        }
+
+        $category = Category::create([
+            'name' => $name,
+            'slug' => $candidate,
+            'is_active' => true,
+        ]);
+
+        return $category->id;
     }
 
     private function syncProductImage(Product $product, Request $request): void

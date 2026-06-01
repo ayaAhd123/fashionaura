@@ -1,0 +1,28 @@
+flowchart TB
+    subgraph CLIENTS["Utilisateurs"]
+        Browser["Navigateur Web<br/>Desktop / Mobile"]
+    end
+
+    subgraph PROD["Serveur Production"]
+        Nginx["Nginx + SSL HTTPS"]
+        Static["Fichiers statiques<br/>frontend/dist"]
+        PHPFPM["PHP-FPM Laravel"]
+        ReverbS["Reverb WebSocket"]
+        MySQLP[("MySQL 8<br/>fashionaura_db")]
+        Redis["Redis — optionnel cache/queue"]
+    end
+
+    subgraph EXT["Externe"]
+        GeminiP["Gemini API"]
+        SMTP["Serveur SMTP<br/>emails"]
+    end
+
+    Browser -->|"HTTPS"| Nginx
+    Nginx --> Static
+    Nginx -->|"API /api/*"| PHPFPM
+    Nginx -->|"WSS /reverb"| ReverbS
+    PHPFPM --> MySQLP
+    PHPFPM --> Redis
+    PHPFPM --> GeminiP
+    PHPFPM --> SMTP
+    ReverbS --> MySQLP

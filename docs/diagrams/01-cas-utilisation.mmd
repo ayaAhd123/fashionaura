@@ -1,0 +1,47 @@
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#E8F0EE', 'primaryTextColor': '#1B3A35', 'lineColor': '#1B3A35'}}}%%
+flowchart LR
+    subgraph ACT[" "]
+        direction TB
+        C((Client))
+        B((Propriétaire<br/>boutique))
+        A((Administrateur))
+    end
+
+    subgraph UC_CLIENT["Cas d'utilisation — Client"]
+        direction TB
+        c1["S'inscrire / Se connecter"]
+        c2["Parcourir villes et boutiques"]
+        c3["Consulter produits"]
+        c4["Panier et commande"]
+        c5["Suivre commande"]
+        c6["Suivre une boutique"]
+        c7["Messagerie"]
+        c8["Chatbot IA styliste"]
+        c9["Laisser un avis"]
+    end
+
+    subgraph UC_BOUTIQUE["Cas d'utilisation — Boutique"]
+        direction TB
+        b1["Gérer produits"]
+        b2["Gérer commandes"]
+        b3["Publier offres spéciales"]
+        b4["Répondre aux avis"]
+        b5["Messagerie clients"]
+        b6["Copilot IA marchand"]
+        b7["Analytics dashboard"]
+    end
+
+    subgraph UC_ADMIN["Cas d'utilisation — Admin"]
+        direction TB
+        a1["Valider boutiques"]
+        a2["Gérer villes"]
+        a3["Gérer catégories"]
+        a4["Superviser commandes"]
+        a5["Gérer utilisateurs"]
+    end
+
+    C --> c1 & c2 & c3 & c4 & c5 & c6 & c7 & c8 & c9
+    B --> b1 & b2 & b3 & b4 & b5 & b6 & b7
+    B --> c1
+    A --> a1 & a2 & a3 & a4 & a5
+    A --> c1

@@ -268,6 +268,130 @@
 .order-status.is-delivered { background: #e3f5e8; color: #1f7a45; }
 .order-status.is-cancelled { background: #fbe4e4; color: #b03434; }
 
+.account-orders__intro {
+  margin: 0 0 1.25rem;
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.order-card__tracking {
+  padding: 0 0 12px;
+  border-bottom: 1px solid #f0ede7;
+  margin-bottom: 4px;
+}
+
+.order-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.order-card__variant {
+  display: block;
+  font-size: 12px;
+  color: #9a9d94;
+  margin-top: 2px;
+}
+
+/* Page suivi commande */
+.order-detail__back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 1.25rem;
+  font-size: 14px;
+  color: #69807e;
+  text-decoration: none;
+}
+
+.order-detail__back:hover {
+  color: #1b3a35;
+}
+
+.order-detail__head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 1.5rem;
+}
+
+.order-detail__title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-weight: 700;
+  margin: 0;
+  color: #1f2421;
+}
+
+.order-detail__meta {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: #9a9d94;
+}
+
+.order-detail__tracking {
+  margin-bottom: 1.25rem;
+}
+
+.order-detail__hint {
+  margin: 12px 0 0;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.order-detail__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 640px) {
+  .order-detail__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.order-detail__info {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.order-detail__info-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 14px;
+  color: #4a4f48;
+}
+
+.order-detail__shops {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.order-detail__shops li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.order-detail__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 1rem;
+}
+
 /* ── État vide ── */
 .account-empty {
   background: #fff;

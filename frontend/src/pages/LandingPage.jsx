@@ -223,7 +223,7 @@ function TopPartnersTeaser({ navigate }) {
                     className="landing-top-partners__ai-link"
                     onClick={() => openFashionBot({ prefill: t('chatbot.prefill_top') })}
                 >
-                    ✦ {t('chatbot.ask_top')}
+                    {t('chatbot.ask_top')}
                 </button>
             </div>
         </section>
@@ -419,7 +419,7 @@ const LandingPage = () => {
                     <div className="section-container">
                         <div className="ai-stylist-content">
                             <div className="ai-badge">
-                                <span className="ai-icon">✦</span> {t('landing.ai_badge')}
+                                <span className="ai-icon">IA</span> {t('landing.ai_badge')}
                             </div>
                             <h2 className="ai-title">{t('landing.ai_title_1')} <span>{t('landing.ai_title_2')}</span></h2>
                             <p className="ai-description">
@@ -432,14 +432,14 @@ const LandingPage = () => {
 
                         <div className="ai-chat-mockup">
                             <div className="chat-bubble ai-bubble">
-                                <div className="bubble-icon">✦</div>
+                                <div className="bubble-icon">IA</div>
                                 <div className="bubble-text">{t('landing.chat_ai_1')}</div>
                             </div>
                             <div className="chat-bubble user-bubble">
                                 <div className="bubble-text">{t('landing.chat_user')}</div>
                             </div>
                             <div className="chat-bubble ai-bubble">
-                                <div className="bubble-icon">✦</div>
+                                <div className="bubble-icon">IA</div>
                                 <div className="bubble-text" dangerouslySetInnerHTML={{ __html: t('landing.chat_ai_2') }} />
                             </div>
                         </div>

@@ -3,6 +3,7 @@
 namespace App\Events;
 
 use App\Models\Message;
+use App\Services\MessageFormatter;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
@@ -15,7 +16,7 @@ class MessageSent implements ShouldBroadcastNow
 
     public function __construct(public Message $message)
     {
-        $this->message->loadMissing('user:id,name,role');
+        $this->message->loadMissing(['user:id,name,role,avatar', 'product.boutique:id,name', 'product.images']);
     }
 
     public function broadcastOn(): array
@@ -32,14 +33,9 @@ class MessageSent implements ShouldBroadcastNow
 
     public function broadcastWith(): array
     {
-        return [
-            'id' => $this->message->id,
-            'conversation_id' => $this->message->conversation_id,
-            'body' => $this->message->body,
-            'user_id' => $this->message->user_id,
-            'sender_name' => $this->message->user?->name ?? 'Utilisateur',
-            'sender_role' => $this->message->user?->role,
-            'created_at' => $this->message->created_at?->toIso8601String(),
-        ];
+        $payload = MessageFormatter::format($this->message);
+        unset($payload['is_mine']);
+
+        return $payload;
     }
 }

@@ -1,0 +1,66 @@
+erDiagram
+    users {
+        BIGINT id PK "AUTO_INCREMENT"
+        VARCHAR name "NOT NULL"
+        VARCHAR email UK "NOT NULL"
+        VARCHAR role "customer|boutique_owner|admin"
+        BIGINT boutique_id FK "NULL"
+        TIMESTAMP created_at
+    }
+
+    cities {
+        BIGINT id PK
+        VARCHAR name UK
+        VARCHAR slug UK
+        VARCHAR region
+        BOOLEAN is_active "DEFAULT 1"
+    }
+
+    boutiques {
+        BIGINT id PK
+        VARCHAR name
+        BIGINT city_id FK "INDEX"
+        DECIMAL rating "10,2"
+        BOOLEAN is_verified
+        VARCHAR subscription_status
+    }
+
+    products {
+        BIGINT id PK
+        VARCHAR name
+        DECIMAL price "10,2"
+        INT stock_quantity
+        BIGINT boutique_id FK "INDEX"
+        BIGINT category_id FK
+        VARCHAR slug UK
+    }
+
+    orders {
+        BIGINT id PK
+        BIGINT user_id FK "INDEX"
+        DECIMAL total "10,2"
+        VARCHAR status "pending|shipped|delivered"
+        VARCHAR address
+        VARCHAR phone
+    }
+
+    order_items {
+        BIGINT id PK
+        BIGINT order_id FK "CASCADE"
+        BIGINT product_id FK
+        INT quantity
+        DECIMAL price "10,2"
+    }
+
+    personal_access_tokens {
+        BIGINT id PK
+        VARCHAR tokenable_type
+        BIGINT tokenable_id
+        VARCHAR token "HASH"
+    }
+
+    cities ||--|{ boutiques : "FK city_id"
+    boutiques ||--|{ products : "FK boutique_id"
+    users ||--o{ orders : "FK user_id"
+    orders ||--|{ order_items : "FK order_id ON DELETE CASCADE"
+    products ||--o{ order_items : "FK product_id"

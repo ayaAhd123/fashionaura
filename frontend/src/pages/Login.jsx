@@ -293,7 +293,7 @@ function Login() {
             </form>
 
             <div style={{ marginTop:'48px', paddingTop:'24px', borderTop:'1px solid #E8E5E0', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
-              <p style={{ fontFamily:'Raleway,sans-serif', fontSize:'11px', color:'#C0C0BC' }}>© 2026 FashionAura</p>
+              <p style={{ fontFamily:'Raleway,sans-serif', fontSize:'11px', color:'#C0C0BC' }}> 2026 FashionAura</p>
               <div style={{ display:'flex', gap:'8px' }}>
                 {['#69807E','#939790','#E3C8B5'].map((c,i) => <div key={i} style={{ width:'6px',height:'6px',borderRadius:'50%',backgroundColor:c,opacity:0.6 }} />)}
               </div>

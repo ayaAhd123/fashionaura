@@ -77,7 +77,7 @@ export const HomePage = () => {
                     />
                   ) : (
                     <div className="w-full h-full bg-accent/30 flex items-center justify-center">
-                       <span className="text-4xl">🏙️</span>
+                       <span className="text-4xl font-serif font-bold text-primary/60">{cityName(t, city).charAt(0)}</span>
                     </div>
                   )}
                   <div className="absolute inset-0 bg-gradient-to-t from-text/80 via-text/20 to-transparent group-hover:from-primary/90 transition-colors duration-500" />
@@ -100,22 +100,22 @@ export const HomePage = () => {
           <h2 className="font-serif text-3xl font-bold mb-16 text-text">L'Expérience FashionAura</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
             <div className="flex flex-col items-center">
-              <div className="w-20 h-20 bg-primary/10 text-primary rounded-2xl flex items-center justify-center text-3xl mb-6 shadow-sm">
-                ✨
+              <div className="w-20 h-20 bg-primary/10 text-primary rounded-2xl flex items-center justify-center text-2xl font-bold mb-6 shadow-sm">
+                S
               </div>
               <h3 className="text-xl font-bold text-text mb-3">Sélection Premium</h3>
               <p className="text-neutral font-light">Des créateurs et artisans rigoureusement choisis pour leur savoir-faire exceptionnel.</p>
             </div>
             <div className="flex flex-col items-center">
-              <div className="w-20 h-20 bg-secondary/20 text-text rounded-2xl flex items-center justify-center text-3xl mb-6 shadow-sm">
-                🤝
+              <div className="w-20 h-20 bg-secondary/20 text-text rounded-2xl flex items-center justify-center text-2xl font-bold mb-6 shadow-sm">
+                A
               </div>
               <h3 className="text-xl font-bold text-text mb-3">Authenticité Garantie</h3>
               <p className="text-neutral font-light">Un lien direct avec les boutiques pour une expérience d'achat en toute confiance.</p>
             </div>
             <div className="flex flex-col items-center">
-              <div className="w-20 h-20 bg-accent/20 text-text rounded-2xl flex items-center justify-center text-3xl mb-6 shadow-sm">
-                🛍️
+              <div className="w-20 h-20 bg-accent/20 text-text rounded-2xl flex items-center justify-center text-2xl font-bold mb-6 shadow-sm">
+                C
               </div>
               <h3 className="text-xl font-bold text-text mb-3">Shopping Simplifié</h3>
               <p className="text-neutral font-light">Commandez facilement depuis n'importe où, avec un suivi clair de vos favoris.</p>

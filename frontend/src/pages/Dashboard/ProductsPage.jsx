@@ -25,15 +25,23 @@ const MOCK_PRODS = [
 ];
 
 const EMPTY_FORM = { name:'', description:'', price:'', stock_quantity:'', category_id:'', style:'casual', is_active:true, threshold:5 };
+const CUSTOM_CATEGORY = '__custom__';
 
 /* ── Product Modal ────────────────────────────────────────── */
 function ProductModal({ product, categories, onClose, onSave }) {
+  const initialCategoryId = product?.category_id ? String(product.category_id) : '';
+  const categoryInList = product?.category_id && categories.some((c) => c.id === Number(product.category_id));
+
   const [form, setForm] = useState(product ? {
     id: product.id, name: product.name, description: product.description||'',
     price: product.price, stock_quantity: product.stock_quantity,
-    category_id: product.category_id||'', style: product.style||'casual',
+    category_id: categoryInList ? initialCategoryId : CUSTOM_CATEGORY,
+    style: product.style||'casual',
     is_active: product.is_active!==false, threshold: product.threshold||5,
   } : { ...EMPTY_FORM });
+  const [customCategory, setCustomCategory] = useState(
+    product && !categoryInList ? (product.category || product.category_name || '') : ''
+  );
   const [imageFile, setImageFile] = useState(null);
   const [preview, setPreview] = useState(product?.image_url ? resolveMediaUrl(product.image_url) : null);
   const [saving, setSaving] = useState(false);
@@ -50,7 +58,13 @@ function ProductModal({ product, categories, onClose, onSave }) {
   const handleSave = async () => {
     if (!form.name.trim()) { toast.error('Nom requis'); return; }
     if (!form.price || isNaN(Number(form.price))) { toast.error('Prix invalide'); return; }
-    if (!form.category_id) { toast.error('Catégorie requise'); return; }
+    const useCustomCategory = form.category_id === CUSTOM_CATEGORY;
+    if (useCustomCategory) {
+      if (!customCategory.trim()) { toast.error('Saisissez le nom de la catégorie'); return; }
+    } else if (!form.category_id) {
+      toast.error('Catégorie requise');
+      return;
+    }
     if (!isEdit && !imageFile) { toast.error('Photo du produit requise'); return; }
     setSaving(true);
     try {
@@ -59,7 +73,11 @@ function ProductModal({ product, categories, onClose, onSave }) {
       fd.append('description', form.description || '');
       fd.append('price', form.price);
       fd.append('stock_quantity', form.stock_quantity || 0);
-      fd.append('category_id', form.category_id);
+      if (useCustomCategory) {
+        fd.append('category_name', customCategory.trim());
+      } else {
+        fd.append('category_id', form.category_id);
+      }
       fd.append('style', form.style || 'casual');
       fd.append('is_active', form.is_active ? '1' : '0');
       if (imageFile) fd.append('image', imageFile);
@@ -119,11 +137,30 @@ function ProductModal({ product, categories, onClose, onSave }) {
           </div>
           <div style={{ display:'grid',gridTemplateColumns:'1fr 1fr',gap:12 }}>
             <div>
-              <label style={lbl}>Catégorie</label>
-              <select value={form.category_id} onChange={e=>set('category_id',e.target.value)} style={inp}>
+              <label style={lbl}>Catégorie *</label>
+              <select
+                value={form.category_id}
+                onChange={(e) => {
+                  set('category_id', e.target.value);
+                  if (e.target.value !== CUSTOM_CATEGORY) setCustomCategory('');
+                }}
+                style={inp}
+              >
                 <option value="">Sélectionner…</option>
-                {categories.map(c=><option key={c.id} value={c.id}>{c.name}</option>)}
+                {categories.map((c) => (
+                  <option key={c.id} value={c.id}>{c.name}</option>
+                ))}
+                <option value={CUSTOM_CATEGORY}>Autre — saisir une catégorie</option>
               </select>
+              {form.category_id === CUSTOM_CATEGORY && (
+                <input
+                  value={customCategory}
+                  onChange={(e) => setCustomCategory(e.target.value)}
+                  style={{ ...inp, marginTop: 8 }}
+                  placeholder="Ex: Bijoux, Paréos, Ensemble mariée…"
+                  maxLength={255}
+                />
+              )}
             </div>
             <div>
               <label style={lbl}>Seuil alerte stock</label>
@@ -203,8 +240,12 @@ export default function ProductsPage() {
   const handleSave = async () => {
     setLoading(true);
     try {
-      const { data } = await api.get('/boutique/products');
-      if (data?.data?.length) setProducts(data.data);
+      const [prodRes, catRes] = await Promise.all([
+        api.get('/boutique/products'),
+        api.get('/boutique/products/categories'),
+      ]);
+      if (Array.isArray(prodRes.data?.data)) setProducts(prodRes.data.data);
+      if (Array.isArray(catRes.data?.data)) setCategories(catRes.data.data);
     } catch {/* keep current */}
     finally { setLoading(false); }
   };
@@ -224,7 +265,7 @@ export default function ProductsPage() {
 
       {/* Controls */}
       <div style={{ display:'flex',gap:10,flexWrap:'wrap',alignItems:'center' }}>
-        <input value={search} onChange={e=>{setSearch(e.target.value);setPage(1);}} placeholder="🔍 Rechercher…" style={{ ...inp,width:240 }}/>
+        <input value={search} onChange={e=>{setSearch(e.target.value);setPage(1);}} placeholder="Rechercher…" style={{ ...inp,width:240 }}/>
         <select value={catFilter} onChange={e=>{setCatFilter(e.target.value);setPage(1);}} style={{ ...inp,width:160 }}>
           <option value="">Toutes catégories</option>
           {categories.map(c=><option key={c.id} value={c.id}>{c.name}</option>)}
@@ -236,7 +277,7 @@ export default function ProductsPage() {
         </select>
         {/* View toggle */}
         <div style={{ display:'flex',gap:0,backgroundColor:'#F3F4F6',borderRadius:10,padding:3,marginLeft:'auto' }}>
-          {[['grid','⊞'],['list','☰']].map(([v,icon])=>(
+          {[['grid','⊞'],['list','']].map(([v,icon])=>(
             <button key={v} onClick={()=>setViewMode(v)} style={{ width:36,height:30,borderRadius:8,border:'none',cursor:'pointer',backgroundColor:view===v?'#fff':'transparent',color:view===v?'#111827':'#9CA3AF',fontSize:16 }}>{icon}</button>
           ))}
         </div>
@@ -249,7 +290,7 @@ export default function ProductsPage() {
             paged.map(p=>(
               <div key={p.id} className="fa-stats-card" style={{ backgroundColor:'#fff',borderRadius:16,border:'1px solid rgba(0,0,0,0.06)',boxShadow:'0 2px 10px rgba(0,0,0,0.06)',overflow:'hidden' }}>
                 <div style={{ height:140,backgroundColor:'#F9FAFB',display:'flex',alignItems:'center',justifyContent:'center',fontSize:48,overflow:'hidden' }}>
-                  {p.image_url ? <img src={resolveMediaUrl(p.image_url)} alt={p.name} style={{ width:'100%',height:'100%',objectFit:'cover' }}/> : '🏷️'}
+                  {p.image_url ? <img src={resolveMediaUrl(p.image_url)} alt={p.name} style={{ width:'100%',height:'100%',objectFit:'cover' }}/> : ''}
                 </div>
                 <div style={{ padding:'14px 16px' }}>
                   <p style={{ fontFamily:'Inter, sans-serif',fontSize:13.5,fontWeight:600,color:'#111827',margin:'0 0 4px',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap' }}>{p.name}</p>
@@ -282,7 +323,7 @@ export default function ProductsPage() {
                       <td style={td}>
                         <div style={{ display:'flex',alignItems:'center',gap:10 }}>
                           <div style={{ width:38,height:38,borderRadius:8,backgroundColor:'#F9FAFB',display:'flex',alignItems:'center',justifyContent:'center',fontSize:20,flexShrink:0,overflow:'hidden' }}>
-                            {p.image_url ? <img src={resolveMediaUrl(p.image_url)} alt="" style={{ width:'100%',height:'100%',objectFit:'cover' }}/> : '🏷️'}
+                            {p.image_url ? <img src={resolveMediaUrl(p.image_url)} alt="" style={{ width:'100%',height:'100%',objectFit:'cover' }}/> : ''}
                           </div>
                           <span style={{ fontFamily:'Inter, sans-serif',fontSize:13,fontWeight:500,color:'#111827' }}>{p.name}</span>
                         </div>
@@ -329,7 +370,7 @@ export default function ProductsPage() {
         <>
           <div onClick={()=>setDelProd(null)} style={{ position:'fixed',inset:0,backgroundColor:'rgba(0,0,0,0.5)',zIndex:90 }}/>
           <div style={{ position:'fixed',top:'50%',left:'50%',transform:'translate(-50%,-50%)',width:360,backgroundColor:'#fff',borderRadius:20,zIndex:100,boxShadow:'0 20px 60px rgba(0,0,0,0.2)',padding:28,textAlign:'center' }}>
-            <div style={{ fontSize:36,marginBottom:12 }}>🗑️</div>
+            <div style={{ fontSize:36,marginBottom:12 }}></div>
             <p style={{ fontFamily:"'Playfair Display', serif",fontSize:17,fontWeight:700,color:'#111827',marginBottom:8 }}>Supprimer «{delProd.name}» ?</p>
             <p style={{ fontFamily:'Inter, sans-serif',fontSize:13,color:'#6B7280',marginBottom:20 }}>Cette action est irréversible.</p>
             <div style={{ display:'flex',gap:10 }}>

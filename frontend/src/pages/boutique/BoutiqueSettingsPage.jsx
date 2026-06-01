@@ -1,11 +1,15 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useTheme } from '../../contexts/ThemeContext';
 import api from '../../services/api';
+import { getCities } from '../../api/cityService';
+import { resolveMediaUrl } from '../../utils/imageUtils';
+import { CROP_PRESETS } from '../../utils/cropImage';
+import ImageCropModal from '../../components/common/ImageCropModal';
 import toast from 'react-hot-toast';
 import i18n from '../../i18n';
 
 const TABS = ['Profil','Apparence','Notifications','Sécurité'];
-const LANGS = [{ code:'fr',label:'🇫🇷 Français' },{ code:'en',label:'🇬🇧 English' },{ code:'ar',label:'🇸🇦 العربية' },{ code:'es',label:'🇪🇸 Español' }];
+const LANGS = [{ code:'fr',label:'Français' },{ code:'en',label:'English' },{ code:'ar',label:'العربية' },{ code:'es',label:'Español' }];
 
 function Toggle({ value, onChange }) {
   return (
@@ -36,55 +40,162 @@ function Section({ title, children }) {
   );
 }
 
-function ImageUpload({ label, value, onChange, aspect }) {
+function ImageUpload({ label, preview, onFileChange, cropPresetKey }) {
   const ref = useRef();
+  const [cropOpen, setCropOpen] = useState(false);
+  const [rawImageSrc, setRawImageSrc] = useState(null);
+  const preset = CROP_PRESETS[cropPresetKey];
+  const previewHeight = cropPresetKey === 'banner' ? 120 : 100;
+
   const handleFile = (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    const url = URL.createObjectURL(file);
-    onChange(url);
+    if (!file.type.startsWith('image/')) {
+      toast.error('Veuillez sélectionner une image');
+      return;
+    }
+    if (rawImageSrc) URL.revokeObjectURL(rawImageSrc);
+    setRawImageSrc(URL.createObjectURL(file));
+    setCropOpen(true);
+    e.target.value = '';
   };
+
+  const closeCrop = () => {
+    setCropOpen(false);
+    if (rawImageSrc) {
+      URL.revokeObjectURL(rawImageSrc);
+      setRawImageSrc(null);
+    }
+  };
+
+  const handleCropConfirm = ({ file, previewUrl }) => {
+    onFileChange(file, previewUrl);
+    closeCrop();
+  };
+
   return (
     <div>
       <label style={lbl}>{label}</label>
-      <div style={{ position:'relative', width:'100%', height:aspect==='banner'?120:80, borderRadius:12, border:'2px dashed #E5E7EB', overflow:'hidden', cursor:'pointer', backgroundColor:'#F9FAFB', display:'flex', alignItems:'center', justifyContent:'center' }}
+      <div style={{ position:'relative', width:'100%', height:previewHeight, borderRadius:12, border:'2px dashed #E5E7EB', overflow:'hidden', cursor:'pointer', backgroundColor:'#F9FAFB', display:'flex', alignItems:'center', justifyContent:'center' }}
         onClick={()=>ref.current?.click()}>
-        {value ? (
-          <img src={value} alt={label} style={{ width:'100%', height:'100%', objectFit:'cover' }}/>
+        {preview ? (
+          <img src={preview} alt={label} style={{ width:'100%', height:'100%', objectFit:'cover' }}/>
         ) : (
           <div style={{ textAlign:'center' }}>
-            <div style={{ fontSize:24, marginBottom:4 }}>{aspect==='banner'?'🖼️':'📷'}</div>
-            <p style={{ fontFamily:'Inter, sans-serif', fontSize:12, color:'#9CA3AF', margin:0 }}>Cliquer pour uploader</p>
+            <p style={{ fontFamily:'Inter, sans-serif', fontSize:13, fontWeight:500, color:'#6B7280', margin:'0 0 4px' }}>Choisir une image</p>
+            <p style={{ fontFamily:'Inter, sans-serif', fontSize:12, color:'#9CA3AF', margin:0 }}>Cliquer pour recadrer</p>
           </div>
         )}
         <input ref={ref} type="file" accept="image/*" onChange={handleFile} style={{ display:'none' }}/>
       </div>
+      <ImageCropModal
+        open={cropOpen}
+        imageSrc={rawImageSrc}
+        preset={preset}
+        onConfirm={handleCropConfirm}
+        onCancel={closeCrop}
+      />
     </div>
   );
 }
 
 function ProfilTab() {
   const [form, setForm] = useState({
-    name: 'Ma Boutique', description: 'Boutique de mode et vêtements de luxe au Maroc.', email: 'contact@maboutique.ma',
-    phone: '+212 661 234 567', city: 'Casablanca', address: '12 Rue Hassan II', logo: '', banner: '',
+    name: '', description: '', email: '', phone: '', address: '', city_id: '',
   });
+  const [logoPreview, setLogoPreview] = useState('');
+  const [bannerPreview, setBannerPreview] = useState('');
+  const [logoFile, setLogoFile] = useState(null);
+  const [bannerFile, setBannerFile] = useState(null);
+  const [cities, setCities] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [lang, setLang] = useState(localStorage.getItem('language') || 'fr');
   const set = (k,v) => setForm(f=>({...f,[k]:v}));
 
+  useEffect(() => {
+    Promise.all([api.get('/boutique/profile'), getCities()])
+      .then(([profileRes, cityList]) => {
+        const data = profileRes.data;
+        setCities(Array.isArray(cityList) ? cityList : []);
+        setForm({
+          name: data.name || '',
+          description: data.description || '',
+          email: data.email || '',
+          phone: data.phone || '',
+          address: data.address || '',
+          city_id: data.city_id ? String(data.city_id) : (data.city?.id ? String(data.city.id) : ''),
+        });
+        setLogoPreview(data.logo ? resolveMediaUrl(data.logo) : '');
+        setBannerPreview(data.banner ? resolveMediaUrl(data.banner) : '');
+      })
+      .catch(() => toast.error('Impossible de charger le profil'))
+      .finally(() => setLoading(false));
+  }, []);
+
   const handleSave = async () => {
+    setSaving(true);
     try {
-      await api.put('/boutique/profile', form);
+      const payload = {
+        name: form.name,
+        description: form.description || '',
+        email: form.email || '',
+        phone: form.phone || '',
+        address: form.address || '',
+        ...(form.city_id ? { city_id: Number(form.city_id) } : {}),
+      };
+
+      if (logoFile || bannerFile) {
+        const fd = new FormData();
+        Object.entries(payload).forEach(([key, value]) => fd.append(key, value));
+        if (logoFile) fd.append('logo', logoFile);
+        if (bannerFile) fd.append('banner', bannerFile);
+        const { data } = await api.post('/boutique/profile', fd);
+        if (data?.boutique) {
+          setLogoPreview(data.boutique.logo ? resolveMediaUrl(data.boutique.logo) : '');
+          setBannerPreview(data.boutique.banner ? resolveMediaUrl(data.boutique.banner) : '');
+        }
+        setLogoFile(null);
+        setBannerFile(null);
+      } else {
+        const { data } = await api.put('/boutique/profile', payload);
+        if (data?.boutique) {
+          setLogoPreview(data.boutique.logo ? resolveMediaUrl(data.boutique.logo) : '');
+          setBannerPreview(data.boutique.banner ? resolveMediaUrl(data.boutique.banner) : '');
+        }
+      }
       toast.success('Profil mis à jour');
-    } catch { toast.success('Profil mis à jour'); }
+    } catch (err) {
+      const msg = err.response?.data?.message
+        || Object.values(err.response?.data?.errors || {})[0]?.[0]
+        || 'Impossible d\'enregistrer le profil';
+      toast.error(msg);
+    } finally {
+      setSaving(false);
+    }
   };
+
+  if (loading) {
+    return <p style={{ fontFamily:'Inter, sans-serif', fontSize:13, color:'#6B7280' }}>Chargement du profil…</p>;
+  }
 
   return (
     <div>
       <Section title="Identité de la boutique">
         <div style={{ display:'flex', flexDirection:'column', gap:14, marginTop:8 }}>
-          <ImageUpload label="Bannière" value={form.banner} onChange={v=>set('banner',v)} aspect="banner"/>
-          <ImageUpload label="Logo" value={form.logo} onChange={v=>set('logo',v)} aspect="logo"/>
-          {[['Nom de la boutique','name'],['Description','description'],['Email public','email'],['Téléphone','phone'],['Ville','city'],['Adresse','address']].map(([label,key])=>(
+          <ImageUpload
+            label="Bannière"
+            preview={bannerPreview}
+            onFileChange={(file, preview) => { setBannerFile(file); setBannerPreview(preview); }}
+            cropPresetKey="banner"
+          />
+          <ImageUpload
+            label="Logo"
+            preview={logoPreview}
+            onFileChange={(file, preview) => { setLogoFile(file); setLogoPreview(preview); }}
+            cropPresetKey="logo"
+          />
+          {[['Nom de la boutique','name'],['Description','description'],['Email public','email'],['Téléphone','phone'],['Adresse','address']].map(([label,key])=>(
             <div key={key}>
               <label style={lbl}>{label}</label>
               {key === 'description'
@@ -93,8 +204,19 @@ function ProfilTab() {
               }
             </div>
           ))}
+          <div>
+            <label style={lbl}>Ville</label>
+            <select value={form.city_id} onChange={e=>set('city_id', e.target.value)} style={inp}>
+              <option value="">Sélectionner une ville</option>
+              {cities.map((city) => (
+                <option key={city.id} value={String(city.id)}>{city.name}</option>
+              ))}
+            </select>
+          </div>
         </div>
-        <button onClick={handleSave} style={{ ...saveBtn, marginTop:16 }}>Enregistrer le profil</button>
+        <button onClick={handleSave} disabled={saving} style={{ ...saveBtn, marginTop:16, opacity:saving?0.7:1 }}>
+          {saving ? 'Enregistrement…' : 'Enregistrer le profil'}
+        </button>
       </Section>
 
       <Section title="Langue d'interface">
@@ -121,7 +243,6 @@ function AppearanceTab() {
     <div>
       <Section title="Thème">
         <div style={{ padding:'20px', backgroundColor:isDark?'#1A1D27':'#F9FAFB', borderRadius:12, marginBottom:16, textAlign:'center' }}>
-          <div style={{ fontSize:48, marginBottom:8 }}>{isDark?'🌙':'☀️'}</div>
           <p style={{ fontFamily:"'Playfair Display', serif", fontSize:18, fontWeight:600, color:isDark?'#E5E7EB':'#111827', margin:'0 0 4px' }}>{isDark?'Mode sombre':'Mode clair'}</p>
           <p style={{ fontFamily:'Inter, sans-serif', fontSize:13, color:isDark?'#9CA3AF':'#6B7280', margin:'0 0 16px' }}>Aperçu du thème actuel</p>
           <button onClick={toggleTheme} style={{ padding:'10px 28px', borderRadius:20, border:'none', backgroundColor:'#1B3A35', color:'#fff', fontFamily:'Inter, sans-serif', fontSize:13, fontWeight:600, cursor:'pointer' }}>

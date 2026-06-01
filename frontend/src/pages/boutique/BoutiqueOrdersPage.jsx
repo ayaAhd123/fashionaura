@@ -123,7 +123,7 @@ function OrderModal({ order, onClose, onUpdate }) {
             <p style={{ fontFamily:'Inter, sans-serif', fontSize:12, color:'#6B7280', margin:'2px 0 0' }}>{order.date}</p>
           </div>
           <div style={{ display:'flex', gap:8 }}>
-            <button onClick={handlePrint} style={{ padding:'7px 14px', borderRadius:10, border:'1.5px solid #E5E7EB', background:'transparent', color:'#374151', fontFamily:'Inter, sans-serif', fontSize:12, fontWeight:500, cursor:'pointer' }}>🖨 Imprimer</button>
+            <button onClick={handlePrint} style={{ padding:'7px 14px', borderRadius:10, border:'1.5px solid #E5E7EB', background:'transparent', color:'#374151', fontFamily:'Inter, sans-serif', fontSize:12, fontWeight:500, cursor:'pointer' }}>Imprimer</button>
             <button onClick={onClose} style={{ background:'none', border:'none', cursor:'pointer', color:'#6B7280', fontSize:22 }}>✕</button>
           </div>
         </div>
@@ -146,7 +146,7 @@ function OrderModal({ order, onClose, onUpdate }) {
               {order.products.map((p,i) => (
                 <div key={i} style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'12px 16px', borderTop: i>0?'1px solid #F3F4F6':'none' }}>
                   <div style={{ display:'flex', alignItems:'center', gap:10 }}>
-                    <div style={{ width:36, height:36, borderRadius:8, backgroundColor:'#F3F4F6', display:'flex', alignItems:'center', justifyContent:'center', fontSize:18 }}>👗</div>
+                    <div style={{ width:36, height:36, borderRadius:8, backgroundColor:'#F3F4F6', display:'flex', alignItems:'center', justifyContent:'center', fontSize:18 }}></div>
                     <div>
                       <p style={{ fontFamily:'Inter, sans-serif', fontSize:13, fontWeight:500, color:'#111827', margin:0 }}>{p.name}</p>
                       <p style={{ fontFamily:'Inter, sans-serif', fontSize:11.5, color:'#9CA3AF', margin:0 }}>Qté: {p.qty}</p>
@@ -238,12 +238,12 @@ export default function BoutiqueOrdersPage() {
           <h2 style={pageTitle}>Commandes</h2>
           <p style={pageSub}>{filtered.length} commande(s) · {orders.filter(o=>o.status==='pending').length} en attente</p>
         </div>
-        <button onClick={exportCSV} style={outlineBtn}>⬇ Exporter CSV</button>
+        <button onClick={exportCSV} style={outlineBtn}> Exporter CSV</button>
       </div>
 
       {/* Filters */}
       <div style={{ display:'flex', gap:10, flexWrap:'wrap' }}>
-        <input value={search} onChange={e=>{setSearch(e.target.value);setPage(1);}} placeholder="🔍 Rechercher #ID ou client…"
+        <input value={search} onChange={e=>{setSearch(e.target.value);setPage(1);}} placeholder="Rechercher #ID ou client…"
           style={{ ...inp, width:260 }}/>
         <select value={statusFilter} onChange={e=>{setStatusFilter(e.target.value);setPage(1);}} style={{ ...inp, width:180 }}>
           <option value="">Tous les statuts</option>
@@ -267,7 +267,7 @@ export default function BoutiqueOrdersPage() {
                 <tr key={i}><td colSpan={7} style={{ padding:16 }}><div style={skLine}/></td></tr>
               )) : paginated.length === 0 ? (
                 <tr><td colSpan={7} style={{ textAlign:'center', padding:'60px 0' }}>
-                  <div style={{ fontSize:48, marginBottom:12 }}>📦</div>
+                  <div style={{ fontSize:48, marginBottom:12 }}></div>
                   <p style={{ fontFamily:"'Playfair Display', serif", fontSize:16, fontWeight:600, color:'#111827', margin:0 }}>Aucune commande</p>
                   <p style={{ fontFamily:'Inter, sans-serif', fontSize:13, color:'#6B7280' }}>Essayez de modifier vos filtres</p>
                 </td></tr>

@@ -86,7 +86,7 @@ export const ProductCard = ({ product, onFavoriteToggle }) => {
     });
 
     setAdded(true);
-    toast.success(`"${product.name}" ajouté au panier ! 🛍️`);
+    toast.success(`"${product.name}" ajouté au panier !`);
     setTimeout(() => setAdded(false), 2500);
   };
 
@@ -145,7 +145,7 @@ export const ProductCard = ({ product, onFavoriteToggle }) => {
                     key={i}
                     className={i < Math.floor(product.rating || 0) ? 'is-filled' : ''}
                   >
-                    ★
+                    
                   </span>
                 ))}
               </div>

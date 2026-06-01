@@ -57,7 +57,7 @@ class BoutiqueFollowerController extends Controller
                 BoutiqueFollower::where('user_id', Auth::id())->pluck('boutique_id')
             )
                 ->withCount('products')
-                ->get(['id', 'name', 'slug', 'logo', 'category', 'rating', 'followers_count', 'is_active']);
+                ->get(['id', 'name', 'slug', 'logo', 'category', 'rating', 'followers_count', 'is_active', 'messages_enabled']);
 
             return response()->json($boutiques);
         }

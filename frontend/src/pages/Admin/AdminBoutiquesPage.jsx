@@ -203,7 +203,7 @@ export default function AdminBoutiquesPage() {
 
       {/* Filters */}
       <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
-        <input value={search} onChange={e => { setSearch(e.target.value); setPage(1); }} placeholder="🔍 Rechercher…" style={{ ...inp, width: 240 }} />
+        <input value={search} onChange={e => { setSearch(e.target.value); setPage(1); }} placeholder="Rechercher…" style={{ ...inp, width: 240 }} />
         <select value={statut} onChange={e => { setStatut(e.target.value); setPage(1); }} style={{ ...inp, width: 150 }}>
           {STATUTS.map(s => <option key={s} value={s}>{s === 'Tous' ? 'Tous statuts' : s.charAt(0).toUpperCase() + s.slice(1)}</option>)}
         </select>

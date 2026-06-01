@@ -149,7 +149,7 @@ export default function AIAdvisor() {
         position: 'relative', overflow: 'hidden',
       }}>
         <div style={{ position: 'relative', zIndex: 1, flex: 1, minWidth: 260 }}>
-          <p style={{ fontFamily: 'Raleway, sans-serif', fontSize: 11, letterSpacing: '0.25em', color: '#E3C8B5', textTransform: 'uppercase', marginBottom: 12 }}>✦ Intelligence artificielle · Gemini</p>
+          <p style={{ fontFamily: 'Raleway, sans-serif', fontSize: 11, letterSpacing: '0.25em', color: '#E3C8B5', textTransform: 'uppercase', marginBottom: 12 }}>Intelligence artificielle · Gemini</p>
           <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 32, fontWeight: 400, color: '#fff', marginBottom: 10, lineHeight: 1.2 }}>
             Conseiller boutique
           </h2>
@@ -158,7 +158,7 @@ export default function AIAdvisor() {
           </p>
           {!data?.gemini_configured && (
             <p style={{ fontFamily: 'Raleway, sans-serif', fontSize: 11, color: '#E3C8B5', marginTop: 12, opacity: 0.9 }}>
-              ⚠ Ajoutez GEMINI_API_KEY dans backend/.env pour l&apos;analyse complète.
+              Note : ajoutez GEMINI_API_KEY dans backend/.env pour l&apos;analyse complète.
             </p>
           )}
         </div>
@@ -183,7 +183,7 @@ export default function AIAdvisor() {
               opacity: analyzing ? 0.7 : 1,
             }}
           >
-            {analyzing ? 'Analyse en cours…' : '✦ Générer analyse IA'}
+            {analyzing ? 'Analyse en cours…' : 'Générer analyse IA'}
           </button>
           {analysis?.available && (
             <button
@@ -227,7 +227,7 @@ export default function AIAdvisor() {
 
           {analysis.monthly_focus && (
             <p style={{ fontFamily: 'Raleway, sans-serif', fontSize: 13, fontWeight: 600, color: '#69807E', marginBottom: 20 }}>
-              🎯 Priorité du mois : {analysis.monthly_focus}
+              Priorité du mois : {analysis.monthly_focus}
             </p>
           )}
 

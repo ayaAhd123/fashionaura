@@ -1,0 +1,101 @@
+%%{init: {'theme': 'base'}}%%
+classDiagram
+    direction TB
+
+    class User {
+        +int id
+        +string name
+        +string email
+        +string role
+        +int boutique_id
+        +login()
+        +register()
+    }
+
+    class City {
+        +int id
+        +string name
+        +string slug
+        +string region
+    }
+
+    class Boutique {
+        +int id
+        +string name
+        +string slug
+        +int city_id
+        +float rating
+        +bool is_verified
+        +follow()
+    }
+
+    class Category {
+        +int id
+        +string name
+        +string slug
+    }
+
+    class Product {
+        +int id
+        +string name
+        +float price
+        +int stock_quantity
+        +int boutique_id
+        +int category_id
+    }
+
+    class Order {
+        +int id
+        +int user_id
+        +float total
+        +string status
+        +string address
+    }
+
+    class OrderItem {
+        +int id
+        +int order_id
+        +int product_id
+        +int quantity
+        +float price
+    }
+
+    class BoutiquePost {
+        +int id
+        +string caption
+        +string promo_code
+        +bool is_exclusive
+    }
+
+    class Conversation {
+        +int id
+        +string kind
+        +int boutique_id
+        +int customer_id
+    }
+
+    class Message {
+        +int id
+        +string type
+        +string body
+        +int sender_id
+    }
+
+    class Review {
+        +int id
+        +int rating
+        +string comment
+    }
+
+    City "1" --> "*" Boutique : contient
+    Boutique "1" --> "*" Product : vend
+    Category "1" --> "*" Product : classe
+    User "1" --> "*" Order : passe
+    Order "1" --> "*" OrderItem : contient
+    Product "1" --> "*" OrderItem : référencé
+    Boutique "1" --> "*" BoutiquePost : publie
+    User "1" --> "0..1" Boutique : possède
+    User "1" --> "*" Conversation : participe
+    Conversation "1" --> "*" Message : contient
+    Boutique "1" --> "*" Review : reçoit
+    User "1" --> "*" Review : écrit

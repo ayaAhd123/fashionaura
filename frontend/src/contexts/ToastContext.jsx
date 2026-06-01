@@ -38,7 +38,7 @@ export const ToastProvider = ({ children }) => {
             }`}
           >
             <span className="text-xl flex-shrink-0">
-              {toast.type === 'success' ? '✓' : toast.type === 'error' ? '✕' : 'ℹ'}
+              {toast.type === 'success' ? '✓' : toast.type === 'error' ? '✕' : ''}
             </span>
             <span>{toast.message}</span>
           </div>

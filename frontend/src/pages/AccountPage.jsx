@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import {
   User, Lock, Heart, Store, Package, ShoppingBag,
@@ -14,6 +14,7 @@ import {
   getMyNotifications, markNotificationRead, deleteNotification,
 } from '../services/api';
 import OrderChatModal from '../components/orders/OrderChatModal';
+import OrderTrackingTimeline from '../components/orders/OrderTrackingTimeline';
 import { getEcho } from '../lib/echo';
 import '../styles/account.css';
 
@@ -46,8 +47,16 @@ const formatDate = (d) => {
 export const AccountPage = () => {
   const { user, token, setSession, logout } = useAuth();
   const { cart } = useContext(CartContext);
+  const [searchParams] = useSearchParams();
   const [tab, setTab] = useState('cart');
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const requested = searchParams.get('tab');
+    if (requested && TABS.some((t) => t.id === requested && !t.href)) {
+      setTab(requested);
+    }
+  }, [searchParams]);
 
   return (
     <main className="account-page">
@@ -231,6 +240,9 @@ function OrdersTab() {
 
   return (
     <div className="account-orders">
+      <p className="account-orders__intro">
+        Suivez l&apos;avancement de vos commandes en temps réel.
+      </p>
       {orders.map((order) => {
         const st = ORDER_STATUS[order.status] || { label: order.status, cls: 'is-pending' };
         return (
@@ -242,6 +254,13 @@ function OrdersTab() {
               </div>
               <span className={`order-status ${st.cls}`}>{st.label}</span>
             </div>
+
+            {order.status !== 'cancelled' && (
+              <div className="order-card__tracking">
+                <OrderTrackingTimeline status={order.status} compact />
+              </div>
+            )}
+
             <ul className="order-card__items">
               {(order.items || []).map((it) => (
                 <li key={it.id}>
@@ -256,17 +275,18 @@ function OrdersTab() {
               <span>Total</span>
               <strong>{Number(order.total).toFixed(2)} DH</strong>
             </div>
-            <button
-              type="button"
-              className="account-btn"
-              style={{ marginTop: 12, background: 'transparent', color: '#69807E', border: '1px solid #69807E' }}
-              onClick={() => setChatOrder(order)}
-            >
-              Contacter la boutique
-            </button>
-            <Link to="/compte/messagerie" className="account-btn" style={{ marginTop: 8, display: 'inline-block', textAlign: 'center', textDecoration: 'none' }}>
-              Ouvrir la messagerie
-            </Link>
+            <div className="order-card__actions">
+              <Link to={`/compte/commandes/${order.id}`} className="account-btn">
+                Voir le suivi détaillé
+              </Link>
+              <button
+                type="button"
+                className="account-btn account-btn--ghost"
+                onClick={() => setChatOrder(order)}
+              >
+                Contacter la boutique
+              </button>
+            </div>
           </div>
         );
       })}
@@ -392,10 +412,10 @@ function FollowingTab() {
 
 /* ───────────────────────── Notifications ───────────────────────── */
 const NOTIF_ICON = {
-  new_product: '🆕',
-  new_post: '📣',
-  back_in_stock: '📦',
-  default: '🔔',
+  new_product: 'N',
+  new_post: 'S',
+  back_in_stock: '!',
+  default: 'N',
 };
 
 function NotificationsTab() {

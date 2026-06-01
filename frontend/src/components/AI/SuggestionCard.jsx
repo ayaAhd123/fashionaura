@@ -16,7 +16,7 @@ export const SuggestionCard = ({ suggestion }) => {
                 {suggestion.image ? (
                     <img src={suggestion.image} alt={suggestion.name} />
                 ) : (
-                    <span className="chat-suggestion-card__placeholder">{isProduct ? '✦' : '🏪'}</span>
+                    <span className="chat-suggestion-card__placeholder">{isProduct ? 'P' : 'B'}</span>
                 )}
             </div>
             <div className="chat-suggestion-card__body">

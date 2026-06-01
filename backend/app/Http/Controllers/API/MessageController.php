@@ -6,7 +6,9 @@ use App\Events\MessageSent;
 use App\Http\Controllers\Controller;
 use App\Models\Conversation;
 use App\Models\Message;
-use App\Models\Order;
+use App\Models\Product;
+use App\Services\MessageFormatter;
+use App\Support\MediaUrl;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -17,9 +19,9 @@ class MessageController extends Controller
         $this->authorizeConversation($conversation);
 
         $messages = $conversation->messages()
-            ->with('user:id,name,role')
+            ->with(['user:id,name,role,avatar', 'product.boutique:id,name', 'product.images'])
             ->get()
-            ->map(fn ($m) => $this->formatMessage($m));
+            ->map(fn ($m) => MessageFormatter::format($m));
 
         return response()->json(['data' => $messages]);
     }
@@ -33,22 +35,78 @@ class MessageController extends Controller
             'body' => 'required|string|max:2000',
         ]);
 
-        $message = $conversation->messages()->create([
-            'user_id' => Auth::id(),
+        $message = $this->createAndBroadcast($conversation, [
+            'type' => Message::TYPE_TEXT,
             'body' => trim($data['body']),
         ]);
 
-        $message->load('user:id,name,role');
+        return response()->json(MessageFormatter::format($message), 201);
+    }
+
+    public function storeAudio(Request $request, Conversation $conversation)
+    {
+        $this->authorizeConversation($conversation);
+        $this->authorizeCanSend($conversation);
+
+        $request->validate([
+            'audio' => 'required|file|max:5120|mimes:webm,mp4,mpeg,wav,ogg,mp3,x-m4a',
+        ]);
+
+        $path = MediaUrl::fromStoragePath($request->file('audio')->store('audio', 'public'));
+
+        $message = $this->createAndBroadcast($conversation, [
+            'type' => Message::TYPE_AUDIO,
+            'body' => null,
+            'audio_path' => $path,
+        ]);
+
+        return response()->json(MessageFormatter::format($message), 201);
+    }
+
+    public function storeProduct(Request $request, Conversation $conversation)
+    {
+        $this->authorizeConversation($conversation);
+        $this->authorizeCanSend($conversation);
+
+        $data = $request->validate([
+            'product_id' => 'required|exists:products,id',
+        ]);
+
+        $product = Product::where('is_active', true)->findOrFail($data['product_id']);
+
+        $message = $this->createAndBroadcast($conversation, [
+            'type' => Message::TYPE_PRODUCT,
+            'body' => null,
+            'product_id' => $product->id,
+        ]);
+
+        return response()->json(MessageFormatter::format($message->load(['product.boutique', 'product.images'])), 201);
+    }
+
+    private function createAndBroadcast(Conversation $conversation, array $attributes): Message
+    {
+        $message = $conversation->messages()->create(array_merge([
+            'user_id' => Auth::id(),
+        ], $attributes));
+
+        $message->load('user:id,name,role,avatar');
         $conversation->touch();
         MessageSent::dispatch($message);
 
-        return response()->json($this->formatMessage($message), 201);
+        return $message;
     }
 
     private function authorizeConversation(Conversation $conversation): void
     {
-        $conversation->loadMissing('boutique');
+        $conversation->loadMissing(['boutique', 'peerUser', 'customer']);
         $user = Auth::user();
+
+        if ($conversation->kind === Conversation::KIND_USER) {
+            if ($conversation->involvesUser((int) $user->id)) {
+                return;
+            }
+            abort(403, 'Accès non autorisé à cette conversation.');
+        }
 
         $isCustomer = (int) $conversation->customer_id === (int) $user->id;
         $isOwner = $user->role === 'boutique_owner'
@@ -64,34 +122,21 @@ class MessageController extends Controller
         $conversation->loadMissing('boutique');
         $user = Auth::user();
 
-        // Le magasinier peut toujours contacter le client (commande ou direct)
+        if ($conversation->kind === Conversation::KIND_USER) {
+            return;
+        }
+
         if ($user->role === 'boutique_owner') {
             return;
         }
 
-        // Conversation liée à une commande : le client peut répondre pour la validation
         if ($conversation->order_id) {
             return;
         }
 
-        // Message direct : respecter le paramètre DM de la boutique
         $boutique = $conversation->boutique;
         if ($boutique && ! $boutique->messages_enabled) {
             abort(403, 'Cette boutique n\'accepte pas les messages pour le moment.');
         }
-    }
-
-    private function formatMessage(Message $message): array
-    {
-        return [
-            'id' => $message->id,
-            'conversation_id' => $message->conversation_id,
-            'body' => $message->body,
-            'user_id' => $message->user_id,
-            'sender_name' => $message->user?->name ?? 'Utilisateur',
-            'sender_role' => $message->user?->role,
-            'is_mine' => (int) $message->user_id === (int) Auth::id(),
-            'created_at' => $message->created_at?->toIso8601String(),
-        ];
     }
 }

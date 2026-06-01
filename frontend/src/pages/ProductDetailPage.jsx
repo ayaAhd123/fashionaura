@@ -135,7 +135,7 @@ export const ProductDetailPage = () => {
       size: selectedSize,
       color: selectedColor,
     });
-    toast.success(`"${product.name}" ajouté au panier ! 🛍️`);
+    toast.success(`"${product.name}" ajouté au panier ! `);
   };
 
   const handleToggleFavorite = () => {
@@ -200,7 +200,7 @@ export const ProductDetailPage = () => {
     <main className="pdp">
       <div className="pdp__center">
         <div>
-          <p style={{ fontSize: '3rem', marginBottom: '0.5rem' }}>😕</p>
+          <p style={{ fontSize: '3rem', marginBottom: '0.5rem' }}></p>
           <h2 style={{ fontFamily: "'Playfair Display', serif", color: 'var(--bordeaux)', marginBottom: '0.5rem' }}>Produit non trouvé</h2>
           <Link to="/boutiques" style={{ color: 'var(--gold)' }}>Retour aux boutiques</Link>
         </div>
@@ -437,7 +437,6 @@ export const ProductDetailPage = () => {
 
             {reviews.length === 0 ? (
               <div className="pdp__empty">
-                <span>✧</span>
                 Aucun avis pour le moment. Soyez le premier à partager votre expérience.
               </div>
             ) : (

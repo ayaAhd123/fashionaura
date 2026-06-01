@@ -16,7 +16,10 @@ class OrderController extends Controller
     public function index()
     {
         $orders = Order::where('user_id', Auth::id())
-            ->with(['items.product:id,name,slug,boutique_id'])
+            ->with([
+                'items.product:id,name,slug,boutique_id',
+                'items.product.boutique:id,name,slug',
+            ])
             ->orderByDesc('created_at')
             ->get();
 
@@ -27,7 +30,10 @@ class OrderController extends Controller
     public function show($id)
     {
         $order = Order::where('user_id', Auth::id())
-            ->with(['items.product:id,name,slug,boutique_id'])
+            ->with([
+                'items.product:id,name,slug,boutique_id',
+                'items.product.boutique:id,name,slug',
+            ])
             ->findOrFail($id);
 
         return response()->json($order);
@@ -76,7 +82,10 @@ class OrderController extends Controller
             $order->update(['total' => round($total, 2)]);
 
             return response()->json(
-                $order->load('items.product:id,name,slug,boutique_id'),
+                $order->load([
+                    'items.product:id,name,slug,boutique_id',
+                    'items.product.boutique:id,name,slug',
+                ]),
                 201
             );
         });

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
-  Star, MapPin, ArrowLeft, UserCheck, UserPlus, Truck, Search, Lock, Tag, MessageCircle,
+  Star, MapPin, ArrowLeft, UserCheck, UserPlus, Truck, Search, MessageCircle,
 } from 'lucide-react';
 import { boutiqueService } from '../services/boutiqueService';
 import { productService } from '../services/productService';
@@ -16,7 +16,8 @@ import { applyCityTheme } from '../utils/cityThemes';
 import { resolveMediaUrl } from '../utils/imageUtils';
 import { PRODUCT_TYPES, OCCASION_TYPES, buildArticleFilters } from '../config/articleTypes';
 import AuthModal from '../components/AuthModal';
-import PostComments from '../components/posts/PostComments';
+import OfferPostCard from '../components/boutique/OfferPostCard';
+import { splitBoutiquePosts } from '../utils/boutiqueOffers';
 import '../styles/boutique.css';
 import '../styles/messaging.css';
 
@@ -56,11 +57,13 @@ export const BoutiqueDetailPage = () => {
   // Auth modal state
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [authModalMessage, setAuthModalMessage] = useState('');
+  const [contentTab, setContentTab] = useState('creations');
 
   useEffect(() => {
     setArticleType(null);
     setArticleSearch('');
     setFilteredProducts([]);
+    setContentTab('creations');
     fetchBoutiqueDetails();
   }, [slug]);
 
@@ -81,6 +84,17 @@ export const BoutiqueDetailPage = () => {
       .finally(() => { if (active) setPostsLoading(false); });
     return () => { active = false; };
   }, [boutique, following]);
+
+  const { publicOffers, exclusiveOffers, news: newsPosts } = splitBoutiquePosts(posts);
+
+  const handleFollowForOffers = () => {
+    if (!isAuthenticated) {
+      setAuthModalMessage('Connectez-vous puis suivez la boutique pour voir les offres exclusives');
+      setAuthModalOpen(true);
+      return;
+    }
+    if (!following) handleFollow();
+  };
 
   const isArticleMode = Boolean(articleType) || articleSearch.trim().length > 0;
 
@@ -126,11 +140,15 @@ export const BoutiqueDetailPage = () => {
       setBoutique(data);
       setFollowersCount(data.followers_count || 0);
 
-      try {
-        const followStatus = await boutiqueService.isFollowing(data.id);
-        setFollowing(followStatus.is_following);
-      } catch {
-        /* auth optional */
+      if (isAuthenticated) {
+        try {
+          const followStatus = await boutiqueService.isFollowing(data.id);
+          setFollowing(followStatus.is_following);
+        } catch {
+          setFollowing(false);
+        }
+      } else {
+        setFollowing(false);
       }
 
       const reviewsData = await boutiqueService.getBoutiqueReviews(data.id);
@@ -234,7 +252,7 @@ export const BoutiqueDetailPage = () => {
     return (
       <div className="boutique-detail__state">
         <div>
-          <p className="text-5xl mb-4">🏪</p>
+          <p className="text-5xl mb-4"></p>
           <h2 className="text-2xl font-serif font-bold text-text mb-2">Boutique non trouvée</h2>
           <Link to="/boutiques" className="text-primary underline">Retour aux boutiques</Link>
         </div>
@@ -254,7 +272,7 @@ export const BoutiqueDetailPage = () => {
       {/* Hero */}
       <section className="boutique-detail__hero">
         {boutique.banner ? (
-          <img src={boutique.banner} alt="" className="boutique-detail__hero-img" />
+          <img src={resolveMediaUrl(boutique.banner)} alt="" className="boutique-detail__hero-img" />
         ) : (
           <span className="boutique-detail__hero-fallback" aria-hidden="true">
             {boutique.name[0]}
@@ -272,7 +290,7 @@ export const BoutiqueDetailPage = () => {
           <div className="boutique-detail__logo-wrap">
             <div className="boutique-detail__logo">
               {boutique.logo ? (
-                <img src={boutique.logo} alt={boutique.name} />
+                <img src={resolveMediaUrl(boutique.logo)} alt={boutique.name} />
               ) : (
                 <span className="boutique-detail__logo-fallback">{boutique.name[0]}</span>
               )}
@@ -371,158 +389,232 @@ export const BoutiqueDetailPage = () => {
           </div>
         </section>
 
-        {/* Products + recherche/filtres (mêmes que la page ville) */}
+        {/* Produits + offres (onglets) */}
         <section className="boutique-detail__section">
-          {/* Barre de recherche d'article */}
-          <div className="boutique-filter">
-            <div className="boutique-filter__search">
-              <Search size={17} className="boutique-filter__search-icon" aria-hidden="true" />
-              <input
-                type="search"
-                placeholder="Rechercher dans cette boutique (robe, caftan, soirée…)"
-                value={articleSearch}
-                onChange={(e) => setArticleSearch(e.target.value)}
-                className="boutique-filter__input"
-              />
-            </div>
+          {contentTab === 'creations' && (
+            <div className="boutique-filter">
+              <div className="boutique-filter__search">
+                <Search size={17} className="boutique-filter__search-icon" aria-hidden="true" />
+                <input
+                  type="search"
+                  placeholder="Rechercher dans cette boutique (robe, caftan, soirée…)"
+                  value={articleSearch}
+                  onChange={(e) => setArticleSearch(e.target.value)}
+                  className="boutique-filter__input"
+                />
+              </div>
 
-            <div className="boutique-filter__chips">
+              <div className="boutique-filter__chips">
+                <button
+                  type="button"
+                  className={`boutique-chip ${!isArticleMode ? 'boutique-chip--active' : ''}`}
+                  onClick={resetArticleFilters}
+                >
+                  Tout
+                </button>
+
+                <select
+                  className="boutique-filter__select"
+                  aria-label="Type de pièce"
+                  value={PRODUCT_TYPES.some((x) => x.id === articleType?.id) ? articleType.id : ''}
+                  onChange={(e) => handleTypeSelect(PRODUCT_TYPES, e)}
+                >
+                  <option value="">Type de pièce</option>
+                  {PRODUCT_TYPES.map((type) => (
+                    <option key={type.id} value={type.id}>{type.label}</option>
+                  ))}
+                </select>
+
+                <select
+                  className="boutique-filter__select"
+                  aria-label="Occasion"
+                  value={OCCASION_TYPES.some((x) => x.id === articleType?.id) ? articleType.id : ''}
+                  onChange={(e) => handleTypeSelect(OCCASION_TYPES, e)}
+                >
+                  <option value="">Occasion</option>
+                  {OCCASION_TYPES.map((type) => (
+                    <option key={type.id} value={type.id}>{type.label}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          )}
+
+          <div className="boutique-detail__section-head boutique-detail__tabs-head">
+            <div className="boutique-detail__tabs" role="tablist" aria-label="Contenu de la boutique">
               <button
                 type="button"
-                className={`boutique-chip ${!isArticleMode ? 'boutique-chip--active' : ''}`}
-                onClick={resetArticleFilters}
+                role="tab"
+                id="boutique-tab-creations"
+                aria-selected={contentTab === 'creations'}
+                aria-controls="boutique-panel-creations"
+                className={`boutique-detail__tab ${contentTab === 'creations' ? 'boutique-detail__tab--active' : ''}`}
+                onClick={() => setContentTab('creations')}
               >
-                Tout
+                {isArticleMode ? 'Résultats' : 'Dernières créations'}
               </button>
-
-              <select
-                className="boutique-filter__select"
-                aria-label="Type de pièce"
-                value={PRODUCT_TYPES.some((x) => x.id === articleType?.id) ? articleType.id : ''}
-                onChange={(e) => handleTypeSelect(PRODUCT_TYPES, e)}
+              <button
+                type="button"
+                role="tab"
+                id="boutique-tab-offers"
+                aria-selected={contentTab === 'offers'}
+                aria-controls="boutique-panel-offers"
+                className={`boutique-detail__tab ${contentTab === 'offers' ? 'boutique-detail__tab--active' : ''}`}
+                onClick={() => setContentTab('offers')}
               >
-                <option value="">Type de pièce</option>
-                {PRODUCT_TYPES.map((type) => (
-                  <option key={type.id} value={type.id}>{type.label}</option>
-                ))}
-              </select>
-
-              <select
-                className="boutique-filter__select"
-                aria-label="Occasion"
-                value={OCCASION_TYPES.some((x) => x.id === articleType?.id) ? articleType.id : ''}
-                onChange={(e) => handleTypeSelect(OCCASION_TYPES, e)}
-              >
-                <option value="">Occasion</option>
-                {OCCASION_TYPES.map((type) => (
-                  <option key={type.id} value={type.id}>{type.label}</option>
-                ))}
-              </select>
+                Offres spéciales
+              </button>
             </div>
-          </div>
-
-          <div className="boutique-detail__section-head">
-            <h2 className="boutique-detail__section-title">
-              {isArticleMode ? 'Résultats' : 'Dernières créations'}
-            </h2>
-            {displayProducts.length > 0 && (
+            {contentTab === 'creations' && displayProducts.length > 0 && (
               <span className="boutique-detail__section-sub">
                 {displayProducts.length} pièce{displayProducts.length > 1 ? 's' : ''}
                 {isArticleMode && articleType ? ` · ${articleType.label}` : ''}
               </span>
             )}
+            {contentTab === 'offers' && !postsLoading && (
+              <span className="boutique-detail__section-sub">
+                {publicOffers.length + exclusiveOffers.length} offre{(publicOffers.length + exclusiveOffers.length) > 1 ? 's' : ''}
+              </span>
+            )}
           </div>
 
-          {productsLoading ? (
-            <div className="boutique-detail__empty">
-              <div className="boutique-detail__spinner" />
-              <p className="boutique-detail__empty-text">Recherche en cours…</p>
+          {contentTab === 'creations' && (
+            <div
+              id="boutique-panel-creations"
+              role="tabpanel"
+              aria-labelledby="boutique-tab-creations"
+            >
+              {productsLoading ? (
+                <div className="boutique-detail__empty">
+                  <div className="boutique-detail__spinner" />
+                  <p className="boutique-detail__empty-text">Recherche en cours…</p>
+                </div>
+              ) : displayProducts.length > 0 ? (
+                <div className="boutique-detail__products-grid">
+                  {displayProducts.map((product) => (
+                    <ProductCard key={product.id} product={product} />
+                  ))}
+                </div>
+              ) : (
+                <div className="boutique-detail__empty">
+                  <p className="boutique-detail__empty-text">
+                    {isArticleMode
+                      ? `Aucune pièce ne correspond à ce filtre dans ${boutique.name}.`
+                      : 'Aucune création publiée pour le moment. Revenez bientôt !'}
+                  </p>
+                  {isArticleMode && (
+                    <button type="button" className="boutique-chip boutique-chip--active" onClick={resetArticleFilters}>
+                      Réinitialiser
+                    </button>
+                  )}
+                </div>
+              )}
             </div>
-          ) : displayProducts.length > 0 ? (
-            <div className="boutique-detail__products-grid">
-              {displayProducts.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-            </div>
-          ) : (
-            <div className="boutique-detail__empty">
-              <div className="boutique-detail__empty-icon">{isArticleMode ? '🔍' : '✨'}</div>
-              <p className="boutique-detail__empty-text">
-                {isArticleMode
-                  ? `Aucune pièce ne correspond à ce filtre dans ${boutique.name}.`
-                  : 'Aucune création publiée pour le moment. Revenez bientôt !'}
-              </p>
-              {isArticleMode && (
-                <button type="button" className="boutique-chip boutique-chip--active" onClick={resetArticleFilters}>
-                  Réinitialiser
-                </button>
+          )}
+
+          {contentTab === 'offers' && boutique && (
+            <div
+              id="boutique-panel-offers"
+              role="tabpanel"
+              aria-labelledby="boutique-tab-offers"
+              className="boutique-offers"
+            >
+              {postsLoading ? (
+                <div className="boutique-detail__empty">
+                  <div className="boutique-detail__spinner" />
+                  <p className="boutique-detail__empty-text">Chargement des offres…</p>
+                </div>
+              ) : (
+                <>
+                  <div className="boutique-offers__lane">
+                    <div className="boutique-offers__lane-head">
+                      <h3 className="boutique-offers__lane-title">Offres pour tous</h3>
+                      <p className="boutique-offers__lane-desc">Promotions accessibles à tous les visiteurs.</p>
+                    </div>
+                    {publicOffers.length > 0 ? (
+                      <div className="boutique-feed__grid">
+                        {publicOffers.map((post) => (
+                          <OfferPostCard
+                            key={post.id}
+                            post={post}
+                            boutiqueId={boutique.id}
+                            onFollow={handleFollowForOffers}
+                          />
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="boutique-offers__empty-lane">Aucune offre publique pour le moment.</p>
+                    )}
+                  </div>
+
+                  <div className="boutique-offers__lane boutique-offers__lane--exclusive">
+                    <div className="boutique-offers__lane-head">
+                      <h3 className="boutique-offers__lane-title">Offres exclusives abonnés</h3>
+                      <p className="boutique-offers__lane-desc">
+                        {following
+                          ? 'Promotions réservées à ceux qui suivent la boutique.'
+                          : 'Suivez la boutique pour débloquer ces offres.'}
+                      </p>
+                    </div>
+
+                    {!following && exclusiveOffers.length > 0 && (
+                      <div className="boutique-offers__follow-cta">
+                        <p>Abonnez-vous à {boutique.name} pour accéder aux promotions exclusives.</p>
+                        <button
+                          type="button"
+                          className="boutique-offers__follow-btn"
+                          onClick={handleFollowForOffers}
+                          disabled={followLoading}
+                        >
+                          {followLoading ? '…' : (
+                            <>
+                              <UserPlus size={16} />
+                              Suivre pour voir les offres
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    )}
+
+                    {exclusiveOffers.length > 0 ? (
+                      <div className="boutique-feed__grid">
+                        {exclusiveOffers.map((post) => (
+                          <OfferPostCard
+                            key={post.id}
+                            post={post}
+                            boutiqueId={boutique.id}
+                            onFollow={handleFollowForOffers}
+                            showLockButton={false}
+                          />
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="boutique-offers__empty-lane">Aucune offre exclusive pour le moment.</p>
+                    )}
+                  </div>
+                </>
               )}
             </div>
           )}
         </section>
 
-        {/* Fil de publications (actualités & offres) */}
-        {(postsLoading || posts.length > 0) && (
+        {/* Actualités (hors offres) */}
+        {!postsLoading && newsPosts.length > 0 && (
           <section className="boutique-feed">
             <div className="boutique-detail__section-head">
-              <h2 className="boutique-detail__section-title">Actualités &amp; offres</h2>
-              {posts.length > 0 && (
-                <span className="boutique-detail__section-sub">{posts.length} publication{posts.length > 1 ? 's' : ''}</span>
-              )}
+              <h2 className="boutique-detail__section-title">Actualités</h2>
+              <span className="boutique-detail__section-sub">{newsPosts.length} publication{newsPosts.length > 1 ? 's' : ''}</span>
             </div>
-
-            {postsLoading ? (
-              <div className="boutique-detail__empty">
-                <div className="boutique-detail__spinner" />
-                <p className="boutique-detail__empty-text">Chargement des publications…</p>
-              </div>
-            ) : (
-              <div className="boutique-feed__grid">
-                {posts.map((post) => (
-                  <article key={post.id} className={`feed-post ${post.is_locked ? 'feed-post--locked' : ''}`}>
-                    <div className="feed-post__media">
-                      {post.image_url && (
-                        <img src={resolveMediaUrl(post.image_url)} alt="" className="feed-post__img" />
-                      )}
-                      {post.is_exclusive && (
-                        <span className="feed-post__exclusive"><Tag size={12} /> Exclusif abonnés</span>
-                      )}
-                      {post.is_locked && (
-                        <div className="feed-post__lock">
-                          <Lock size={22} />
-                          <p>Offre réservée aux abonnés</p>
-                          <button type="button" className="feed-post__lock-btn" onClick={handleFollow}>
-                            {isAuthenticated ? 'Suivre pour débloquer' : 'Connectez-vous & suivez'}
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                    {!post.is_locked && (
-                      <div className="feed-post__body">
-                        {post.caption && <p className="feed-post__caption">{post.caption}</p>}
-                        {post.promo_text && (
-                          <p className="feed-post__promo">
-                            <Tag size={13} /> {post.promo_text}
-                            {post.promo_code && <code className="feed-post__code">{post.promo_code}</code>}
-                          </p>
-                        )}
-                        {post.product && (
-                          <Link to={`/products/${post.product.slug}`} className="feed-post__product">
-                            Voir « {post.product.name} » →
-                          </Link>
-                        )}
-                        <PostComments
-                          boutiqueId={boutique.id}
-                          postId={post.id}
-                          initialCount={post.comments_count || 0}
-                        />
-                        <span className="feed-post__time">{post.created_at}</span>
-                      </div>
-                    )}
-                  </article>
-                ))}
-              </div>
-            )}
+            <div className="boutique-feed__grid">
+              {newsPosts.map((post) => (
+                <OfferPostCard
+                  key={post.id}
+                  post={post}
+                  boutiqueId={boutique.id}
+                  onFollow={handleFollowForOffers}
+                />
+              ))}
+            </div>
           </section>
         )}
 
@@ -562,7 +654,6 @@ export const BoutiqueDetailPage = () => {
 
           {reviews.length === 0 ? (
             <div className="boutique-detail__review-empty">
-              <span className="boutique-detail__empty-icon">💬</span>
               <p>Soyez le premier à partager votre expérience avec {boutique.name}.</p>
             </div>
           ) : (
@@ -585,7 +676,7 @@ export const BoutiqueDetailPage = () => {
                     </div>
                     <div className="flex gap-0.5">
                       {[...Array(5)].map((_, i) => (
-                        <span key={i} className={i < review.rating ? 'text-secondary text-sm' : 'text-accent/30 text-sm'}>★</span>
+                        <span key={i} className={i < review.rating ? 'text-secondary text-sm' : 'text-accent/30 text-sm'}></span>
                       ))}
                     </div>
                   </div>

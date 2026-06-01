@@ -2,14 +2,14 @@ import { useState } from 'react';
 import toast from 'react-hot-toast';
 
 const MOCK_NOTIFS = [
-  { id:1,  type:'boutique', icon:'🏬', title:'Nouvelle boutique en attente', message:'«Élégance Paris» de Amina Benali attend validation.', time:'Il y a 15 min', read:false },
-  { id:2,  type:'order',    icon:'🛍', title:'Commande #1047 annulée',       message:'Le client Nadia Chraibi a annulé sa commande.',        time:'Il y a 1h',    read:false },
-  { id:3,  type:'user',     icon:'👥', title:'Nouvel utilisateur inscrit',   message:'Sara Farouk vient de créer un compte client.',        time:'Il y a 2h',    read:false },
-  { id:4,  type:'system',   icon:'⚙️', title:'Mise à jour système',          message:'La base de données a été sauvegardée avec succès.',   time:'Il y a 4h',    read:true  },
-  { id:5,  type:'boutique', icon:'🏬', title:'Boutique suspendue',           message:'Chic Fès a été suspendue pour violation des CGU.',    time:'Hier',         read:true  },
-  { id:6,  type:'order',    icon:'🛍', title:'Commande #1044 livrée',        message:'La commande de Sara Farouk a été livrée.',            time:'Il y a 2j',    read:true  },
-  { id:7,  type:'system',   icon:'📊', title:'Rapport mensuel disponible',   message:'Le rapport d\'avril 2026 est prêt à télécharger.',    time:'Il y a 3j',    read:true  },
-  { id:8,  type:'user',     icon:'👥', title:'Compte utilisateur supprimé',  message:'Un compte dormant a été archivé automatiquement.',    time:'Il y a 5j',    read:true  },
+  { id:1,  type:'boutique', icon:'', title:'Nouvelle boutique en attente', message:'«Élégance Paris» de Amina Benali attend validation.', time:'Il y a 15 min', read:false },
+  { id:2,  type:'order',    icon:'', title:'Commande #1047 annulée',       message:'Le client Nadia Chraibi a annulé sa commande.',        time:'Il y a 1h',    read:false },
+  { id:3,  type:'user',     icon:'', title:'Nouvel utilisateur inscrit',   message:'Sara Farouk vient de créer un compte client.',        time:'Il y a 2h',    read:false },
+  { id:4,  type:'system',   icon:'', title:'Mise à jour système',          message:'La base de données a été sauvegardée avec succès.',   time:'Il y a 4h',    read:true  },
+  { id:5,  type:'boutique', icon:'', title:'Boutique suspendue',           message:'Chic Fès a été suspendue pour violation des CGU.',    time:'Hier',         read:true  },
+  { id:6,  type:'order',    icon:'', title:'Commande #1044 livrée',        message:'La commande de Sara Farouk a été livrée.',            time:'Il y a 2j',    read:true  },
+  { id:7,  type:'system',   icon:'', title:'Rapport mensuel disponible',   message:'Le rapport d\'avril 2026 est prêt à télécharger.',    time:'Il y a 3j',    read:true  },
+  { id:8,  type:'user',     icon:'', title:'Compte utilisateur supprimé',  message:'Un compte dormant a été archivé automatiquement.',    time:'Il y a 5j',    read:true  },
 ];
 
 const TABS = ['Toutes','Non lues','Lues'];
@@ -59,13 +59,12 @@ export default function AdminNotificationsPage() {
       <div style={{ display:'flex',flexDirection:'column',gap:8 }}>
         {filtered.length === 0 ? (
           <div style={{ textAlign:'center',padding:'60px 0' }}>
-            <div style={{ fontSize:48,marginBottom:12 }}>🔔</div>
             <p style={{ fontFamily:"'Playfair Display', serif",fontSize:18,fontWeight:600,color:'#111827',marginBottom:4 }}>Aucune notification</p>
             <p style={{ fontFamily:'Inter, sans-serif',fontSize:13,color:'#6B7280' }}>Vous êtes à jour !</p>
           </div>
         ) : filtered.map(n => (
           <div key={n.id} style={{ backgroundColor:n.read?'#fff':'rgba(201,168,76,0.05)',borderRadius:14,padding:'16px 20px',border:`1px solid ${n.read?'rgba(0,0,0,0.06)':'rgba(201,168,76,0.2)'}`,display:'flex',gap:14,alignItems:'flex-start',transition:'all 0.18s' }}>
-            <div style={{ width:40,height:40,borderRadius:10,backgroundColor:n.read?'#F3F4F6':'rgba(201,168,76,0.15)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:20,flexShrink:0 }}>{n.icon}</div>
+            <div style={{ width:40,height:40,borderRadius:10,backgroundColor:n.read?'#F3F4F6':'rgba(201,168,76,0.15)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:14,fontWeight:700,color:'#374151',flexShrink:0 }}>{n.icon || (n.type?.charAt(0)?.toUpperCase() || 'N')}</div>
             <div style={{ flex:1,minWidth:0 }}>
               <div style={{ display:'flex',justifyContent:'space-between',alignItems:'flex-start',gap:8,marginBottom:2 }}>
                 <p style={{ fontFamily:'Inter, sans-serif',fontSize:13.5,fontWeight:n.read?500:700,color:'#111827',margin:0 }}>{n.title}</p>

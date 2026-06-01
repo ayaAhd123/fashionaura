@@ -5,8 +5,8 @@ function ProtectedRoute({ allowedRoles = [] }) {
   const { isAuthenticated, isLoading, user } = useAuth();
   const location = useLocation();
 
-  console.log('🔒 ProtectedRoute - isAuthenticated:', isAuthenticated);
-  console.log('🔒 ProtectedRoute - user:', user);
+  console.log('ProtectedRoute - isAuthenticated:', isAuthenticated);
+  console.log('ProtectedRoute - user:', user);
 
   if (isLoading) {
     return (
@@ -18,16 +18,16 @@ function ProtectedRoute({ allowedRoles = [] }) {
   }
 
   if (!isAuthenticated) {
-    console.log('🔒 Non authentifié, redirection vers /login');
+    console.log('Non authentifié, redirection vers /login');
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
   if (allowedRoles.length > 0 && !allowedRoles.includes(user?.role)) {
-    console.log('⛔ Rôle non autorisé:', user?.role);
+    console.log('Rôle non autorisé:', user?.role);
     return <Navigate to="/unauthorized" replace />;
   }
 
-  console.log('✅ Accès autorisé');
+  console.log('Accès autorisé');
   return <Outlet />;
 }
 

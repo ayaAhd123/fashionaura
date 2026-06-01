@@ -1,0 +1,67 @@
+erDiagram
+    users ||--o{ orders : "user_id"
+    users ||--o| boutiques : "boutique_id"
+    users ||--o{ reviews : "user_id"
+    users ||--o{ conversations : "customer_id"
+    users ||--o{ carts : "user_id"
+    users ||--o{ favorites : "user_id"
+    users ||--o{ boutique_followers : "user_id"
+
+    cities ||--|{ boutiques : "city_id"
+    boutiques ||--|{ products : "boutique_id"
+    categories ||--|{ products : "category_id"
+    boutiques ||--|{ boutique_posts : "boutique_id"
+    boutiques ||--|{ reviews : "boutique_id"
+
+    orders ||--|{ order_items : "order_id"
+    products ||--o{ order_items : "product_id"
+    carts ||--|{ cart_items : "cart_id"
+    products ||--o{ cart_items : "product_id"
+
+    conversations ||--|{ messages : "conversation_id"
+    users ||--o{ messages : "sender_id"
+    orders |o--o| conversations : "order_id"
+
+    users {
+        bigint id PK
+        string name
+        string email UK
+        string role
+        bigint boutique_id FK
+    }
+
+    cities {
+        bigint id PK
+        string name UK
+        string slug UK
+    }
+
+    boutiques {
+        bigint id PK
+        string name
+        bigint city_id FK
+        boolean is_verified
+    }
+
+    products {
+        bigint id PK
+        string name
+        decimal price
+        int stock_quantity
+        bigint boutique_id FK
+        bigint category_id FK
+    }
+
+    orders {
+        bigint id PK
+        bigint user_id FK
+        decimal total
+        string status
+    }
+
+    order_items {
+        bigint id PK
+        bigint order_id FK
+        bigint product_id FK
+        int quantity
+    }

@@ -15,6 +15,9 @@ api.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+    if (config.data instanceof FormData) {
+      delete config.headers['Content-Type'];
+    }
     return config;
   },
   (error) => Promise.reject(error)
@@ -56,7 +59,7 @@ api.interceptors.response.use(
 
 export const loginUser    = (email, password) => api.post('/login', { email, password });
 export const logoutUser   = () => api.post('/logout');
-export const registerUser = (data) => api.post('/register', data);  // ✅ Ajouté
+export const registerUser = (data) => api.post('/register', data);  //  Ajouté
 
 // ─── Compte client ────────────────────────────────────────────────────────────
 export const updateProfile  = (data) => api.put('/account/profile', data);
@@ -64,6 +67,7 @@ export const updatePassword = (data) => api.put('/account/password', data);
 
 // ─── Commandes ──────────────────────────────────────────────────────────────
 export const getMyOrders = () => api.get('/orders');
+export const getOrder = (id) => api.get(`/orders/${id}`);
 export const createOrder = (data) => api.post('/orders', data);
 export const getOrderConversation = (orderId) => api.get(`/orders/${orderId}/conversation`);
 export const getConversationMessages = (conversationId) => api.get(`/conversations/${conversationId}/messages`);

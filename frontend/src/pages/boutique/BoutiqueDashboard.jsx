@@ -77,7 +77,7 @@ function RecentPostsSection() {
   return (
     <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px rgba(44,58,57,0.07)', border: '1px solid rgba(147,151,144,0.12)', overflow: 'hidden' }}>
       <div style={{ padding: '18px 22px', borderBottom: '1px solid rgba(147,151,144,0.12)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h3 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 20, fontWeight: 500, color: '#2C2C2C', margin: 0 }}>Vos publications</h3>
+        <h3 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 20, fontWeight: 500, color: '#2C2C2C', margin: 0 }}>Vos offres spéciales</h3>
         <Link to="/boutique/publications" style={{ fontFamily: 'Raleway, sans-serif', fontSize: 12, fontWeight: 600, color: '#69807E', textDecoration: 'none' }}>Gérer →</Link>
       </div>
       {loading ? (
@@ -85,7 +85,7 @@ function RecentPostsSection() {
       ) : posts.length === 0 ? (
         <div style={{ padding: '28px 22px', textAlign: 'center' }}>
           <p style={{ fontFamily: 'Raleway, sans-serif', fontSize: 13, color: '#939790', marginBottom: 12 }}>Aucune publication. Partagez vos offres et actualités avec vos abonnés.</p>
-          <Link to="/boutique/publications" style={{ display: 'inline-block', padding: '8px 18px', borderRadius: 999, background: '#69807E', color: '#fff', fontFamily: 'Raleway, sans-serif', fontSize: 12, fontWeight: 600, textDecoration: 'none' }}>+ Créer une publication</Link>
+          <Link to="/boutique/publications" style={{ display: 'inline-block', padding: '8px 18px', borderRadius: 999, background: '#69807E', color: '#fff', fontFamily: 'Raleway, sans-serif', fontSize: 12, fontWeight: 600, textDecoration: 'none' }}>+ Créer une offre</Link>
         </div>
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: 14, padding: 18 }}>
@@ -205,7 +205,7 @@ function RecentOrdersTable({ orders = [], loading = false, onStatusChange, onMes
 function AIAdvisorTeaser() {
   return (
     <div style={{ background: 'linear-gradient(135deg, #2C3A39 0%, #3D5452 50%, #69807E 100%)', borderRadius: 16, padding: '24px 28px', color: '#fff', position: 'relative', overflow: 'hidden' }}>
-      <p style={{ fontFamily: 'Raleway, sans-serif', fontSize: 11, letterSpacing: '0.2em', color: '#E3C8B5', textTransform: 'uppercase', marginBottom: 10 }}>✦ Conseiller IA</p>
+      <p style={{ fontFamily: 'Raleway, sans-serif', fontSize: 11, letterSpacing: '0.2em', color: '#E3C8B5', textTransform: 'uppercase', marginBottom: 10 }}>Conseiller IA</p>
       <p style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 22, fontWeight: 400, marginBottom: 8, lineHeight: 1.3 }}>Analyse et recommandations</p>
       <p style={{ fontFamily: 'Raleway, sans-serif', fontSize: 13, color: 'rgba(255,255,255,0.6)', marginBottom: 20, lineHeight: 1.6 }}>
         Basé sur vos ventes et stocks réels.
@@ -282,7 +282,7 @@ export default function BoutiqueDashboard() {
         <div>
           <p style={{ fontFamily: 'Raleway, sans-serif', fontSize: 12, color: '#939790', letterSpacing: '0.1em', marginBottom: 4, textTransform: 'capitalize' }}>{today}</p>
           <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 28, fontWeight: 400, color: '#2C2C2C' }}>
-            Bonjour, {user?.name?.split(' ')[0] || 'là'} 👋
+            Bonjour, {user?.name?.split(' ')[0] || 'là'} 
           </h2>
           <p style={{ fontFamily: 'Raleway, sans-serif', fontSize: 13, color: '#939790', marginTop: 2 }}>
             {statsLoading ? 'Chargement…' : `${todayOrders} commande(s) aujourd'hui · ${Number(todayRevenue).toLocaleString('fr-FR')} MAD`}

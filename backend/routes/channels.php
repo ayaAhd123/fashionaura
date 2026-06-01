@@ -2,6 +2,7 @@
 
 use App\Models\Conversation;
 use App\Models\Order;
+use App\Models\User;
 use Illuminate\Support\Facades\Broadcast;
 
 Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
@@ -11,6 +12,14 @@ Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
 Broadcast::channel('conversation.{conversationId}', function ($user, $conversationId) {
     $conversation = Conversation::find($conversationId);
     if (! $conversation) {
+        return false;
+    }
+
+    if ($conversation->kind === Conversation::KIND_USER) {
+        if ($conversation->involvesUser((int) $user->id)) {
+            return ['id' => $user->id, 'name' => $user->name];
+        }
+
         return false;
     }
 

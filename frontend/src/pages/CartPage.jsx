@@ -26,7 +26,7 @@ export const CartPage = () => {
   };
 
   const handleCheckoutSuccess = async (form) => {
-    await createOrder({
+    const { data: order } = await createOrder({
       items: items.map((i) => ({
         product_id: i.product_id,
         quantity: i.quantity,
@@ -37,6 +37,7 @@ export const CartPage = () => {
       phone: form.phone,
     });
     clearCart();
+    return order;
   };
 
   const handleFinalize = () => {

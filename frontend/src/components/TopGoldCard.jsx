@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Star, Truck } from 'lucide-react';
-import { cityName } from '../utils/cityI18n';
+import { resolveMediaUrl } from '../utils/imageUtils';
 
 import '../styles/top-partners.css';
 
@@ -21,7 +21,7 @@ export function TopGoldCard({ boutique, city, rank }) {
 
       <div className="top-gold-card__media">
         {boutique.logo ? (
-          <img src={boutique.logo} alt={boutique.name} />
+          <img src={resolveMediaUrl(boutique.logo)} alt={boutique.name} />
         ) : (
           <span className="top-gold-card__initial">{boutique.name[0]}</span>
         )}

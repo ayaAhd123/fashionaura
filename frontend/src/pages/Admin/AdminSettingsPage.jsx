@@ -4,7 +4,7 @@ import toast from 'react-hot-toast';
 import i18n from '../../i18n';
 
 const TABS = ['Général','Apparence','Notifications','Sécurité','Avancé'];
-const LANGS = [{ code:'fr',label:'🇫🇷 Français' },{ code:'en',label:'🇬🇧 English' },{ code:'ar',label:'🇸🇦 العربية' },{ code:'es',label:'🇪🇸 Español' }];
+const LANGS = [{ code:'fr',label:'Français' },{ code:'en',label:'English' },{ code:'ar',label:'العربية' },{ code:'es',label:'Español' }];
 
 function Toggle({ value, onChange }) {
   return (
@@ -83,7 +83,6 @@ function AppearanceTab() {
   return (
     <Section title="Apparence">
       <div style={{ padding:'20px',backgroundColor:isDark?'#1A1D27':'#F9FAFB',borderRadius:12,marginBottom:16,textAlign:'center' }}>
-        <div style={{ fontSize:48,marginBottom:8 }}>{isDark?'🌙':'☀️'}</div>
         <p style={{ fontFamily:"'Playfair Display', serif",fontSize:18,fontWeight:600,color:isDark?'#E5E7EB':'#111827',margin:'0 0 4px' }}>{isDark?'Mode sombre':'Mode clair'}</p>
         <p style={{ fontFamily:'Inter, sans-serif',fontSize:13,color:isDark?'#9CA3AF':'#6B7280',margin:'0 0 16px' }}>Aperçu du thème actuel</p>
         <button onClick={toggleTheme} style={{ padding:'10px 28px',borderRadius:20,border:'none',backgroundColor:'#1B3A35',color:'#fff',fontFamily:'Inter, sans-serif',fontSize:13,fontWeight:600,cursor:'pointer' }}>

@@ -4,12 +4,12 @@ import LoadingSpinner from '../../components/common/LoadingSpinner';
 import api from '../../services/api';
 
 const typeConfig = {
-  order:  { label: 'Commande', bg: '#EEF6FF', color: '#1A5BA6', icon: '🛍️' },
-  review: { label: 'Avis',     bg: '#FFF8F0', color: '#B85C00', icon: '⭐' },
-  stock:  { label: 'Stock',    bg: '#FFF0F0', color: '#c0392b', icon: '📦' },
-  product:{ label: 'Stock',    bg: '#FFF0F0', color: '#c0392b', icon: '📦' },
-  promo:  { label: 'Promo',    bg: '#F0FFF4', color: '#1A6B3C', icon: '🏷️' },
-  system: { label: 'Système',  bg: '#F5F5F5', color: '#555',    icon: '⚙️' },
+  order:  { label: 'Commande', bg: '#EEF6FF', color: '#1A5BA6', icon: '' },
+  review: { label: 'Avis',     bg: '#FFF8F0', color: '#B85C00', icon: '' },
+  stock:  { label: 'Stock',    bg: '#FFF0F0', color: '#c0392b', icon: '' },
+  product:{ label: 'Stock',    bg: '#FFF0F0', color: '#c0392b', icon: '' },
+  promo:  { label: 'Promo',    bg: '#F0FFF4', color: '#1A6B3C', icon: '' },
+  system: { label: 'Système',  bg: '#F5F5F5', color: '#555',    icon: '' },
 };
 
 const FILTERS = ['Toutes', 'Non lues', 'Stock'];
@@ -277,8 +277,8 @@ export default function NotificationsList() {
                   animation: `fa-fade-in 0.3s ease ${i * 0.05}s both`,
                 }}
               >
-                <div style={{ width: 42, height: 42, borderRadius: 12, backgroundColor: cfg.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, flexShrink: 0 }}>
-                  {cfg.icon}
+                <div style={{ width: 42, height: 42, borderRadius: 12, backgroundColor: cfg.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, fontWeight: 700, color: cfg.color, flexShrink: 0 }}>
+                  {cfg.icon || cfg.label.charAt(0)}
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>

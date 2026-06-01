@@ -7,6 +7,9 @@ use App\Models\Boutique;
 use App\Models\Conversation;
 use App\Models\Message;
 use App\Models\Order;
+use App\Models\User;
+use App\Services\MessageFormatter;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class ConversationController extends Controller
@@ -18,20 +21,34 @@ class ConversationController extends Controller
             ->with([
                 'boutique:id,name,logo,messages_enabled',
                 'customer:id,name,avatar',
+                'peerUser:id,name,avatar',
                 'order:id,status',
             ])
             ->withCount('messages');
 
         if ($user->role === 'boutique_owner') {
             abort_unless($user->boutique_id, 422, 'Aucune boutique associée.');
-            $query->where('boutique_id', $user->boutique_id);
+            $query->where('kind', Conversation::KIND_BOUTIQUE)
+                ->where('boutique_id', $user->boutique_id);
         } else {
-            $query->where('customer_id', $user->id);
+            $query->where(function ($q) use ($user) {
+                $q->where(function ($q2) use ($user) {
+                    $q2->where('kind', Conversation::KIND_BOUTIQUE)
+                        ->where('customer_id', $user->id);
+                })->orWhere(function ($q2) use ($user) {
+                    $q2->where('kind', Conversation::KIND_USER)
+                        ->where(function ($q3) use ($user) {
+                            $q3->where('customer_id', $user->id)
+                                ->orWhere('peer_user_id', $user->id);
+                        });
+                });
+            });
         }
 
         $conversations = $query->latest('updated_at')->get();
 
         $lastMessages = Message::whereIn('conversation_id', $conversations->pluck('id'))
+            ->with(['product:id,name'])
             ->orderByDesc('created_at')
             ->get()
             ->unique('conversation_id')
@@ -39,9 +56,33 @@ class ConversationController extends Controller
 
         $data = $conversations->map(function (Conversation $conv) use ($user, $lastMessages) {
             $last = $lastMessages->get($conv->id);
+            $lastFormatted = $last ? MessageFormatter::format($last, (int) $user->id) : null;
+
+            if ($conv->kind === Conversation::KIND_USER) {
+                $counterpart = (int) $user->id === (int) $conv->customer_id
+                    ? $conv->peerUser
+                    : $conv->customer;
+
+                return [
+                    'id' => $conv->id,
+                    'kind' => $conv->kind,
+                    'type' => 'user',
+                    'peer_user_id' => $counterpart?->id,
+                    'counterpart_name' => $counterpart?->name ?? 'Utilisateur',
+                    'counterpart_avatar' => $counterpart?->avatar,
+                    'label' => $counterpart?->name ?? 'Discussion',
+                    'messages_count' => $conv->messages_count,
+                    'last_message' => $lastFormatted ? [
+                        'preview' => $lastFormatted['preview'],
+                        'created_at' => $lastFormatted['created_at'],
+                    ] : null,
+                    'updated_at' => $conv->updated_at?->toIso8601String(),
+                ];
+            }
 
             return [
                 'id' => $conv->id,
+                'kind' => $conv->kind,
                 'type' => $conv->order_id ? 'order' : 'direct',
                 'order_id' => $conv->order_id,
                 'order_status' => $conv->order?->status,
@@ -58,15 +99,61 @@ class ConversationController extends Controller
                 'label' => $conv->order_id
                     ? 'Commande #'.$conv->order_id
                     : 'Message direct',
-                'last_message' => $last ? [
-                    'body' => $last->body,
-                    'created_at' => $last->created_at?->toIso8601String(),
+                'last_message' => $lastFormatted ? [
+                    'preview' => $lastFormatted['preview'],
+                    'created_at' => $lastFormatted['created_at'],
                 ] : null,
                 'updated_at' => $conv->updated_at?->toIso8601String(),
             ];
         });
 
         return response()->json(['data' => $data]);
+    }
+
+    public function searchUsers(Request $request)
+    {
+        abort_unless(Auth::user()->role === 'customer', 403, 'Recherche réservée aux comptes client.');
+
+        $q = trim((string) $request->get('q', ''));
+        abort_if(mb_strlen($q) < 2, 422, 'Saisissez au moins 2 caractères.');
+
+        $users = User::query()
+            ->where('id', '!=', Auth::id())
+            ->where('role', 'customer')
+            ->where('is_active', true)
+            ->where(function ($w) use ($q) {
+                $w->where('name', 'like', "%{$q}%")
+                    ->orWhere('email', 'like', "%{$q}%");
+            })
+            ->orderBy('name')
+            ->limit(15)
+            ->get(['id', 'name', 'email', 'avatar']);
+
+        return response()->json(['data' => $users]);
+    }
+
+    public function forUser(int $userId)
+    {
+        abort_unless(Auth::user()->role === 'customer', 403, 'Seuls les clients peuvent discuter entre eux.');
+
+        $other = User::where('role', 'customer')->where('is_active', true)->findOrFail($userId);
+        abort_if((int) Auth::id() === (int) $other->id, 422, 'Impossible de discuter avec vous-même.');
+
+        $conversation = Conversation::findOrCreateUserDirect(Auth::user(), $other)
+            ->load(['customer:id,name,avatar', 'peerUser:id,name,avatar']);
+
+        $counterpart = (int) Auth::id() === (int) $conversation->customer_id
+            ? $conversation->peerUser
+            : $conversation->customer;
+
+        return response()->json([
+            'id' => $conversation->id,
+            'kind' => $conversation->kind,
+            'type' => 'user',
+            'peer_user_id' => $counterpart?->id,
+            'counterpart_name' => $counterpart?->name,
+            'counterpart_avatar' => $counterpart?->avatar,
+        ]);
     }
 
     public function forOrder($orderId)
@@ -98,6 +185,7 @@ class ConversationController extends Controller
     {
         return [
             'id' => $conversation->id,
+            'kind' => $conversation->kind,
             'type' => $conversation->order_id ? 'order' : 'direct',
             'order_id' => $conversation->order_id,
             'boutique_id' => $conversation->boutique_id,

@@ -1,0 +1,25 @@
+sequenceDiagram
+    autonumber
+    actor Client
+    participant React as Frontend React
+    participant API as Laravel API
+    participant DB as MySQL
+    participant Reverb as Laravel Reverb
+    actor Boutique as Propriétaire boutique
+
+    Client->>React: Valider panier (CheckoutModal)
+    React->>API: POST /api/orders + Bearer token
+    API->>API: Valider items et calculer prix
+    API->>DB: Transaction Order + OrderItems
+    DB-->>API: Commande créée
+    API-->>React: JSON order id + détails
+    React-->>Client: Redirection suivi /compte/commandes/{id}
+
+    Note over Client,React: Suivi en temps réel
+
+    Boutique->>React: Met à jour statut (Expédiée)
+    React->>API: PUT /boutique/orders/{id}/status
+    API->>DB: UPDATE orders.status
+    API->>Reverb: Broadcast OrderStatusUpdated
+    Reverb-->>React: WebSocket order.{id}
+    React-->>Client: Timeline mise à jour

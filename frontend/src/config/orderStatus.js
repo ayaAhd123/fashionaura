@@ -7,6 +7,19 @@ export const ORDER_STATUS_CFG = {
   cancelled:  { label: 'Annulée',     bg: '#fef2f2', color: '#dc2626', border: '#fecaca' },
 };
 
+/** Étapes affichées dans le suivi client (hors annulation). */
+export const ORDER_TRACKING_STEPS = ['pending', 'confirmed', 'processing', 'shipped', 'delivered'];
+
+export function getOrderStatusCfg(status) {
+  return ORDER_STATUS_CFG[status] || ORDER_STATUS_CFG.pending;
+}
+
+export function getTrackingStepIndex(status) {
+  if (status === 'cancelled') return -1;
+  const idx = ORDER_TRACKING_STEPS.indexOf(status);
+  return idx >= 0 ? idx : 0;
+}
+
 export const ORDER_STATUS_OPTIONS = Object.entries(ORDER_STATUS_CFG).map(([value, cfg]) => ({
   value,
   label: cfg.label,

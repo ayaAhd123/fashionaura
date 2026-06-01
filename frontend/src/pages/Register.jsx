@@ -450,7 +450,7 @@ function Register() {
         </div>
 
         <p style={{ textAlign: 'center', color: '#C0C0BC', fontSize: '11px', marginTop: '24px' }}>
-          © 2025 FashionAura
+           2025 FashionAura
         </p>
       </div>
     </div>

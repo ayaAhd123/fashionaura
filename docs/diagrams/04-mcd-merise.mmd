@@ -1,0 +1,91 @@
+erDiagram
+    UTILISATEUR ||--o{ COMMANDE : passe
+    UTILISATEUR ||--o| BOUTIQUE : possede
+    UTILISATEUR ||--o{ AVIS : redige
+    UTILISATEUR ||--o{ CONVERSATION : participe
+    UTILISATEUR ||--o{ PANIER : a
+    UTILISATEUR ||--o{ FAVORI : a
+    UTILISATEUR ||--o{ ABONNEMENT_BOUTIQUE : suit
+
+    VILLE ||--|{ BOUTIQUE : heberge
+    BOUTIQUE ||--|{ PRODUIT : propose
+    CATEGORIE ||--|{ PRODUIT : classe
+    BOUTIQUE ||--|{ PUBLICATION : publie
+    BOUTIQUE ||--|{ AVIS : recoit
+
+    COMMANDE ||--|{ LIGNE_COMMANDE : contient
+    PRODUIT ||--o{ LIGNE_COMMANDE : figure_dans
+    PANIER ||--|{ LIGNE_PANIER : contient
+    PRODUIT ||--o{ LIGNE_PANIER : ajoute
+
+    CONVERSATION ||--|{ MESSAGE : contient
+    COMMANDE |o--o| CONVERSATION : liee
+
+    UTILISATEUR {
+        int id PK
+        string nom
+        string email
+        string role
+        string telephone
+    }
+
+    VILLE {
+        int id PK
+        string nom
+        string slug
+        string region
+    }
+
+    BOUTIQUE {
+        int id PK
+        string nom
+        int ville_id FK
+        bool verifiee
+        float note
+    }
+
+    PRODUIT {
+        int id PK
+        string nom
+        float prix
+        int stock
+        int boutique_id FK
+        int categorie_id FK
+    }
+
+    COMMANDE {
+        int id PK
+        int utilisateur_id FK
+        float total
+        string statut
+        string adresse
+    }
+
+    LIGNE_COMMANDE {
+        int id PK
+        int commande_id FK
+        int produit_id FK
+        int quantite
+        float prix
+    }
+
+    PUBLICATION {
+        int id PK
+        string legende
+        string code_promo
+        bool exclusive
+    }
+
+    CONVERSATION {
+        int id PK
+        string type
+        int boutique_id FK
+        int client_id FK
+    }
+
+    MESSAGE {
+        int id PK
+        string type
+        string contenu
+        int expediteur_id FK
+    }

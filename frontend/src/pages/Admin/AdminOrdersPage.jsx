@@ -170,7 +170,7 @@ export default function AdminOrdersPage() {
 
       {/* Filters */}
       <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
-        <input value={search} onChange={e => { setSearch(e.target.value); setPage(1); }} placeholder="🔍 Rechercher commande, client…" style={{ ...inp, width: 280 }} />
+        <input value={search} onChange={e => { setSearch(e.target.value); setPage(1); }} placeholder="Rechercher commande, client…" style={{ ...inp, width: 280 }} />
         <select value={status} onChange={e => { setStatus(e.target.value); setPage(1); }} style={{ ...inp, width: 160 }}>
           <option value="Tous">Tous statuts</option>
           {STATUSES.map(s => <option key={s} value={s}>{STATUS_CFG[s]?.label}</option>)}

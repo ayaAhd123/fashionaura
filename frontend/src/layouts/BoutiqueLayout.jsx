@@ -23,10 +23,10 @@ const ROUTE_LABELS = {
 };
 
 const LANGS = [
-  { code: 'fr', label: '🇫🇷 FR' },
-  { code: 'en', label: '🇬🇧 EN' },
-  { code: 'ar', label: '🇸🇦 AR' },
-  { code: 'es', label: '🇪🇸 ES' },
+  { code: 'fr', label: 'FR' },
+  { code: 'en', label: 'EN' },
+  { code: 'ar', label: 'AR' },
+  { code: 'es', label: 'ES' },
 ];
 
 /* ── Icons ─────────────────────────────────────────────────── */
@@ -54,7 +54,7 @@ const Ico = {
 const NAV_ITEMS = [
   { to: '/boutique/dashboard',     label: 'Dashboard',     icon: 'dashboard' },
   { to: '/boutique/produits',      label: 'Produits',      icon: 'products'  },
-  { to: '/boutique/publications',  label: 'Publications',  icon: 'posts'     },
+  { to: '/boutique/publications',  label: 'Offres spéciales',  icon: 'posts'     },
   { to: '/boutique/commandes',     label: 'Commandes',     icon: 'orders'    },
   { to: '/boutique/messagerie',    label: 'Messagerie',    icon: 'messages'  },
   { to: '/boutique/clients',       label: 'Clients',       icon: 'clients'   },
@@ -229,7 +229,7 @@ function Header({ onMenuToggle, isDark }) {
 
   const mockNotifs = [
     { id: 1, text: 'Nouvelle commande reçue #2058', time: 'Il y a 30min', read: false },
-    { id: 2, text: 'Nouveau avis 5★ de Amina B.', time: 'Il y a 2h', read: false },
+    { id: 2, text: 'Nouveau avis 5 de Amina B.', time: 'Il y a 2h', read: false },
     { id: 3, text: 'Stock faible : Robe Émeraude (3 restants)', time: 'Il y a 5h', read: true },
     { id: 4, text: 'Votre rapport hebdomadaire est prêt', time: 'Hier', read: true },
   ];
@@ -294,7 +294,7 @@ function Header({ onMenuToggle, isDark }) {
         {/* Language */}
         <div ref={langRef} style={{ position: 'relative' }}>
           <button onClick={() => { setShowLang(v => !v); setShowBell(false); setShowUser(false); }} style={{ ...iconBtn, width: 'auto', padding: '0 12px', borderRadius: 20, fontFamily: 'Inter, sans-serif', fontSize: 12, fontWeight: 500, gap: 4 }}>
-            {LANGS.find(l => l.code === lang)?.label || '🇫🇷 FR'}
+            {LANGS.find(l => l.code === lang)?.label || 'FR'}
           </button>
           {showLang && (
             <div style={{ ...dropStyle, minWidth: 130, padding: 6 }}>

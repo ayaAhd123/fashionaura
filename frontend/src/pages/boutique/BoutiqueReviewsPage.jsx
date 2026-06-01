@@ -118,7 +118,7 @@ export default function BoutiqueReviewsPage() {
             </button>
           ))}
         </div>
-        <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="🔍 Client, produit ou mot-clé…"
+        <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Client, produit ou mot-clé…"
           style={{ ...inp, width:260 }}/>
       </div>
 
@@ -128,7 +128,7 @@ export default function BoutiqueReviewsPage() {
           <div key={i} style={{ backgroundColor:'#fff', borderRadius:14, padding:20 }}><div style={skLine}/></div>
         )) : filtered.length === 0 ? (
           <div style={{ textAlign:'center', padding:'60px 0', backgroundColor:'#fff', borderRadius:16, boxShadow:'0 2px 12px rgba(0,0,0,0.06)', border:'1px solid rgba(0,0,0,0.06)' }}>
-            <div style={{ fontSize:48, marginBottom:12 }}>⭐</div>
+            <div style={{ fontSize:48, marginBottom:12 }}></div>
             <p style={{ fontFamily:"'Playfair Display', serif", fontSize:16, fontWeight:600, color:'#111827', margin:0 }}>Aucun avis trouvé</p>
             <p style={{ fontFamily:'Inter, sans-serif', fontSize:13, color:'#6B7280' }}>Essayez de modifier vos filtres</p>
           </div>
@@ -175,10 +175,10 @@ export default function BoutiqueReviewsPage() {
             {/* Actions */}
             <div style={{ display:'flex', gap:8, marginLeft:52, marginTop:r.reply||replyingId===r.id?12:0 }}>
               {!r.reply && replyingId !== r.id && (
-                <button onClick={()=>{setReplyingId(r.id);setReplyText('');}} style={actionBtn}>💬 Répondre</button>
+                <button onClick={()=>{setReplyingId(r.id);setReplyText('');}} style={actionBtn}>Répondre</button>
               )}
               {!r.reported && (
-                <button onClick={()=>handleReport(r.id)} style={{ ...actionBtn, color:'#dc2626', borderColor:'#fecaca' }}>🚩 Signaler</button>
+                <button onClick={()=>handleReport(r.id)} style={{ ...actionBtn, color:'#dc2626', borderColor:'#fecaca' }}>Signaler</button>
               )}
             </div>
           </div>

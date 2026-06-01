@@ -18,10 +18,10 @@ const ROUTE_LABELS = {
 };
 
 const LANGS = [
-  { code: 'fr', label: '🇫🇷 FR' },
-  { code: 'en', label: '🇬🇧 EN' },
-  { code: 'ar', label: '🇸🇦 AR' },
-  { code: 'es', label: '🇪🇸 ES' },
+  { code: 'fr', label: 'FR' },
+  { code: 'en', label: 'EN' },
+  { code: 'ar', label: 'AR' },
+  { code: 'es', label: 'ES' },
 ];
 
 /* ── SVG Icons ─────────────────────────────────────────────── */
@@ -322,7 +322,7 @@ function Header({ onMenuToggle, isDark }) {
         <div ref={langRef} style={{ position: 'relative' }}>
           <button onClick={() => { setShowLang(v => !v); setShowBell(false); setShowUser(false); }}
             style={{ ...iconBtn, width: 'auto', padding: '0 12px', borderRadius: 20, fontFamily: 'Inter, sans-serif', fontSize: 12, fontWeight: 500, gap: 4, color: txt }}>
-            {LANGS.find(l => l.code === lang)?.label || '🇫🇷 FR'}
+            {LANGS.find(l => l.code === lang)?.label || 'FR'}
           </button>
           {showLang && (
             <div style={{ ...dropStyle, minWidth: 130, padding: 6 }}>

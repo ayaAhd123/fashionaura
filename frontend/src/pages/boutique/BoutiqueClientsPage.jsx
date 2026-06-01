@@ -55,9 +55,9 @@ function ClientModal({ client, onClose }) {
         <div style={{ padding:'24px 28px', display:'flex', flexDirection:'column', gap:20 }}>
           {/* Stats */}
           <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:12 }}>
-            {[['Commandes', client.orders, '🛍'], ['Total dépensé', `${client.total.toLocaleString('fr-FR')} MAD`, '💰'], ['Membre depuis', client.since.split('-')[0], '📅']].map(([label,value,icon])=>(
+            {[['Commandes', client.orders, 'C'], ['Total dépensé', `${client.total.toLocaleString('fr-FR')} MAD`, 'M'], ['Membre depuis', client.since.split('-')[0], 'D']].map(([label,value,icon])=>(
               <div key={label} style={{ backgroundColor:'#F9FAFB', borderRadius:10, padding:'14px', textAlign:'center' }}>
-                <div style={{ fontSize:22, marginBottom:6 }}>{icon}</div>
+                <div style={{ fontSize:14, fontWeight:700, color:'#1B3A35', marginBottom:6, fontFamily:'Inter, sans-serif' }}>{icon}</div>
                 <p style={{ fontFamily:"'Playfair Display', serif", fontSize:18, fontWeight:700, color:'#111827', margin:'0 0 2px' }}>{value}</p>
                 <p style={{ fontFamily:'Inter, sans-serif', fontSize:11, color:'#9CA3AF', margin:0 }}>{label}</p>
               </div>
@@ -149,12 +149,12 @@ export default function BoutiqueClientsPage() {
           <h2 style={pageTitle}>Clients</h2>
           <p style={pageSub}>{filtered.length} client(s) · {clients.filter(c=>c.status==='vip').length} VIP</p>
         </div>
-        <button onClick={exportCSV} style={outlineBtn}>⬇ Exporter CSV</button>
+        <button onClick={exportCSV} style={outlineBtn}> Exporter CSV</button>
       </div>
 
       {/* Filters */}
       <div style={{ display:'flex', gap:10, flexWrap:'wrap' }}>
-        <input value={search} onChange={e=>{setSearch(e.target.value);setPage(1);}} placeholder="🔍 Nom, email ou ville…"
+        <input value={search} onChange={e=>{setSearch(e.target.value);setPage(1);}} placeholder="Nom, email ou ville…"
           style={{ ...inp, width:260 }}/>
         <select value={statusFilter} onChange={e=>{setStatusFilter(e.target.value);setPage(1);}} style={{ ...inp, width:160 }}>
           <option value="">Tous les clients</option>
@@ -185,7 +185,6 @@ export default function BoutiqueClientsPage() {
                 <tr key={i}><td colSpan={7} style={{ padding:16 }}><div style={skLine}/></td></tr>
               )) : paginated.length === 0 ? (
                 <tr><td colSpan={7} style={{ textAlign:'center', padding:'60px 0' }}>
-                  <div style={{ fontSize:48, marginBottom:12 }}>👥</div>
                   <p style={{ fontFamily:"'Playfair Display', serif", fontSize:16, fontWeight:600, color:'#111827', margin:0 }}>Aucun client trouvé</p>
                 </td></tr>
               ) : paginated.map(c => {
