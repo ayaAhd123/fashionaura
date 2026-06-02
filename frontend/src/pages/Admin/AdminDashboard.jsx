@@ -9,12 +9,12 @@ import toast from 'react-hot-toast';
 
 /* ── Card configs ─────────────────────────────────────────── */
 const CARD_GRADIENTS = [
-  { gradient: 'linear-gradient(135deg,#f0fdf4,#dcfce7)', iconColor: '#16a34a', icon: <BoutiqueIcon /> },
-  { gradient: 'linear-gradient(135deg,#eff6ff,#dbeafe)', iconColor: '#2563eb', icon: <CityIcon /> },
-  { gradient: 'linear-gradient(135deg,#fdf4ff,#fae8ff)', iconColor: '#9333ea', icon: <UserIcon /> },
-  { gradient: 'linear-gradient(135deg,#fffbeb,#fef3c7)', iconColor: '#d97706', icon: <OrderIcon /> },
-  { gradient: 'linear-gradient(135deg,#fff1f2,#ffe4e6)', iconColor: '#dc2626', icon: <RevenueIcon /> },
-  { gradient: 'linear-gradient(135deg,#fff7ed,#ffedd5)', iconColor: '#ea580c', icon: <ClockIcon /> },
+  { gradient: 'linear-gradient(135deg, #F2F5F5, #DCE6E5)', iconColor: '#5B7371', icon: <BoutiqueIcon /> },
+  { gradient: 'linear-gradient(135deg, #F2F5F5, #DCE6E5)', iconColor: '#5B7371', icon: <CityIcon /> },
+  { gradient: 'linear-gradient(135deg, #F2F5F5, #DCE6E5)', iconColor: '#5B7371', icon: <UserIcon /> },
+  { gradient: 'linear-gradient(135deg, #F2F5F5, #DCE6E5)', iconColor: '#5B7371', icon: <OrderIcon /> },
+  { gradient: 'linear-gradient(135deg, #F2F5F5, #DCE6E5)', iconColor: '#5B7371', icon: <RevenueIcon /> },
+  { gradient: 'linear-gradient(135deg, #F2F5F5, #DCE6E5)', iconColor: '#5B7371', icon: <ClockIcon /> },
 ];
 
 function BoutiqueIcon() { return <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>; }
@@ -110,9 +110,9 @@ function RecentBoutiquesTable({ boutiques = [], loading, onValidate }) {
 function QuickActions() {
   return (
     <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-      <Link to="/admin/boutiques" style={qBtn('#1B3A35', '#fff')}>+ Boutique</Link>
-      <Link to="/admin/categories" style={qBtn('#2A5248', '#fff')}>+ Catégorie</Link>
-      <button onClick={() => toast.success('Export en cours…')} style={{ ...qBtn('#C9A84C', '#1B3A35'), border: 'none', cursor: 'pointer', textDecoration: 'none' }}>
+      <Link to="/admin/boutiques" style={qBtn('#6B7F6B', '#fff')}>+ Boutique</Link>
+      <Link to="/admin/categories" style={qBtn('#8B9E8B', '#fff')}>+ Catégorie</Link>
+      <button onClick={() => toast.success('Export en cours…')} style={{ ...qBtn('#C4918A', '#fff'), border: 'none', cursor: 'pointer', textDecoration: 'none' }}>
         Exporter rapport
       </button>
     </div>

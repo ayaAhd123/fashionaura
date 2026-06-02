@@ -66,7 +66,7 @@ function Sidebar({ collapsed, onToggle }) {
   return (
     <aside style={{
       width: collapsed ? 64 : 240,
-      backgroundColor: '#1B3A35',
+      backgroundColor: '#69807E',
       display: 'flex',
       flexDirection: 'column',
       position: 'fixed',
@@ -80,7 +80,7 @@ function Sidebar({ collapsed, onToggle }) {
       {/* Logo area */}
       <div style={{
         padding: collapsed ? '20px 0' : '20px 18px',
-        borderBottom: '1px solid rgba(255,255,255,0.07)',
+        borderBottom: '1px solid rgba(255,255,255,0.1)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: collapsed ? 'center' : 'space-between',
@@ -89,13 +89,13 @@ function Sidebar({ collapsed, onToggle }) {
       }}>
         {!collapsed && (
           <div>
-            <p style={{ fontFamily: "'Playfair Display', serif", fontSize: 17, fontWeight: 700, color: '#C9A84C', margin: 0 }}>FashionAura</p>
-            <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 9, letterSpacing: '0.2em', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', margin: 0, marginTop: 2 }}>Administration</p>
+            <p style={{ fontFamily: "'Playfair Display', serif", fontSize: 17, fontWeight: 700, color: '#fff', margin: 0 }}>FashionAura</p>
+            <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 9, letterSpacing: '0.2em', color: 'rgba(255,255,255,0.45)', textTransform: 'uppercase', margin: 0, marginTop: 2 }}>Administration</p>
           </div>
         )}
         {collapsed && (
-          <div style={{ width: 30, height: 30, borderRadius: 8, backgroundColor: '#C9A84C', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <span style={{ fontFamily: "'Playfair Display', serif", fontSize: 13, fontWeight: 700, color: '#1B3A35' }}>FA</span>
+          <div style={{ width: 30, height: 30, borderRadius: 8, backgroundColor: '#C4918A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <span style={{ fontFamily: "'Playfair Display', serif", fontSize: 13, fontWeight: 700, color: '#fff' }}>FA</span>
           </div>
         )}
         {/* Collapse toggle */}
@@ -107,7 +107,7 @@ function Sidebar({ collapsed, onToggle }) {
             backgroundColor: 'rgba(255,255,255,0.12)',
             border: 'none', cursor: 'pointer',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            color: 'rgba(255,255,255,0.6)',
+            color: 'rgba(255,255,255,0.7)',
             flexShrink: 0,
           }}
         >
@@ -118,7 +118,7 @@ function Sidebar({ collapsed, onToggle }) {
       {/* Nav */}
       <nav style={{ flex: 1, padding: '12px 8px', overflowY: 'auto', overflowX: 'hidden' }}>
         {!collapsed && (
-          <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 9, letterSpacing: '0.18em', color: 'rgba(255,255,255,0.22)', textTransform: 'uppercase', padding: '0 8px', marginBottom: 6, marginTop: 2 }}>
+          <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 9, letterSpacing: '0.18em', color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', padding: '0 8px', marginBottom: 6, marginTop: 2 }}>
             Menu
           </p>
         )}
@@ -137,9 +137,9 @@ function Sidebar({ collapsed, onToggle }) {
               marginBottom: 1,
               textDecoration: 'none',
               transition: 'all 0.18s',
-              backgroundColor: isActive ? '#2A5248' : 'transparent',
-              color: isActive ? '#fff' : 'rgba(255,255,255,0.52)',
-              borderLeft: isActive ? '3px solid #C9A84C' : '3px solid transparent',
+              backgroundColor: isActive ? 'rgba(255,255,255,0.15)' : 'transparent',
+              color: isActive ? '#fff' : 'rgba(255,255,255,0.6)',
+              borderLeft: isActive ? '3px solid #C4918A' : '3px solid transparent',
             })}
           >
             {Ico[icon]}
@@ -149,7 +149,7 @@ function Sidebar({ collapsed, onToggle }) {
           </NavLink>
         ))}
 
-        <div style={{ borderTop: '1px solid rgba(255,255,255,0.07)', marginTop: 10, paddingTop: 10 }}>
+        <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', marginTop: 10, paddingTop: 10 }}>
           <Link
             to="/"
             title="Retour au site"
@@ -158,7 +158,7 @@ function Sidebar({ collapsed, onToggle }) {
               padding: collapsed ? '10px 0' : '9px 10px',
               justifyContent: collapsed ? 'center' : 'flex-start',
               borderRadius: 9, textDecoration: 'none', transition: 'all 0.18s',
-              color: 'rgba(255,255,255,0.52)',
+              color: 'rgba(255,255,255,0.6)',
               borderLeft: '3px solid transparent',
             }}
           >
@@ -169,29 +169,29 @@ function Sidebar({ collapsed, onToggle }) {
       </nav>
 
       {/* User + Logout */}
-      <div style={{ borderTop: '1px solid rgba(255,255,255,0.07)', padding: collapsed ? '10px 0' : '10px 8px', flexShrink: 0 }}>
+      <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', padding: collapsed ? '10px 0' : '10px 8px', flexShrink: 0 }}>
         {!collapsed ? (
           <>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 10px', borderRadius: 9, marginBottom: 2 }}>
-              <div style={{ width: 32, height: 32, borderRadius: '50%', backgroundColor: '#2A5248', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Playfair Display', serif", fontSize: 13, color: '#C9A84C', fontWeight: 700, flexShrink: 0 }}>
+              <div style={{ width: 32, height: 32, borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Playfair Display', serif", fontSize: 13, color: '#fff', fontWeight: 700, flexShrink: 0 }}>
                 {user?.name?.[0]?.toUpperCase() || 'A'}
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 12.5, color: '#fff', fontWeight: 500, margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.name || 'Admin'}</p>
-                <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 10.5, color: 'rgba(255,255,255,0.38)', margin: 0 }}>Administrateur</p>
+                <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 10.5, color: 'rgba(255,255,255,0.45)', margin: 0 }}>Administrateur</p>
               </div>
             </div>
-            <button onClick={handleLogout} className="fa-logout-btn" style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 9, padding: '8px 10px', borderRadius: 9, border: 'none', backgroundColor: 'transparent', cursor: 'pointer', color: 'rgba(255,255,255,0.42)', fontFamily: 'Inter, sans-serif', fontSize: 12.5, transition: 'all 0.18s' }}>
+            <button onClick={handleLogout} className="fa-logout-btn" style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 9, padding: '8px 10px', borderRadius: 9, border: 'none', backgroundColor: 'transparent', cursor: 'pointer', color: 'rgba(255,255,255,0.5)', fontFamily: 'Inter, sans-serif', fontSize: 12.5, transition: 'all 0.18s' }}>
               {Ico.logout}
               <span>Déconnexion</span>
             </button>
           </>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
-            <div title={user?.name || 'Admin'} style={{ width: 32, height: 32, borderRadius: '50%', backgroundColor: '#2A5248', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Playfair Display', serif", fontSize: 13, color: '#C9A84C', fontWeight: 700 }}>
+            <div title={user?.name || 'Admin'} style={{ width: 32, height: 32, borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Playfair Display', serif", fontSize: 13, color: '#fff', fontWeight: 700 }}>
               {user?.name?.[0]?.toUpperCase() || 'A'}
             </div>
-            <button onClick={handleLogout} title="Déconnexion" style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.42)', padding: 5, borderRadius: 7 }}>
+            <button onClick={handleLogout} title="Déconnexion" style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.5)', padding: 5, borderRadius: 7 }}>
               {Ico.logout}
             </button>
           </div>
@@ -291,7 +291,7 @@ function Header({ onMenuToggle, isDark }) {
           <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 1 }}>
             <span style={{ fontFamily: 'Inter, sans-serif', fontSize: 11.5, color: muted }}>Admin</span>
             <span style={{ color: muted, fontSize: 11 }}>›</span>
-            <span style={{ fontFamily: 'Inter, sans-serif', fontSize: 11.5, color: '#C9A84C', fontWeight: 600 }}>{breadcrumb}</span>
+            <span style={{ fontFamily: 'Inter, sans-serif', fontSize: 11.5, color: '#C4918A', fontWeight: 600 }}>{breadcrumb}</span>
           </div>
           <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 10.5, color: muted, margin: 0, textTransform: 'capitalize' }}>{today}</p>
         </div>
@@ -330,9 +330,9 @@ function Header({ onMenuToggle, isDark }) {
                 <button key={l.code} onClick={() => changeLang(l.code)} style={{
                   display: 'block', width: '100%', textAlign: 'left', padding: '8px 11px',
                   border: 'none', borderRadius: 8, cursor: 'pointer',
-                  backgroundColor: lang === l.code ? (isDark ? 'rgba(201,168,76,0.15)' : '#fef9ed') : 'transparent',
+                  backgroundColor: lang === l.code ? (isDark ? 'rgba(196,145,138,0.15)' : '#FDF5F3') : 'transparent',
                   fontFamily: 'Inter, sans-serif', fontSize: 12.5,
-                  color: lang === l.code ? '#C9A84C' : txt,
+                  color: lang === l.code ? '#C4918A' : txt,
                   fontWeight: lang === l.code ? 600 : 400,
                 }}>{l.label}</button>
               ))}
@@ -359,14 +359,14 @@ function Header({ onMenuToggle, isDark }) {
                 <span style={{ fontFamily: 'Inter, sans-serif', fontSize: 13.5, fontWeight: 600, color: txt }}>
                   Notifications {unreadCount > 0 && <span style={{ backgroundColor: '#EF4444', color: '#fff', borderRadius: 20, fontSize: 10, padding: '1px 6px', marginLeft: 4 }}>{unreadCount}</span>}
                 </span>
-                <button style={{ fontFamily: 'Inter, sans-serif', fontSize: 11, color: '#1B3A35', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 600 }}>
+                <button style={{ fontFamily: 'Inter, sans-serif', fontSize: 11, color: '#6B7F6B', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 600 }}>
                   Tout lire
                 </button>
               </div>
               <div style={{ maxHeight: 280, overflowY: 'auto' }}>
                 {mockNotifs.map(n => (
-                  <div key={n.id} style={{ padding: '11px 18px', display: 'flex', gap: 10, alignItems: 'flex-start', borderBottom: `1px solid ${bdr}`, backgroundColor: n.read ? 'transparent' : (isDark ? 'rgba(201,168,76,0.06)' : 'rgba(201,168,76,0.05)') }}>
-                    <div style={{ width: 7, height: 7, borderRadius: '50%', backgroundColor: n.read ? 'transparent' : '#C9A84C', marginTop: 5, flexShrink: 0 }} />
+                  <div key={n.id} style={{ padding: '11px 18px', display: 'flex', gap: 10, alignItems: 'flex-start', borderBottom: `1px solid ${bdr}`, backgroundColor: n.read ? 'transparent' : (isDark ? 'rgba(196,145,138,0.06)' : 'rgba(196,145,138,0.05)') }}>
+                    <div style={{ width: 7, height: 7, borderRadius: '50%', backgroundColor: n.read ? 'transparent' : '#C4918A', marginTop: 5, flexShrink: 0 }} />
                     <div>
                       <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 12.5, color: txt, fontWeight: n.read ? 400 : 500, margin: 0 }}>{n.text}</p>
                       <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 10.5, color: muted, margin: '2px 0 0' }}>{n.time}</p>
@@ -375,7 +375,7 @@ function Header({ onMenuToggle, isDark }) {
                 ))}
               </div>
               <div style={{ padding: '10px 18px', textAlign: 'center' }}>
-                <a href="/admin/notifications" style={{ fontFamily: 'Inter, sans-serif', fontSize: 12, color: '#1B3A35', textDecoration: 'none', fontWeight: 600 }}>Voir toutes →</a>
+                <a href="/admin/notifications" style={{ fontFamily: 'Inter, sans-serif', fontSize: 12, color: '#6B7F6B', textDecoration: 'none', fontWeight: 600 }}>Voir toutes →</a>
               </div>
             </div>
           )}
@@ -383,7 +383,7 @@ function Header({ onMenuToggle, isDark }) {
 
         {/* Avatar */}
         <div ref={userRef} style={{ position: 'relative' }}>
-          <button onClick={() => { setShowUser(v => !v); setShowBell(false); setShowLang(false); }} style={{ width: 36, height: 36, borderRadius: '50%', backgroundColor: '#1B3A35', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Playfair Display', serif", fontSize: 14, color: '#C9A84C', fontWeight: 700 }}>
+          <button onClick={() => { setShowUser(v => !v); setShowBell(false); setShowLang(false); }} style={{ width: 36, height: 36, borderRadius: '50%', backgroundColor: '#6B7F6B', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Playfair Display', serif", fontSize: 14, color: '#F5F0EB', fontWeight: 700 }}>
             {user?.name?.[0]?.toUpperCase() || 'A'}
           </button>
           {showUser && (
@@ -420,7 +420,7 @@ export default function AdminLayout() {
     });
   };
 
-  const bg = isDark ? '#0F1117' : '#F5F7FA';
+  const bg = isDark ? '#0F1117' : '#F5F0EB';
 
   return (
     <>
@@ -428,7 +428,7 @@ export default function AdminLayout() {
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
         *, *::before, *::after { box-sizing: border-box; }
         body { margin: 0; }
-        .fa-logout-btn:hover { color: rgba(255,255,255,0.8) !important; background: rgba(255,255,255,0.07) !important; }
+        .fa-logout-btn:hover { color: rgba(255,255,255,0.9) !important; background: rgba(255,255,255,0.08) !important; }
         .fa-stats-card { transition: transform 0.3s ease, box-shadow 0.3s ease !important; }
         .fa-stats-card:hover { transform: translateY(-4px) !important; box-shadow: 0 8px 28px rgba(0,0,0,0.13) !important; }
         @keyframes fa-pulse { 0%,100%{opacity:1} 50%{opacity:.45} }
